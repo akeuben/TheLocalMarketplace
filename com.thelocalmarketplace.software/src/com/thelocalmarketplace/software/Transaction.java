@@ -13,17 +13,23 @@ public class Transaction {
     private static final ArrayList<BarcodedProduct> products = new ArrayList<>();
     
     private static double expectedWeight=0.0;
+    
+    private static long totalCost = 0;
 
     /**
      * Adds product to transaction array list
      * Adds weight to total expected weight
+     * Adds cost of item to total cost
+     * Prints item description
      * @param barcode
      */
     public static void addItem(Barcode barcode) {
         if (barcode != null) {
             BarcodedProduct product = BARCODED_PRODUCT_DATABASE.get(barcode);
             products.add(product);
+            totalCost = totalCost + product.getPrice();
             expectedWeight = expectedWeight+product.getExpectedWeight();
+            System.out.println(product.getDescription());
         }
         else {
             throw new NullPointerException("barcode");
@@ -38,5 +44,10 @@ public class Transaction {
     public double getExpectedWeight() {
 		return expectedWeight;
     }
+    
+    public long getTotalCost() {
+    	return totalCost;
+    }
+    
 		
 }
