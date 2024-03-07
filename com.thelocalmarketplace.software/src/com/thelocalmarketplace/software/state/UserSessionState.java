@@ -1,5 +1,10 @@
 package com.thelocalmarketplace.software.state;
 
+import java.math.BigDecimal;
+
+import com.jjjwelectronics.Mass;
+import com.thelocalmarketplace.hardware.Product;
+
 public enum UserSessionState implements IUserSessionStateActions<UserSessionState> {
 	/**
 	 * This state is used when the system
@@ -24,17 +29,17 @@ public enum UserSessionState implements IUserSessionStateActions<UserSessionStat
 	}
 
 	@Override
-	public UserSessionState addItem() {
-		return this.state.addItem();
+	public UserSessionState addItem(Product product) {
+		return this.state.addItem(product);
 	}
 
 	@Override
-	public UserSessionState weightChanged() {
-		return this.state.weightChanged();
+	public UserSessionState weightChanged(Mass mass) {
+		return this.state.weightChanged(mass);
 	}
 
 	@Override
-	public UserSessionState paymentAdded() {
-		return this.state.paymentAdded();
+	public UserSessionState paymentAdded(BigDecimal amount, PaymentSource source) {
+		return this.state.paymentAdded(amount, source);
 	}
 }
