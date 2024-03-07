@@ -1,9 +1,5 @@
 package com.thelocalmarketplace.software.state;
 
-<<<<<<< Updated upstream
-public enum UserSessionState {
-	
-=======
 public enum UserSessionState implements IUserSessionStateActions<UserSessionState> {
 	/**
 	 * This state is used when the system
@@ -44,5 +40,4 @@ public enum UserSessionState implements IUserSessionStateActions<UserSessionStat
 		// TODO Auto-generated method stub
 		return null;
 	}
->>>>>>> Stashed changes
 }
