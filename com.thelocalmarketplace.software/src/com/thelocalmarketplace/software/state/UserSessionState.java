@@ -17,27 +17,24 @@ public enum UserSessionState implements IUserSessionStateActions<UserSessionStat
 	 */
 	READY_FOR_PAYMENT(null);
 	
-	private Object state;
+	private IUserSessionState<UserSessionState> state;
 	
-	private UserSessionState(Object sessionState) {
+	private UserSessionState(IUserSessionState<UserSessionState> sessionState) {
 		this.state = sessionState;
 	}
 
 	@Override
 	public UserSessionState addItem() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.state.addItem();
 	}
 
 	@Override
 	public UserSessionState weightChanged() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.state.weightChanged();
 	}
 
 	@Override
 	public UserSessionState paymentAdded() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.state.paymentAdded();
 	}
 }
