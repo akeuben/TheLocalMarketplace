@@ -1,3 +1,5 @@
+package com.thelocalmarketplace.software;
+
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import java.util.ArrayList;
 import com.jjjwelectronics.scanner.Barcode;
@@ -8,20 +10,33 @@ public class Transaction {
     /**
      * Items contained in an instance of transaction TODO Create constructor
      */
-    public static final ArrayList<BarcodedProduct> products = new ArrayList<>();
+    private static final ArrayList<BarcodedProduct> products = new ArrayList<>();
+    
+    private static double expectedWeight=0.0;
 
     /**
      * Adds product to transaction array list
+     * Adds weight to total expected weight
      * @param barcode
      */
     public static void addItem(Barcode barcode) {
         if (barcode != null) {
             BarcodedProduct product = BARCODED_PRODUCT_DATABASE.get(barcode);
             products.add(product);
+            expectedWeight = expectedWeight+product.getExpectedWeight();
         }
         else {
             throw new NullPointerException("barcode");
         }
 
     }
+    
+    /**
+     * Getter method for expected weight
+     * @return expectedWeight
+     */
+    public double getExpectedWeight() {
+		return expectedWeight;
+    }
+		
 }
