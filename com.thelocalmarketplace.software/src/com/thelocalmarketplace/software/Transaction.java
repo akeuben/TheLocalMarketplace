@@ -23,7 +23,7 @@ public class Transaction {
      * Prints item description
      * @param barcode
      */
-    public static void addItem(Barcode barcode) {
+    public static void addItem(Barcode barcode) { //TODO Remove method when necessary
         if (barcode != null) {
             BarcodedProduct product = BARCODED_PRODUCT_DATABASE.get(barcode);
             products.add(product);
@@ -35,6 +35,22 @@ public class Transaction {
             throw new NullPointerException("barcode");
         }
 
+    }
+
+    /**
+     * Adds a product into the current transaction
+     * @param product item being added to transaction/products
+     */
+    public static void addItem(Product product) {
+        if (product != null) {
+            products.add(product);
+            totalCost += product.getPrice();
+            expectedWeight += product.getExpectedWeight();
+            System.out.println(product.getDescription());
+        }
+        else {
+            throw new NullPointerException("barcode");
+        }
     }
     
     /**
