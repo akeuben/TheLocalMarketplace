@@ -12,11 +12,11 @@ import com.tdc.coin.CoinValidator;
 import com.tdc.coin.CoinValidatorObserver;
 
 public class CashPayment extends IPayment {
-	private static long amount=0;
-    private long amountPaid;
+	private static BigDecimal amount= BigDecimal.ZERO; // Don't think this is needed
+    private BigDecimal amountPaid;
     private CoinValidatorObserverPayment observer;
 
-    public CashPayment(long amountPaid) {
+    public CashPayment(BigDecimal amountPaid) {
         this.amountPaid = amountPaid;
     }
 
@@ -29,7 +29,7 @@ public class CashPayment extends IPayment {
     @Override
     public boolean processPayment(CoinValidator cv) {
     	cv.attach(observer);
-        if (amountPaid >= amount) {
+        if (amountPaid.compareTo(amount) >= 0) {
             System.out.println("Cash Payment Accepted");
             return true;
         } else {
@@ -67,8 +67,7 @@ public class CashPayment extends IPayment {
 
 		@Override
 		public void validCoinDetected(CoinValidator validator, BigDecimal value) {
-			long val = value.longValue();
-			amount = amount + val;
+			amount = amount.add(value);
 			
 		}
 
@@ -79,11 +78,12 @@ public class CashPayment extends IPayment {
 		}
     	
     }
+    
 
 
 	@Override
-	public boolean processPayment(long amount) {
-        if (amountPaid >= amount) {
+	public boolean processPayment(BigDecimal amount) {
+        if (amountPaid.compareTo(amount) >= 0) {
             System.out.println("Cash Payment Accepted");
             return true;
         } else {

@@ -1,6 +1,9 @@
 package com.thelocalmarketplace.software;
 
 import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.hardware.Product;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import com.thelocalmarketplace.software.IPayment;
 import java.util.HashMap;
@@ -13,11 +16,11 @@ public class Transaction {
     /**
      * Items contained in an instance of transaction TODO Create constructor
      */
-    private static final ArrayList<BarcodedProduct> products = new ArrayList<>();
+    private static final ArrayList<Product> products = new ArrayList<>();
     
     private static double expectedWeight=0.0;
     
-    private static long totalCost = 0;
+    private static BigDecimal totalCost = BigDecimal.ZERO;
 
     private static final HashMap<UUID, IPayment> payments = new HashMap<>();
 
@@ -32,7 +35,7 @@ public class Transaction {
         if (barcode != null) {
             BarcodedProduct product = BARCODED_PRODUCT_DATABASE.get(barcode);
             products.add(product);
-            totalCost = totalCost + product.getPrice();
+            totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()));
             expectedWeight = expectedWeight+product.getExpectedWeight();
             System.out.println(product.getDescription());
         }
@@ -49,7 +52,7 @@ public class Transaction {
     public static void addItem(Product product) {
         if (product != null) {
             products.add(product);
-            totalCost += product.getPrice();
+            totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()));
             expectedWeight += product.getExpectedWeight();
             System.out.println(product.getDescription());
         }
@@ -58,15 +61,6 @@ public class Transaction {
         }
     }
 
-    /**
-     * Reset Transaction
-     * A method to reset the transaction could be useful after successful payment
-     */
-    private static void resetTransaction() {
-        products.clear();
-        totalCost = 0;
-        expectedWeight = 0.0;
-    }
 
 
     /**
@@ -75,17 +69,13 @@ public class Transaction {
      * @param paymentMethod, type of payment method used, must be initialized so amountPaid is already defined
      */
     public static void addPayment(IPayment paymentMethod) {
-        UUID transactionId = UUID.randomUUID(); // Generate a unique ID for this transaction/payment
-        if (paymentMethod.processPayment(totalCost)) {
-            payments.put(transactionId, paymentMethod);
-            System.out.println("Payment added successfully for transaction ID: " + transactionId);
-            // Assuming the entire total cost is paid successfully
-            totalCost = 0;
-//            resetTransaction(); // Optionally, reset the transaction for the next custmer
-        } else {
-            System.out.println("Payment failed to process");
-        }
+    	UUID transactionId = UUID.randomUUID(); // Generate a unique ID for this transaction/payment
+    	payments.put(transactionId, paymentMethod); // Add payment to HashMap
+    	totalCost = totalCost.subtract(paymentMethod.getAmountPaid());
     }
+
+    
+
     
     /**
      * Getter method for expected weight
@@ -95,7 +85,7 @@ public class Transaction {
 		return expectedWeight;
     }
     
-    public long getTotalCost() {
+    public BigDecimal getTotalCost() {
     	return totalCost;
     }
     
