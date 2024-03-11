@@ -24,28 +24,11 @@ public class Transaction {
 
     private static final HashMap<UUID, IPayment> payments = new HashMap<>();
 
-    /**
-     * Adds product to transaction array list
-     * Adds weight to total expected weight
-     * Adds cost of item to total cost
-     * Prints item description
-     * @param barcode
-     */
-    public static void addItem(Barcode barcode) { //TODO Remove method when necessary
-        if (barcode != null) {
-            BarcodedProduct product = BARCODED_PRODUCT_DATABASE.get(barcode);
-            products.add(product);
-            totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()));
-            expectedWeight = expectedWeight+product.getExpectedWeight();
-        }
-        else {
-            throw new NullPointerException("barcode");
-        }
-
-    }
 
     /**
      * Adds a product into the current transaction
+     * Adds weight to total expected weight
+     * Adds cost of item to total cost
      * @param product item being added to transaction/products
      */
     public static void addItem(Product product) {

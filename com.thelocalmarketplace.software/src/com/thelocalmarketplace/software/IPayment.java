@@ -7,7 +7,6 @@ import java.math.BigDecimal;
  */
 
 public abstract class IPayment {
-    public abstract boolean processPayment(BigDecimal amount);
     private BigDecimal amountPaid;
     
     

@@ -19,21 +19,6 @@ public class CashPayment extends IPayment {
         this.amountPaid = amountPaid;
     }
 
-    /**
-    *
-    * @param amount given
-    * @return T/F the payment has been processed
-    */
-	@Override
-	public boolean processPayment(BigDecimal amount) {
-        if (amountPaid.compareTo(amount) >= 0) {
-            System.out.println("Cash Payment Accepted");
-            return true;
-        } else {
-            System.out.println("Insufficent Cash Provided");
-            return false;
-        }
-	}
 
 
 }
