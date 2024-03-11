@@ -1,6 +1,5 @@
 package com.thelocalmarketplace.software;
 
-import com.tdc.coin.CoinValidator;
 import java.math.BigDecimal;
 
 /**
@@ -9,7 +8,6 @@ import java.math.BigDecimal;
 
 public abstract class IPayment {
     public abstract boolean processPayment(BigDecimal amount);
-    public abstract boolean processPayment(CoinValidator cv);
     private BigDecimal amountPaid;
     
     

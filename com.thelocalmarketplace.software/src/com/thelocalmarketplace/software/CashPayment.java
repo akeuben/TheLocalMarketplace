@@ -12,76 +12,18 @@ import com.tdc.coin.CoinValidator;
 import com.tdc.coin.CoinValidatorObserver;
 
 public class CashPayment extends IPayment {
-	private static BigDecimal amount= BigDecimal.ZERO; // Don't think this is needed
     private BigDecimal amountPaid;
-    private CoinValidatorObserverPayment observer;
+
 
     public CashPayment(BigDecimal amountPaid) {
         this.amountPaid = amountPaid;
     }
 
-
     /**
-     *
-     * @param amount given
-     * @return T/F the payment has been processed
-     */
-    @Override
-    public boolean processPayment(CoinValidator cv) {
-    	cv.attach(observer);
-        if (amountPaid.compareTo(amount) >= 0) {
-            System.out.println("Cash Payment Accepted");
-            return true;
-        } else {
-            System.out.println("Insufficent Cash Provided");
-            return false;
-        }
-
-    }
-    
-    private static class CoinValidatorObserverPayment implements CoinValidatorObserver {
-    	// I am uncertain to why Overrides were put here, I am commenting them out as to not have errors
-    	
-		//@Override
-		public void enabled(IComponent<? extends IComponentObserver> component) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		//@Override
-		public void disabled(IComponent<? extends IComponentObserver> component) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		//@Override
-		public void turnedOn(IComponent<? extends IComponentObserver> component) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		//@Override
-		public void turnedOff(IComponent<? extends IComponentObserver> component) {
-			// TODO Auto-generated method stub
-			
-		}
-
-		//@Override
-		public void validCoinDetected(CoinValidator validator, BigDecimal value) {
-			amount = amount.add(value);
-			
-		}
-
-		//@Override
-		public void invalidCoinDetected(CoinValidator validator) {
-			// TODO Auto-generated method stub
-			
-		}
-    	
-    }
-    
-
-
+    *
+    * @param amount given
+    * @return T/F the payment has been processed
+    */
 	@Override
 	public boolean processPayment(BigDecimal amount) {
         if (amountPaid.compareTo(amount) >= 0) {
@@ -92,5 +34,6 @@ public class CashPayment extends IPayment {
             return false;
         }
 	}
+
 
 }
