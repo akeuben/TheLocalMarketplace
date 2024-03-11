@@ -48,4 +48,15 @@ public abstract class Product {
 	public boolean isPerUnit() {
 		return isPerUnit;
 	}
+
+	// dummy methods, code in transaction assumes the existence of these methods
+	public double getExpectedWeight() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public String getDescription() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

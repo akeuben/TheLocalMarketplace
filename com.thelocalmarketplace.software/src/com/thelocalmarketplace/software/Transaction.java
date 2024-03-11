@@ -57,7 +57,7 @@ public class Transaction {
             System.out.println(product.getDescription());
         }
         else {
-            throw new NullPointerException("barcode");
+            throw new NullPointerException("product");
         }
     }
 
@@ -81,11 +81,11 @@ public class Transaction {
      * Getter method for expected weight
      * @return expectedWeight
      */
-    public double getExpectedWeight() {
+    public static double getExpectedWeight() {
 		return expectedWeight;
     }
     
-    public BigDecimal getTotalCost() {
+    public static BigDecimal getTotalCost() {
     	return totalCost;
     }
     

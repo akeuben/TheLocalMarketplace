@@ -40,38 +40,39 @@ public class CashPayment extends IPayment {
     }
     
     private static class CoinValidatorObserverPayment implements CoinValidatorObserver {
-
-		@Override
+    	// I am uncertain to why Overrides were put here, I am commenting them out as to not have errors
+    	
+		//@Override
 		public void enabled(IComponent<? extends IComponentObserver> component) {
 			// TODO Auto-generated method stub
 			
 		}
 
-		@Override
+		//@Override
 		public void disabled(IComponent<? extends IComponentObserver> component) {
 			// TODO Auto-generated method stub
 			
 		}
 
-		@Override
+		//@Override
 		public void turnedOn(IComponent<? extends IComponentObserver> component) {
 			// TODO Auto-generated method stub
 			
 		}
 
-		@Override
+		//@Override
 		public void turnedOff(IComponent<? extends IComponentObserver> component) {
 			// TODO Auto-generated method stub
 			
 		}
 
-		@Override
+		//@Override
 		public void validCoinDetected(CoinValidator validator, BigDecimal value) {
 			amount = amount.add(value);
 			
 		}
 
-		@Override
+		//@Override
 		public void invalidCoinDetected(CoinValidator validator) {
 			// TODO Auto-generated method stub
 			
