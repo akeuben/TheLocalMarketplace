@@ -2,27 +2,14 @@ package com.thelocalmarketplace.software.session;
 import com.thelocalmarketplace.software.payment.Transaction;
 import com.thelocalmarketplace.software.state.UserSessionState;
 
-import java.math.BigDecimal;
-
-import com.jjjwelectronics.IDevice;
-import com.jjjwelectronics.IDeviceListener;
-import com.jjjwelectronics.Mass;
-import com.jjjwelectronics.scale.ElectronicScaleListener;
-import com.jjjwelectronics.scale.IElectronicScale;
-import com.jjjwelectronics.scanner.Barcode;
-import com.jjjwelectronics.scanner.BarcodeScannerListener;
-import com.jjjwelectronics.scanner.IBarcodeScanner;
-import com.tdc.IComponent;
-import com.tdc.IComponentObserver;
-import com.tdc.coin.CoinValidator;
-import com.tdc.coin.CoinValidatorObserver;
-
 public class UserSession {
 
     private UserSessionState state;
     private Transaction transaction;
 
     private CoinValidatorHandler coinValidatorHandler;
+    private BarcodeHandler barcodeHandler;
+    private ElectronicScaleHandler electronicScaleHandler;
     
     /**
      * Create a user session. This holds all data pertaining
@@ -34,6 +21,8 @@ public class UserSession {
     	
     	// Initialize the event handlers
     	this.coinValidatorHandler = new CoinValidatorHandler(this);
+    	this.barcodeHandler = new BarcodeHandler(this);
+    	this.electronicScaleHandler = new ElectronicScaleHandler(this);
     }
     
     /**
@@ -67,9 +56,25 @@ public class UserSession {
     
     /**
      * Get the CoinValidatorObserver for the current session
-     * @return
+     * @return The Coin ValidatorObserver
      */
     public CoinValidatorHandler getCoinValidatorHandler() {
     	return this.coinValidatorHandler;
     }
+    
+    /**
+     * Get the BarcodeScannerListener for the current session
+     * @return The BarcodeScannerListener
+     */
+	public BarcodeHandler getBarcodeHandler() {
+		return barcodeHandler;
+	}
+
+	/**
+	 * Get the ElectronicScaleListener for the current session
+	 * @return The ElectronicScaleListener
+	 */
+	public ElectronicScaleHandler getElectronicScaleHandler() {
+		return electronicScaleHandler;
+	}
 }

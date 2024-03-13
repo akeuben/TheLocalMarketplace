@@ -44,12 +44,12 @@ public class CoinPaymentFeature implements SelfCheckoutFeature {
 
 	@Override
 	public void onUserSessionStart(UserSession session) {
-		coinValidator.attach(session);
+		coinValidator.attach(session.getCoinValidatorHandler());
 	}
 	
 	@Override
 	public void onUserSessionEnd(UserSession session) {
-		coinValidator.detach(session);
+		coinValidator.detach(session.getCoinValidatorHandler());
 	}
 
 	public CoinTray getRejectTray() {

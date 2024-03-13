@@ -13,12 +13,12 @@ public class ElectronicScaleFeature implements SelfCheckoutFeature {
 
 	@Override
 	public void onUserSessionStart(UserSession session) {
-		scale.register(session);
+		scale.register(session.getElectronicScaleHandler());
 	}
 
 	@Override
 	public void onUserSessionEnd(UserSession session) {
-		scale.deregister(session);
+		scale.deregister(session.getElectronicScaleHandler());
 	}
 
 	public ElectronicScale getScale() {
