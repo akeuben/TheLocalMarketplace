@@ -105,4 +105,8 @@ public class SelfCheckout {
 		SelfCheckoutFeature feature = this.features.get(featureClass);
 		return featureClass.cast(feature);
 	}
+	
+	public static void unInitialize() {
+		instance = null;
+	}
 }

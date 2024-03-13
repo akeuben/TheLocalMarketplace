@@ -20,11 +20,13 @@ public class SelfCheckoutTest {
 	public void testDoubleInitilization() {
 		SelfCheckout.initialize(SelfCheckoutType.BASIC_CANADA);
 		assertThrows(RuntimeException.class, () -> SelfCheckout.initialize(SelfCheckoutType.BASIC_CANADA));
+		SelfCheckout.unInitialize();
 	}
 	
 	@Test
 	public void testNullType() {
 		assertThrows(NullPointerException.class, () -> SelfCheckout.initialize(null));
+		SelfCheckout.unInitialize();
 	}
 	
 	@Test
@@ -32,6 +34,7 @@ public class SelfCheckoutTest {
 		SelfCheckout check = SelfCheckout.initialize(SelfCheckoutType.BASIC_CANADA);
 		check.startNewSession();
 		assertThrows(RuntimeException.class, () -> check.startNewSession());
+		SelfCheckout.unInitialize();
 	}
 	
 	@Test
@@ -39,11 +42,13 @@ public class SelfCheckoutTest {
 		SelfCheckout check = SelfCheckout.initialize(SelfCheckoutType.BASIC_CANADA);
 		check.startNewSession();
 		assertEquals(check.endCurrentSession(), true);
+		SelfCheckout.unInitialize();
 	}
 	
 	@Test
 	public void testSessionEndsNull() {
 		SelfCheckout check = SelfCheckout.initialize(SelfCheckoutType.BASIC_CANADA);
 		assertEquals(check.endCurrentSession(), false);
+		SelfCheckout.unInitialize();
 	}
 }
