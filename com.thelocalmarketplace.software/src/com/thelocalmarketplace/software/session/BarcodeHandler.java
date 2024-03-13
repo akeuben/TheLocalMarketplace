@@ -5,6 +5,7 @@ import com.jjjwelectronics.IDeviceListener;
 import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.BarcodeScannerListener;
 import com.jjjwelectronics.scanner.IBarcodeScanner;
+import com.thelocalmarketplace.software.state.UserSessionState;
 
 public class BarcodeHandler extends AbstractUserSessionHandler implements BarcodeScannerListener {
 
@@ -26,7 +27,9 @@ public class BarcodeHandler extends AbstractUserSessionHandler implements Barcod
 
 	@Override
 	public void aBarcodeHasBeenScanned(IBarcodeScanner barcodeScanner, Barcode barcode) {
-		getUserSession().getState().onScanBarcode(barcode);
+		UserSessionState newState = getUserSession().getState().onScanBarcode(barcode);
+		if(newState != null) {
+			getUserSession().setState(newState); 
+		}
 	}
-
 }

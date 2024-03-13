@@ -6,7 +6,7 @@ import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.scanner.Barcode;
 
 public interface IUserSessionState<T> {
-	void onStateSet();
+	T onStateSet();
 	void onStateUnset();
 	
 	T onScanBarcode(Barcode barcode);
