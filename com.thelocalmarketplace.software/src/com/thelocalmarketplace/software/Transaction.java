@@ -16,13 +16,14 @@ public class Transaction {
     /**
      * Items contained in an instance of transaction TODO Create constructor
      */
-    private static final ArrayList<Product> products = new ArrayList<>();
+    private final ArrayList<Product> products = new ArrayList<>();
     
-    private static double expectedWeight=0.0;
+    private double expectedWeight=0.0;
     
-    private static BigDecimal totalCost = BigDecimal.ZERO;
+    private BigDecimal totalCost = BigDecimal.ZERO;
 
-    private static final HashMap<UUID, IPayment> payments = new HashMap<>();
+    private final HashMap<UUID, IPayment> payments = new HashMap<>();
+    
 
 
     /**
@@ -31,7 +32,7 @@ public class Transaction {
      * Adds cost of item to total cost
      * @param product item being added to transaction/products
      */
-    public static void addItem(Product product) {
+    public void addItem(Product product) {
         if (product != null) {
             products.add(product);
             totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()));
@@ -48,7 +49,7 @@ public class Transaction {
      * Adds a payment to the transaction by storing in HashMap payments
      * @param paymentMethod, type of payment method used, must be initialized so amountPaid is already defined
      */
-    public static void addPayment(IPayment paymentMethod) {
+    public void addPayment(IPayment paymentMethod) {
     	UUID transactionId = UUID.randomUUID(); // Generate a unique ID for this transaction/payment
     	payments.put(transactionId, paymentMethod); // Add payment to HashMap
     	totalCost = totalCost.subtract(paymentMethod.getAmountPaid());
@@ -58,20 +59,20 @@ public class Transaction {
     /**
      * Prints item descriptions and costs that have been added to transaction 
      */
-    public static void printReceipt() {
-    	for (int i = 0; i < products.size(); i++ ) {
-    		Product printProduct = products.get(i);
-    		System.out.println(printProduct.getDescription()+"\t" + printProduct.getPrice());
-    	}
-    	System.out.println("Total cost: " + totalCost);
-    }
+    //public static void printReceipt() {
+    //	for (int i = 0; i < products.size(); i++ ) {
+    //		Product printProduct = products.get(i);
+    //		System.out.println(printProduct.getDescription()+"\t" + printProduct.getPrice());
+    //	}
+    //	System.out.println("Total cost: " + totalCost);
+    //}
 
     
     /**
      * Getter method for expected weight
      * @return expectedWeight
      */
-    public static double getExpectedWeight() {
+    public double getExpectedWeight() {
 		return expectedWeight;
     }
     
@@ -79,7 +80,7 @@ public class Transaction {
      * Getter method for total cost
      * @return totalCost
      */
-    public static BigDecimal getTotalCost() {
+    public BigDecimal getTotalCost() {
     	return totalCost;
     }
     
