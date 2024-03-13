@@ -1,4 +1,5 @@
 package com.thelocalmarketplace.software.session;
+import com.thelocalmarketplace.software.payment.Transaction;
 import com.thelocalmarketplace.software.state.UserSessionState;
 
 import java.math.BigDecimal;
@@ -16,91 +17,59 @@ import com.tdc.IComponentObserver;
 import com.tdc.coin.CoinValidator;
 import com.tdc.coin.CoinValidatorObserver;
 
-public class UserSession implements CoinValidatorObserver, BarcodeScannerListener, ElectronicScaleListener {
+public class UserSession {
 
-    public UserSessionState state;
+    private UserSessionState state;
+    private Transaction transaction;
+
+    private CoinValidatorHandler coinValidatorHandler;
     
-	@Override
-	public void enabled(IComponent<? extends IComponentObserver> component) {
-		// TODO Auto-generated method stub
-		
+    /**
+     * Create a user session. This holds all data pertaining
+     * to the user during a transaction at a self checkout machine.
+     */
+    public UserSession() {
+    	this.transaction = new Transaction(); 
+    	setState(UserSessionState.READY_FOR_ITEM);
+    	
+    	// Initialize the event handlers
+    	this.coinValidatorHandler = new CoinValidatorHandler(this);
+    }
+    
+    /**
+     * Set the state to a new value
+     * @param newState The new state to set
+     */
+    public void setState(UserSessionState newState) {
+    	if(newState == this.state) return;
+    	
+    	// Send relevant events and update the state field.
+    	this.state.onStateUnset();
+    	this.state = newState;
+    	this.state.onStateSet();
+    }
+    
+    /**
+     * Get the state
+     * @return The state
+     */
+    public UserSessionState getState() {
+		return state;
 	}
 
-	@Override
-	public void disabled(IComponent<? extends IComponentObserver> component) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void turnedOn(IComponent<? extends IComponentObserver> component) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void turnedOff(IComponent<? extends IComponentObserver> component) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void validCoinDetected(CoinValidator validator, BigDecimal value) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void invalidCoinDetected(CoinValidator validator) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void aDeviceHasBeenEnabled(IDevice<? extends IDeviceListener> device) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void aDeviceHasBeenDisabled(IDevice<? extends IDeviceListener> device) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void aDeviceHasBeenTurnedOn(IDevice<? extends IDeviceListener> device) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void aDeviceHasBeenTurnedOff(IDevice<? extends IDeviceListener> device) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void theMassOnTheScaleHasChanged(IElectronicScale scale, Mass mass) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void theMassOnTheScaleHasExceededItsLimit(IElectronicScale scale) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void theMassOnTheScaleNoLongerExceedsItsLimit(IElectronicScale scale) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void aBarcodeHasBeenScanned(IBarcodeScanner barcodeScanner, Barcode barcode) {
-		// TODO Auto-generated method stub
-		
-	}
+	/**
+     * Get the transaction related to this state
+     * @return The transaction related to this state
+     */
+    public Transaction getTransaction() {
+    	return this.transaction;
+    } 
+    
+    /**
+     * Get the CoinValidatorObserver for the current session
+     * @return
+     */
+    public CoinValidatorHandler getCoinValidatorHandler() {
+    	return this.coinValidatorHandler;
+    }
 }

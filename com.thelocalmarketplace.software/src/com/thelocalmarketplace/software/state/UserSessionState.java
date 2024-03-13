@@ -1,5 +1,7 @@
 package com.thelocalmarketplace.software.state;
 
+import java.math.BigDecimal;
+
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.scanner.Barcode;
 import com.tdc.coin.Coin;
@@ -38,8 +40,8 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	}
 
 	@Override
-	public UserSessionState onScanBarcode(Barcode product) {
-		return state.onScanBarcode(product);
+	public UserSessionState onScanBarcode(Barcode barcode) {
+		return state.onScanBarcode(barcode);
 	}
 
 	@Override
@@ -48,7 +50,7 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	}
 
 	@Override
-	public UserSessionState onCoinInserted(Coin coin) {
-		return state.onCoinInserted(coin);
+	public UserSessionState onCoinInserted(BigDecimal value) {
+		return state.onCoinInserted(value);
 	}
 }

@@ -1,5 +1,7 @@
 package com.thelocalmarketplace.software.state;
 
+import java.math.BigDecimal;
+
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.scanner.Barcode;
 import com.tdc.coin.Coin;
@@ -19,7 +21,7 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 	}
 
 	@Override
-	public UserSessionState onScanBarcode(Barcode product) {
+	public UserSessionState onScanBarcode(Barcode barcode) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -31,7 +33,7 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 	}
 
 	@Override
-	public UserSessionState onCoinInserted(Coin coin) {
+	public UserSessionState onCoinInserted(BigDecimal value) {
 		// TODO Auto-generated method stub
 		return null;
 	}

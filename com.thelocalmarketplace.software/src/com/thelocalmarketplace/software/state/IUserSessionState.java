@@ -1,14 +1,15 @@
 package com.thelocalmarketplace.software.state;
 
+import java.math.BigDecimal;
+
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.scanner.Barcode;
-import com.tdc.coin.Coin;
 
 public interface IUserSessionState<T> {
 	void onStateSet();
 	void onStateUnset();
 	
-	T onScanBarcode(Barcode product);
+	T onScanBarcode(Barcode barcode);
 	T onWeightChanged(Mass mass);
-	T onCoinInserted(Coin coin);
+	T onCoinInserted(BigDecimal value);
 }
