@@ -9,17 +9,17 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	 * This state is used when the system
 	 * is ready for an item to be added to the bagging area.
 	 */
-	READY_FOR_ITEM(null),
+	READY_FOR_ITEM(new ReadyForItemState()),
 	/**
 	 * This state is used when the system
 	 * is waiting for an item to be added to the bagging area
 	 */
-	WAITING_FOR_BAGGING(null),
+	WAITING_FOR_BAGGING(new WaitingforBaggingState()),
 	/**
 	 * This state is used when the system
 	 * is ready to accept payment
 	 */
-	READY_FOR_PAYMENT(null);
+	READY_FOR_PAYMENT(new ReadyForPaymentState());
 	
 	private IUserSessionState<UserSessionState> state;
 	
