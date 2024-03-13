@@ -1,15 +1,11 @@
-package com.thelocalmarketplace.software;
-
-import com.thelocalmarketplace.hardware.BarcodedProduct;
-import com.thelocalmarketplace.hardware.Product;
+	package com.thelocalmarketplace.software;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import com.thelocalmarketplace.software.IPayment;
 import java.util.HashMap;
 import java.util.UUID;
-import com.jjjwelectronics.scanner.Barcode;
-import static com.thelocalmarketplace.hardware.external.ProductDatabases.BARCODED_PRODUCT_DATABASE;
+
+import com.thelocalmarketplace.hardware.Product;
 
 public class Transaction {
 
