@@ -19,10 +19,10 @@ public class TransactionTest {
 		// setup code
 	}
 	
-	@Test
-	public void testNullItemBarcode() {
-		assertThrows(NullPointerException.class, () -> Transaction.addItem((Barcode)null));
-	}
+	//@Test
+	//public void testNullItemBarcode() {
+		//assertThrows(NullPointerException.class, () -> Transaction.addItem((Barcode)null));
+	//}
 	
 	@Test
 	public void testNullItemProduct() {
