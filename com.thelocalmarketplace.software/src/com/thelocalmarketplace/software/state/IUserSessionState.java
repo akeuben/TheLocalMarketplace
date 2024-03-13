@@ -1,3 +1,14 @@
-package com.thelocalmarketplace.software.state; 
+package com.thelocalmarketplace.software.state;
 
-public interface IUserSessionState<T> extends IUserSessionStateActions<T>, IStateChangedObserver {}
+import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.scanner.Barcode;
+import com.tdc.coin.Coin;
+
+public interface IUserSessionState<T> {
+	void onStateSet();
+	void onStateUnset();
+	
+	T onScanBarcode(Barcode product);
+	T onWeightChanged(Mass mass);
+	T onCoinInserted(Coin coin);
+}

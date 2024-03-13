@@ -1,11 +1,10 @@
 package com.thelocalmarketplace.software.state;
 
-import java.math.BigDecimal;
-
 import com.jjjwelectronics.Mass;
-import com.thelocalmarketplace.hardware.Product;
+import com.jjjwelectronics.scanner.Barcode;
+import com.tdc.coin.Coin;
 
-public enum UserSessionState implements IUserSessionStateActions<UserSessionState> {
+public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	/**
 	 * This state is used when the system
 	 * is ready for an item to be added to the bagging area.
@@ -29,17 +28,27 @@ public enum UserSessionState implements IUserSessionStateActions<UserSessionStat
 	}
 
 	@Override
-	public UserSessionState addItem(Product product) {
-		return this.state.addItem(product);
+	public void onStateSet() {
+		state.onStateSet();
 	}
 
 	@Override
-	public UserSessionState weightChanged(Mass mass) {
-		return this.state.weightChanged(mass);
+	public void onStateUnset() {
+		state.onStateUnset();
 	}
 
 	@Override
-	public UserSessionState paymentAdded(BigDecimal amount, PaymentSource source) {
-		return this.state.paymentAdded(amount, source);
+	public UserSessionState onScanBarcode(Barcode product) {
+		return state.onScanBarcode(product);
+	}
+
+	@Override
+	public UserSessionState onWeightChanged(Mass mass) {
+		return state.onWeightChanged(mass);
+	}
+
+	@Override
+	public UserSessionState onCoinInserted(Coin coin) {
+		return state.onCoinInserted(coin);
 	}
 }

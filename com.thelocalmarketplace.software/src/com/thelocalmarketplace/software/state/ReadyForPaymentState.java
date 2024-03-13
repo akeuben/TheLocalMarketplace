@@ -1,34 +1,39 @@
 package com.thelocalmarketplace.software.state;
 
 import com.jjjwelectronics.Mass;
-import com.thelocalmarketplace.hardware.Product;
-
-import java.math.BigDecimal;
+import com.jjjwelectronics.scanner.Barcode;
+import com.tdc.coin.Coin;
 
 public class ReadyForPaymentState implements IUserSessionState<UserSessionState> {
 
-    @Override
-    public void onStateSet() {
+	@Override
+	public void onStateSet() {
+		// TODO Auto-generated method stub
+		
+	}
 
-    }
+	@Override
+	public void onStateUnset() {
+		// TODO Auto-generated method stub
+		
+	}
 
-    @Override
-    public void onStateUnset() {
+	@Override
+	public UserSessionState onScanBarcode(Barcode product) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-    }
+	@Override
+	public UserSessionState onWeightChanged(Mass mass) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-    @Override
-    public UserSessionState addItem(Product product) {
-        return null;
-    }
+	@Override
+	public UserSessionState onCoinInserted(Coin coin) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-    @Override
-    public UserSessionState weightChanged(Mass mass) {
-        return null;
-    }
-
-    @Override
-    public UserSessionState paymentAdded(BigDecimal amount, PaymentSource source) {
-        return null;
-    }
 }
