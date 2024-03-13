@@ -28,8 +28,8 @@ public class CoinPaymentFeature implements SelfCheckoutFeature {
 		coinSlot = new CoinSlot();
 		coinValidator = new CoinValidator(currency, supportedDenomination);
 		
-		rejectTray = new CoinTray(1000);
-		overflowTray = new CoinTray(1000);
+		rejectTray = new CoinTray(coinStorageCapacity);
+		overflowTray = new CoinTray(coinStorageCapacity);
 		
 		coinHolders = new HashMap<>();
 		
