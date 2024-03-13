@@ -1,6 +1,6 @@
 package com.thelocalmarketplace.software.feature;
 
-import com.thelocalmarketplace.software.UserSession;
+import com.thelocalmarketplace.software.session.UserSession;
 
 public interface SelfCheckoutFeature {
 	/**

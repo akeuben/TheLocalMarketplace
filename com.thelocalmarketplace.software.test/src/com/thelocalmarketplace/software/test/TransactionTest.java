@@ -9,12 +9,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-//import com.tdc.coin.Coin;
-import com.thelocalmarketplace.software.Transaction;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
+import com.thelocalmarketplace.software.payment.Transaction;
 
 public class TransactionTest {
 	//private Coin coinOne;

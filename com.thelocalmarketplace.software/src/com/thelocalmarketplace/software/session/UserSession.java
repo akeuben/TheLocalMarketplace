@@ -1,4 +1,4 @@
-package com.thelocalmarketplace.software;
+package com.thelocalmarketplace.software.session;
 import com.thelocalmarketplace.software.state.UserSessionState;
 
 import java.math.BigDecimal;

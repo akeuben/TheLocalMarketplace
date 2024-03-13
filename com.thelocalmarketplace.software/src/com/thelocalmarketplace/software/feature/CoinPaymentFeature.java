@@ -12,7 +12,7 @@ import com.tdc.coin.CoinSlot;
 import com.tdc.coin.CoinStorageUnit;
 import com.tdc.coin.CoinValidator;
 import com.thelocalmarketplace.hardware.CoinTray;
-import com.thelocalmarketplace.software.UserSession;
+import com.thelocalmarketplace.software.session.UserSession;
 
 public class CoinPaymentFeature implements SelfCheckoutFeature {
 	

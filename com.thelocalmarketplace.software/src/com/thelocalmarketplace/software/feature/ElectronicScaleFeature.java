@@ -1,7 +1,7 @@
 package com.thelocalmarketplace.software.feature;
 
 import com.jjjwelectronics.scale.ElectronicScale;
-import com.thelocalmarketplace.software.UserSession;
+import com.thelocalmarketplace.software.session.UserSession;
 
 public class ElectronicScaleFeature implements SelfCheckoutFeature {
 	

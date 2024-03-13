@@ -1,7 +1,7 @@
 package com.thelocalmarketplace.software.feature;
 
 import com.jjjwelectronics.scanner.BarcodeScanner;
-import com.thelocalmarketplace.software.UserSession;
+import com.thelocalmarketplace.software.session.UserSession;
 
 public class LaserScannerFeature implements SelfCheckoutFeature {
 	

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.thelocalmarketplace.software.feature.SelfCheckoutFeature;
+import com.thelocalmarketplace.software.session.UserSession;
 
 public class SelfCheckout {
 	
