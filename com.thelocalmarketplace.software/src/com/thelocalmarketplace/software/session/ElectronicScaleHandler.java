@@ -5,6 +5,7 @@ import com.jjjwelectronics.IDeviceListener;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.scale.ElectronicScaleListener;
 import com.jjjwelectronics.scale.IElectronicScale;
+import com.thelocalmarketplace.software.state.UserSessionState;
 
 public class ElectronicScaleHandler extends AbstractUserSessionHandler implements ElectronicScaleListener {
 
@@ -26,7 +27,10 @@ public class ElectronicScaleHandler extends AbstractUserSessionHandler implement
 
 	@Override
 	public void theMassOnTheScaleHasChanged(IElectronicScale scale, Mass mass) {
-		getUserSession().getState().onWeightChanged(mass);
+		UserSessionState newState = getUserSession().getState().onWeightChanged(mass);
+		if(newState != null) {
+			getUserSession().setState(newState); 
+		}
 	}
 
 	@Override

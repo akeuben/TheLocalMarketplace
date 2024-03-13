@@ -9,9 +9,8 @@ import com.tdc.coin.Coin;
 public class ReadyForPaymentState implements IUserSessionState<UserSessionState> {
 
 	@Override
-	public void onStateSet() {
-		// TODO Auto-generated method stub
-		
+	public UserSessionState onStateSet() {
+		return null; 	
 	}
 
 	@Override

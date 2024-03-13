@@ -30,8 +30,8 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	}
 
 	@Override
-	public void onStateSet() {
-		state.onStateSet();
+	public UserSessionState onStateSet() {
+		return state.onStateSet();
 	}
 
 	@Override

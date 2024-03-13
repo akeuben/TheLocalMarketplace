@@ -15,8 +15,8 @@ import java.util.*;
 public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 
 	@Override
-	public void onStateSet() {
-		// do nothing, don't need to set anything
+	public UserSessionState onStateSet() {
+		return null; 
 		
 	}
 

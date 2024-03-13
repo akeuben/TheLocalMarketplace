@@ -6,6 +6,7 @@ import com.tdc.IComponent;
 import com.tdc.IComponentObserver;
 import com.tdc.coin.CoinValidator;
 import com.tdc.coin.CoinValidatorObserver;
+import com.thelocalmarketplace.software.state.UserSessionState;
 
 public class CoinValidatorHandler extends AbstractUserSessionHandler implements CoinValidatorObserver {
 	public CoinValidatorHandler(UserSession session) {
@@ -26,7 +27,10 @@ public class CoinValidatorHandler extends AbstractUserSessionHandler implements 
 
 	@Override
 	public void validCoinDetected(CoinValidator validator, BigDecimal value) {
-		getUserSession().getState().onCoinInserted(value);
+		UserSessionState newState = getUserSession().getState().onCoinInserted(value);
+		if(newState != null) {
+			getUserSession().setState(newState); 
+		}
 	}
 
 	@Override
