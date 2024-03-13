@@ -1,5 +1,6 @@
 package com.thelocalmarketplace.software;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ public class SelfCheckout {
 	private Map<Class<? extends SelfCheckoutFeature>, SelfCheckoutFeature> features;
 	
 	private SelfCheckout(List<SelfCheckoutFeature> features) {
+		this.features = new HashMap<Class<? extends SelfCheckoutFeature>, SelfCheckoutFeature>();
 		// Add the specified features.
 		for(SelfCheckoutFeature feature : features) {
 			this.features.put(feature.getClass(), feature);
@@ -40,7 +42,7 @@ public class SelfCheckout {
 	 * @throws RuntimeException If there is already a self checkout instance
 	 */
 	public static SelfCheckout initialize(SelfCheckoutType type) throws RuntimeException {
-		if(instance == null) throw new RuntimeException("There is already a self checkout initialized!");
+		if(instance != null) throw new RuntimeException("There is already a self checkout initialized!");
 		instance = new SelfCheckout(type.getSupportedFeatures());
 		return instance;
 	}

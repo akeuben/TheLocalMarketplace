@@ -17,6 +17,7 @@ import com.thelocalmarketplace.software.UserSession;
 public class CoinPaymentFeature implements SelfCheckoutFeature {
 	
 	private CoinTray rejectTray;
+	private CoinTray overflowTray;
 	private CoinSlot coinSlot;
 	private CoinValidator coinValidator;
 	
@@ -28,6 +29,7 @@ public class CoinPaymentFeature implements SelfCheckoutFeature {
 		coinValidator = new CoinValidator(currency, supportedDenomination);
 		
 		rejectTray = new CoinTray(1000);
+		overflowTray = new CoinTray(1000);
 		
 		coinHolders = new HashMap<>();
 		
@@ -35,7 +37,7 @@ public class CoinPaymentFeature implements SelfCheckoutFeature {
 			coinHolders.put(denomination, new CoinStorageUnit(coinStorageCapacity));
 		}
 		
-		coinValidator.setup(rejectTray, coinHolders, rejectTray);
+		coinValidator.setup(rejectTray, coinHolders, overflowTray);
 		
 		coinSlot.sink = coinValidator;
 	}
