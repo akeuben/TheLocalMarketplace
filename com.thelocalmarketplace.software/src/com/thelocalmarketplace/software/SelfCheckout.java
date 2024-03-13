@@ -92,4 +92,16 @@ public class SelfCheckout {
 		return this.features.containsKey(feature);
 	}
 	
+	/**
+	 * Gets the specified feature from the self checkout
+	 * @param <T> The feature type
+	 * @param featureClass The class of the feature type
+	 * @return The feature, or null if the self checkout machine does not include the specified feature.
+	 */
+	public <T extends SelfCheckoutFeature> T getFeature(Class<T> featureClass) {
+		if(!supportsFeature(featureClass)) return null;
+		SelfCheckoutFeature feature = this.features.get(featureClass);
+		return featureClass.cast(feature);
+	}
+	
 }

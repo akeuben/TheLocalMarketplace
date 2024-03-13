@@ -21,4 +21,8 @@ public class LaserScannerFeature implements SelfCheckoutFeature {
 		scanner.deregister(session);
 	}
 
+	public BarcodeScanner getScanner() {
+		return scanner;
+	}
+
 }

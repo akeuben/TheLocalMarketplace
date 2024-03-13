@@ -49,4 +49,21 @@ public class CoinPaymentFeature implements SelfCheckoutFeature {
 	public void onUserSessionEnd(UserSession session) {
 		coinValidator.detach(session);
 	}
+
+	public CoinTray getRejectTray() {
+		return rejectTray;
+	}
+
+	public CoinSlot getCoinSlot() {
+		return coinSlot;
+	}
+
+	public CoinValidator getCoinValidator() {
+		return coinValidator;
+	}
+
+	public Map<BigDecimal, Sink<Coin>> getCoinHolders() {
+		return coinHolders;
+	}
+	
 }

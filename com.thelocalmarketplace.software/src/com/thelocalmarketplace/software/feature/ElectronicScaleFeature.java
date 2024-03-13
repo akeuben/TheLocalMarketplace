@@ -21,4 +21,8 @@ public class ElectronicScaleFeature implements SelfCheckoutFeature {
 		scale.deregister(session);
 	}
 
+	public ElectronicScale getScale() {
+		return scale;
+	}
+
 }
