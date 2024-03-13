@@ -9,6 +9,7 @@ import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.feature.ElectronicScaleFeature;
+import com.thelocalmarketplace.software.payment.Transaction;
 
 import java.util.*; 
 public class ReadyForItemState implements IUserSessionState<UserSessionState> {
@@ -21,13 +22,14 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 
 	@Override
 	public void onStateUnset() throws RuntimeException{
-		throw new RuntimeException(""); // throws an exception for now
 		
 	}
 
 	@Override
 	public UserSessionState onScanBarcode(Barcode barcode) {
 		Product barcodeProduct = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
+		Transaction currentTransaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();
+		currentTransaction.addItem(barcodeProduct);
 		if(SelfCheckout.getInstance().supportsFeature(ElectronicScaleFeature.class)){
 			return UserSessionState.WAITING_FOR_BAGGING;	
 		}
