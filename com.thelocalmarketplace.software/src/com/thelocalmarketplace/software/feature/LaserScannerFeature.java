@@ -13,12 +13,12 @@ public class LaserScannerFeature implements SelfCheckoutFeature {
 
 	@Override
 	public void onUserSessionStart(UserSession session) {
-		scanner.register(session);
+		scanner.register(session.getBarcodeHandler());
 	}
 
 	@Override
 	public void onUserSessionEnd(UserSession session) {
-		scanner.deregister(session);
+		scanner.deregister(session.getBarcodeHandler());
 	}
 
 	public BarcodeScanner getScanner() {
