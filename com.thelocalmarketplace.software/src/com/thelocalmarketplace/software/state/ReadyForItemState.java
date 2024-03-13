@@ -5,30 +5,40 @@ import java.math.BigDecimal;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.scanner.Barcode;
 import com.tdc.coin.Coin;
+import com.thelocalmarketplace.hardware.external.ProductDatabases;
+import com.thelocalmarketplace.software.SelfCheckout;
+import com.thelocalmarketplace.hardware.Product;
+import com.thelocalmarketplace.software.feature.ElectronicScaleFeature;
 
+import java.util.*; 
 public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 
 	@Override
 	public void onStateSet() {
-		// TODO Auto-generated method stub
+		// do nothing, don't need to set anything
 		
 	}
 
 	@Override
-	public void onStateUnset() {
-		// TODO Auto-generated method stub
+	public void onStateUnset() throws RuntimeException{
+		throw new RuntimeException(""); // throws an exception for now
 		
 	}
 
 	@Override
 	public UserSessionState onScanBarcode(Barcode barcode) {
-		// TODO Auto-generated method stub
-		return null;
+		Product barcodeProduct = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
+		if(SelfCheckout.getInstance().supportsFeature(ElectronicScaleFeature.class)){
+			return UserSessionState.WAITING_FOR_BAGGING;	
+		}
+		else {
+			return null; 
+		}
 	}
 
 	@Override
 	public UserSessionState onWeightChanged(Mass mass) {
-		// TODO Auto-generated method stub
+		
 		return null;
 	}
 
