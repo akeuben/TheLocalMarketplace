@@ -1,75 +1,47 @@
 package com.thelocalmarketplace.software;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Currency;
-import java.util.Locale;
+import java.util.List;
 import java.util.Map;
 
-import com.jjjwelectronics.scale.ElectronicScale;
-import com.jjjwelectronics.scanner.BarcodeScanner;
-import com.tdc.Sink;
-import com.tdc.coin.Coin;
-import com.tdc.coin.CoinSlot;
-import com.tdc.coin.CoinStorageUnit;
-import com.tdc.coin.CoinValidator;
-import com.thelocalmarketplace.hardware.CoinTray;
+import com.thelocalmarketplace.software.feature.SelfCheckoutFeature;
 
 public class SelfCheckout {
+	
 	private static SelfCheckout instance;
 	
 	private UserSession currentSession;
 	
-	private BarcodeScanner barcodeScanner;
-	private ElectronicScale electronicScale;
+	private Map<Class<? extends SelfCheckoutFeature>, SelfCheckoutFeature> features;
 	
-	private CoinSlot coinSlot;
-	private CoinValidator coinValidator;
-	
-	private Sink<Coin> nickelSink;
-	private Sink<Coin> dimeSink;
-	private Sink<Coin> quarterSink;
-	private Sink<Coin> loonieSink;
-	private Sink<Coin> toonieSink;
-	private Sink<Coin> rejectSink;
-	
-	private SelfCheckout() {
-		barcodeScanner = new BarcodeScanner();
-		electronicScale = new ElectronicScale();
-		coinSlot = new CoinSlot();
-		coinValidator = new CoinValidator(
-				Currency.getInstance(Locale.CANADA), 
-				Arrays.asList(
-						BigDecimal.valueOf(0.05),
-						BigDecimal.valueOf(0.10),
-						BigDecimal.valueOf(0.25),
-						BigDecimal.valueOf(1),
-						BigDecimal.valueOf(2)));
-
-		nickelSink = new CoinStorageUnit(1000);
-		dimeSink = new CoinStorageUnit(1000);
-		quarterSink = new CoinStorageUnit(1000);
-		loonieSink = new CoinStorageUnit(1000);
-		toonieSink = new CoinStorageUnit(1000);
-		rejectSink = new CoinTray(1000);
-		
-		coinValidator.setup(rejectSink, Map.of(
-				BigDecimal.valueOf(0.05), nickelSink,
-				BigDecimal.valueOf(0.10), dimeSink,
-				BigDecimal.valueOf(0.25), quarterSink,
-				BigDecimal.valueOf(1), loonieSink,
-				BigDecimal.valueOf(2), toonieSink
-		), rejectSink);
-		
-		coinSlot.sink = coinValidator;
-		
+	private SelfCheckout(List<SelfCheckoutFeature> features) {
+		// Add the specified features.
+		for(SelfCheckoutFeature feature : features) {
+			this.features.put(feature.getClass(), feature);
+		}
 		currentSession = null;
 	}
 	
-	public static SelfCheckout getInstance() {
+	/**
+	 * Get the instance of the self checkout
+	 * @return The instance of the self checkout
+	 * @throws RuntimeException if there is no current instance
+	 */
+	public static SelfCheckout getInstance() throws RuntimeException {
 		if(instance == null) {
-			instance = new SelfCheckout();
+			throw new RuntimeException("The self checkout machine has not been initialized yet.");
 		}
+		return instance;
+	}
+	
+	/**
+	 * Initializes the self checkout machine
+	 * @param type The type of machine
+	 * @return The instance of the self checkout
+	 * @throws RuntimeException If there is already a self checkout instance
+	 */
+	public static SelfCheckout initialize(SelfCheckoutType type) throws RuntimeException {
+		if(instance == null) throw new RuntimeException("There is already a self checkout initialized!");
+		instance = new SelfCheckout(type.getSupportedFeatures());
 		return instance;
 	}
 	
@@ -91,14 +63,33 @@ public class SelfCheckout {
 			throw new RuntimeException("There is already an active user session.");
 		}
 		currentSession = new UserSession();
+		for(SelfCheckoutFeature feature : this.features.values()) {
+			feature.onUserSessionStart(currentSession);
+		}
 		return currentSession;
 	}
 	
 	/**
 	 * Ends the current session
+	 * @return true, if a session was ended. false, if there was
+	 * no active session
 	 */
-	public void endCurrentSession() {
-		
+	public boolean endCurrentSession() {
+		if(currentSession == null) return false;
+		for(SelfCheckoutFeature feature : this.features.values()) {
+			feature.onUserSessionEnd(currentSession);
+		}
+		currentSession = null;
+		return true;
+	}
+	
+	/**
+	 * Checks whether the specified feature is supported for this self checkout machine
+	 * @param feature The feature to test for
+	 * @return True if the self checkout supports this feature, false otherwise.
+	 */
+	public boolean supportsFeature(Class<? extends SelfCheckoutFeature> feature) {
+		return this.features.containsKey(feature);
 	}
 	
 }
