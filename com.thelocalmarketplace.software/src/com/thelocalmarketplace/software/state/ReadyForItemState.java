@@ -30,12 +30,14 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 		Product barcodeProduct = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
 		Transaction currentTransaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();
 		currentTransaction.addItem(barcodeProduct);
-		if(SelfCheckout.getInstance().supportsFeature(ElectronicScaleFeature.class)){
-			return UserSessionState.WAITING_FOR_BAGGING;	
+		
+		
+		if(!SelfCheckout.getInstance().supportsFeature(ElectronicScaleFeature.class)){
+			return null;	
 		}
-		else {
-			return null; 
-		}
+		
+			return UserSessionState.WAITING_FOR_BAGGING; 
+		
 	}
 
 	@Override
