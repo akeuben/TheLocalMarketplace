@@ -20,6 +20,10 @@ public class UserSessionTest {
 
     }
     @Test
+    public void testInitialState() {
+        assertEquals(session.getState(), UserSessionState.READY_FOR_ITEM);
+    }
+    @Test
     public void testChangingState() {
         session.setState(UserSessionState.READY_FOR_PAYMENT);
         UserSessionState newstate = session.getState();

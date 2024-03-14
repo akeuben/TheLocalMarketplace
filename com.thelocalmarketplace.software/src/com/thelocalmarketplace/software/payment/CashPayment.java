@@ -10,7 +10,7 @@ public class CashPayment extends IPayment {
         this.amountPaid = amountPaid;
     }
     
-    public BigDecimal getAmountPayed() {
+    public BigDecimal getAmountPaid() {
     	return amountPaid;
     }
 }
