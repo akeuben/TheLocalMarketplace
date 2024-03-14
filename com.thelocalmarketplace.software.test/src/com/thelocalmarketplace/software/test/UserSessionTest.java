@@ -25,4 +25,22 @@ public class UserSessionTest {
         UserSessionState newstate = session.getState();
         assertEquals(newstate, UserSessionState.READY_FOR_PAYMENT);
     }
+
+    @Test
+    public void testChangingState2() {
+        session.setState(UserSessionState.WAITING_FOR_BAGGING);
+        UserSessionState newstate = session.getState();
+        assertEquals(newstate, UserSessionState.WAITING_FOR_BAGGING);
+    }
+
+    @Test
+    public void testChangingState3() {
+        session.setState(UserSessionState.WAITING_FOR_BAGGING);
+        session.setState(UserSessionState.READY_FOR_ITEM);
+        session.setState(UserSessionState.WAITING_FOR_BAGGING);
+        session.setState(UserSessionState.READY_FOR_PAYMENT);
+        session.setState(UserSessionState.WAITING_FOR_BAGGING);
+        UserSessionState newstate = session.getState();
+        assertEquals(newstate, UserSessionState.WAITING_FOR_BAGGING);
+    }
 }

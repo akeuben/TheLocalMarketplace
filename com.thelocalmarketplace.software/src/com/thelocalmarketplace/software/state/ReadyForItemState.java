@@ -36,7 +36,7 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 			return null;	
 		}
 		
-			return UserSessionState.WAITING_FOR_BAGGING; 
+		return UserSessionState.WAITING_FOR_BAGGING;
 		
 	}
 
