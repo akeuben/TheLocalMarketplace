@@ -16,8 +16,8 @@ public class UserSession {
      * to the user during a transaction at a self checkout machine.
      */
     public UserSession() {
-    	this.transaction = new Transaction(); 
-    	setState(UserSessionState.READY_FOR_ITEM);
+    	this.transaction = new Transaction();
+		state = UserSessionState.READY_FOR_ITEM;
     	
     	// Initialize the event handlers
     	this.coinValidatorHandler = new CoinValidatorHandler(this);
