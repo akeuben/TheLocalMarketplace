@@ -1,6 +1,7 @@
 package com.thelocalmarketplace.software.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
 import java.math.BigDecimal;
@@ -219,8 +220,8 @@ public class FullSystemTest {
 		BarcodeScanner scanner = sc.getHardware().scanner; 
 		Numeral[] dummyCode = {Numeral.one, Numeral.two};
 		BarcodedItem newItem = new BarcodedItem(new Barcode(dummyCode), new Mass(10.0));
-		
-		assertThrows(RuntimeException.class, () -> scanner.scan(newItem));
+		scanner.scan(newItem); 
+		assertEquals(session.getState(), UserSessionState.READY_FOR_ITEM);
 		
 		
 		
