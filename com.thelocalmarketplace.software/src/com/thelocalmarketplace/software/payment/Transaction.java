@@ -33,7 +33,7 @@ public class Transaction {
     public void addItem(Product product) {
         if (product != null) {
             products.add(product);
-            totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()));
+            totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
             expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM))));
         }
         else {

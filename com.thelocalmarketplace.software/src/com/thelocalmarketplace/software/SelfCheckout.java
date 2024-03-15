@@ -1,11 +1,9 @@
 package com.thelocalmarketplace.software;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.thelocalmarketplace.software.feature.SelfCheckoutFeature;
+import com.thelocalmarketplace.hardware.SelfCheckoutStation;
 import com.thelocalmarketplace.software.session.UserSession;
+
+import powerutility.PowerGrid;
 
 public class SelfCheckout {
 	
@@ -13,15 +11,15 @@ public class SelfCheckout {
 	
 	private UserSession currentSession;
 	
-	private Map<Class<? extends SelfCheckoutFeature>, SelfCheckoutFeature> features;
+	private SelfCheckoutStation hardware;
 	
-	private SelfCheckout(List<SelfCheckoutFeature> features) {
-		this.features = new HashMap<Class<? extends SelfCheckoutFeature>, SelfCheckoutFeature>();
-		// Add the specified features.
-		for(SelfCheckoutFeature feature : features) {
-			this.features.put(feature.getClass(), feature);
-		}
+	private SelfCheckout() {
 		currentSession = null;
+		
+		hardware = new SelfCheckoutStation();
+		PowerGrid.engageUninterruptiblePowerSource();
+		hardware.plugIn(PowerGrid.instance());
+		hardware.turnOn();
 	}
 	
 	/**
@@ -42,10 +40,30 @@ public class SelfCheckout {
 	 * @return The instance of the self checkout
 	 * @throws RuntimeException If there is already a self checkout instance
 	 */
-	public static SelfCheckout initialize(SelfCheckoutType type) throws RuntimeException {
+	public static SelfCheckout initialize(SelfCheckoutConfiguration configuration) throws RuntimeException {
 		if(instance != null) throw new RuntimeException("There is already a self checkout initialized!");
-		instance = new SelfCheckout(type.getSupportedFeatures());
+		
+		instance = new SelfCheckout();
+		
+		// Initialize the hardware
+		SelfCheckoutStation.configureCurrency(configuration.currency);
+		SelfCheckoutStation.configureCoinDenominations(configuration.coinDenominations);
+		SelfCheckoutStation.configureCoinDispenserCapacity(configuration.coinDispenserCapacity);
+		SelfCheckoutStation.configureCoinStorageUnitCapacity(configuration.coinStorageUnitCapacity);
+		SelfCheckoutStation.configureCoinTrayCapacity(configuration.coinTrayCapacity);
+		
 		return instance;
+	}
+	
+	/**
+	 * Uninitializes the self checkout machine.
+	 */
+	public static void uninitialize() {
+		if(instance == null) return;
+		
+		instance.endCurrentSession();
+		
+		instance = null;
 	}
 	
 	/**
@@ -66,9 +84,12 @@ public class SelfCheckout {
 			throw new RuntimeException("There is already an active user session.");
 		}
 		currentSession = new UserSession();
-		for(SelfCheckoutFeature feature : this.features.values()) {
-			feature.onUserSessionStart(currentSession);
-		}
+		
+		// Register listeners
+		hardware.scanner.register(currentSession.getBarcodeHandler());
+		hardware.baggingArea.register(currentSession.getElectronicScaleHandler());
+		hardware.coinValidator.attach(currentSession.getCoinValidatorHandler());
+		
 		return currentSession;
 	}
 	
@@ -79,35 +100,21 @@ public class SelfCheckout {
 	 */
 	public boolean endCurrentSession() {
 		if(currentSession == null) return false;
-		for(SelfCheckoutFeature feature : this.features.values()) {
-			feature.onUserSessionEnd(currentSession);
-		}
+		
+		// Register listeners
+		hardware.scanner.deregister(currentSession.getBarcodeHandler());
+		hardware.baggingArea.deregister(currentSession.getElectronicScaleHandler());
+		hardware.coinValidator.detach(currentSession.getCoinValidatorHandler());
+		
 		currentSession = null;
 		return true;
 	}
-	
+
 	/**
-	 * Checks whether the specified feature is supported for this self checkout machine
-	 * @param feature The feature to test for
-	 * @return True if the self checkout supports this feature, false otherwise.
+	 * Gets the hardware for the self checkout station.
+	 * @return The hardware of the self checkout station.
 	 */
-	public boolean supportsFeature(Class<? extends SelfCheckoutFeature> feature) {
-		return this.features.containsKey(feature);
-	}
-	
-	/**
-	 * Gets the specified feature from the self checkout
-	 * @param <T> The feature type
-	 * @param featureClass The class of the feature type
-	 * @return The feature, or null if the self checkout machine does not include the specified feature.
-	 */
-	public <T extends SelfCheckoutFeature> T getFeature(Class<T> featureClass) {
-		if(!supportsFeature(featureClass)) return null;
-		SelfCheckoutFeature feature = this.features.get(featureClass);
-		return featureClass.cast(feature);
-	}
-	
-	public static void unInitialize() {
-		instance = null;
+	public SelfCheckoutStation getHardware() {
+		return hardware;
 	}
 }

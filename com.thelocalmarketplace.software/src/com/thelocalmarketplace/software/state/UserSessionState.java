@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.scanner.Barcode;
-import com.tdc.coin.Coin;
 
 public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	/**

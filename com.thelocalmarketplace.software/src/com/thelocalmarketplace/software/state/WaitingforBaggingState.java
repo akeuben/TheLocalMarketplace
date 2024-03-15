@@ -7,7 +7,6 @@ import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.OverloadedDevice;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.software.SelfCheckout;
-import com.thelocalmarketplace.software.feature.ElectronicScaleFeature;
 import com.thelocalmarketplace.software.payment.Transaction;
 
 public class WaitingforBaggingState implements IUserSessionState<UserSessionState> {
@@ -17,13 +16,9 @@ public class WaitingforBaggingState implements IUserSessionState<UserSessionStat
 	@Override
 	public UserSessionState onStateSet() {
 		
-		if(!SelfCheckout.getInstance().supportsFeature(ElectronicScaleFeature.class)){ // If the self-checkout does not have an electronic scale,
-			return UserSessionState.READY_FOR_ITEM;									   // skip this state and go back to ReadyForItemState
-		}
-		
 		Mass mass;
 		try {
-			mass = SelfCheckout.getInstance().getFeature(ElectronicScaleFeature.class).getScale().getCurrentMassOnTheScale();
+			mass = SelfCheckout.getInstance().getHardware().baggingArea.getCurrentMassOnTheScale();
 		} catch (OverloadedDevice | RuntimeException e) { // Catch errors when retrieving mass from scale
 			return null;
 		}
