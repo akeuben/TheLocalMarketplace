@@ -2,7 +2,7 @@ package com.thelocalmarketplace.software.payment;
 
 import java.math.BigDecimal;
 
-public class CashPayment extends IPayment {
+public class CashPayment extends Payment {
     private BigDecimal amountPaid;
 
 

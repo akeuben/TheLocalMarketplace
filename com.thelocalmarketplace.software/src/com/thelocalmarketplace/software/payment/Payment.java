@@ -6,7 +6,7 @@ import java.math.BigDecimal;
  * Abstract class for methods of payment
  */
 
-public abstract class IPayment {
+public abstract class Payment {
     private BigDecimal amountPaid;
     
     
