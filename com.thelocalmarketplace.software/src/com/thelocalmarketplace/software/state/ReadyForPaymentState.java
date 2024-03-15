@@ -5,6 +5,9 @@ import java.math.BigDecimal;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.scanner.Barcode;
 import com.tdc.coin.Coin;
+import com.thelocalmarketplace.software.SelfCheckout;
+import com.thelocalmarketplace.software.feature.ElectronicScaleFeature;
+import com.thelocalmarketplace.software.payment.Transaction;
 
 public class ReadyForPaymentState implements IUserSessionState<UserSessionState> {
 
@@ -27,7 +30,23 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 
 	@Override
 	public UserSessionState onWeightChanged(Mass mass) {
-		// TODO Auto-generated method stub
+		// Possible Weight Discrepancy
+		
+		// Get the relevant masses to compare
+		Transaction transaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();
+		Mass expectedMass = transaction.getExpectedMass();
+		Mass absoluteDifference = expectedMass.difference(mass).abs();
+		
+		// The maximum difference between masses.
+		Mass maximumDifference = SelfCheckout.getInstance().getFeature(ElectronicScaleFeature.class).getScale().getSensitivityLimit();
+		
+		// Check if we are within the margin of error. If so, do nothing
+		if(absoluteDifference.compareTo(maximumDifference) == -1) {
+			return UserSessionState.WAITING_FOR_BAGGING;
+		}
+		
+		// The change in mass was within the margin of error. It is okay to
+		// allow the customer to continue. Stay on the same state.
 		return null;
 	}
 
