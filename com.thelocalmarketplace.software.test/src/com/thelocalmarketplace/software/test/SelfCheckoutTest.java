@@ -13,7 +13,7 @@ public class SelfCheckoutTest {
 	
 	@Before
 	public void setup() {
-		
+		SelfCheckout.uninitialize();
 	}
 	
 	@Test

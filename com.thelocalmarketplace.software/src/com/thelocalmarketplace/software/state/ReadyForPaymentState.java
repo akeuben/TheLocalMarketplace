@@ -39,7 +39,7 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 		Mass maximumDifference = SelfCheckout.getInstance().getHardware().baggingArea.getSensitivityLimit();
 		
 		// Check if we are within the margin of error. If so, do nothing
-		if(absoluteDifference.compareTo(maximumDifference) == -1) {
+		if(absoluteDifference.compareTo(maximumDifference) == 1) {
 			return UserSessionState.WAITING_FOR_BAGGING;
 		}
 		

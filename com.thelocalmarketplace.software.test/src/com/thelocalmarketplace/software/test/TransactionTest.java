@@ -36,8 +36,8 @@ public class TransactionTest {
 		//this.num = (Numeral)one((byte)1);
 		//this.coinOne = new Coin(Currency.getInstance("CAD"), new BigDecimal(1.0));
 		//this.coinTwo = new Coin(Currency.getInstance("CAD"), new BigDecimal(1.0));
-		this.productOne = new BarcodedProduct(bc, "test1", 1, 1);
-		this.productTwo = new BarcodedProduct(bc, "test2", 2, 2);
+		this.productOne = new BarcodedProduct(bc, "test1", 100, 1);
+		this.productTwo = new BarcodedProduct(bc, "test2", 200, 2);
 		//this.productZeroCost = new BarcodedProduct(null, "test1", 0, 1);
 		//this.productZeroWeight = new BarcodedProduct(null, "test2", 1, 0);
 		
@@ -90,14 +90,14 @@ public class TransactionTest {
 	@Test
 	public void testAddOneItemCost() {
 		transaction.addItem(productOne);
-		Assert.assertEquals(transaction.getTotalCost(), BigDecimal.valueOf(productOne.getPrice()));
+		Assert.assertEquals(transaction.getTotalCost().compareTo(BigDecimal.valueOf(1.00)), 0);
 	}
 	
 	@Test
 	public void testAddMultipleItemsCost() {
 		transaction.addItem(productOne);
 		transaction.addItem(productTwo);
-		Assert.assertEquals(transaction.getTotalCost(), BigDecimal.valueOf(productOne.getPrice()+productTwo.getPrice()));
+		Assert.assertEquals(transaction.getTotalCost().compareTo(BigDecimal.valueOf(3.00)), 0);
 	}
 	
 }

@@ -13,11 +13,10 @@ import static org.junit.Assert.*;
 
 public class UserSessionTest {
 
-    private UserSession session = new UserSession();
+    private UserSession session;
     @Before
     public void setup() {
-
-
+    	session = new UserSession();
     }
     @Test
     public void testInitialState() {

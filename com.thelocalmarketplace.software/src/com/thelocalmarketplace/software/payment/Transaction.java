@@ -47,10 +47,10 @@ public class Transaction {
      * Adds a payment to the transaction by storing in HashMap payments
      * @param paymentMethod, type of payment method used, must be initialized so amountPaid is already defined
      */
-    public void addPayment(IPayment paymentMethod) {
+    public void addPayment(IPayment payment) {
     	UUID transactionId = UUID.randomUUID(); // Generate a unique ID for this transaction/payment
-    	payments.put(transactionId, paymentMethod); // Add payment to HashMap
-    	totalCost = totalCost.subtract(paymentMethod.getAmountPaid());
+    	payments.put(transactionId, payment); // Add payment to HashMap
+    	totalCost = totalCost.subtract(payment.getAmountPaid());
     }
     
     
@@ -81,6 +81,18 @@ public class Transaction {
     public BigDecimal getTotalCost() {
     	return totalCost;
     }
-    
-		
+
+
+	public Product[] getProducts() {
+		Product[] products = new Product[0];
+		products = this.products.toArray(products);
+		return products;
+	}
+
+
+	public IPayment[] getPayments() {
+		IPayment[] payments = new IPayment[0];
+		payments = this.payments.values().toArray(payments);
+		return payments;
+	}
 }
