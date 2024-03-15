@@ -5,6 +5,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.thelocalmarketplace.software.SelfCheckout;
+import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.state.UserSessionState;
 
@@ -13,7 +15,9 @@ public class UserSessionTest {
     private UserSession session;
     @Before
     public void setup() {
-    	session = new UserSession();
+    	SelfCheckout.uninitialize();
+    	SelfCheckout.initialize(new SelfCheckoutConfiguration());
+    	session = SelfCheckout.getInstance().startNewSession();
     }
     @Test
     public void testInitialState() {
@@ -42,5 +46,13 @@ public class UserSessionTest {
         session.setState(UserSessionState.WAITING_FOR_BAGGING);
         UserSessionState newstate = session.getState();
         assertEquals(newstate, UserSessionState.WAITING_FOR_BAGGING);
+    }
+    
+    @Test
+    public void testSameState() {
+    	session.setState(UserSessionState.READY_FOR_ITEM);
+        assertEquals(session.getState(), UserSessionState.READY_FOR_ITEM);
+    	session.setState(UserSessionState.READY_FOR_ITEM);
+        assertEquals(session.getState(), UserSessionState.READY_FOR_ITEM);
     }
 }
