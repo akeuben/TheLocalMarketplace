@@ -1,10 +1,12 @@
 	package com.thelocalmarketplace.software.payment;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
+import com.jjjwelectronics.Mass;
 import com.thelocalmarketplace.hardware.Product;
 
 public class Transaction {
@@ -14,7 +16,7 @@ public class Transaction {
      */
     private final ArrayList<Product> products = new ArrayList<>();
     
-    private double expectedWeight=0.0;
+    private Mass expectedMass = Mass.ZERO;
     
     private BigDecimal totalCost = BigDecimal.ZERO;
 
@@ -32,7 +34,7 @@ public class Transaction {
         if (product != null) {
             products.add(product);
             totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()));
-            expectedWeight += product.getExpectedWeight();
+            expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM))));
         }
         else {
             throw new NullPointerException("product");
@@ -68,8 +70,8 @@ public class Transaction {
      * Getter method for expected weight
      * @return expectedWeight
      */
-    public double getExpectedWeight() {
-		return expectedWeight;
+    public Mass getExpectedMass() {
+		return expectedMass;
     }
     
     /**
