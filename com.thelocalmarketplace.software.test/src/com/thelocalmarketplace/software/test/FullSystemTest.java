@@ -1,6 +1,7 @@
 package com.thelocalmarketplace.software.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 import java.math.BigDecimal;
 import java.util.Currency;
@@ -185,7 +186,7 @@ public class FullSystemTest {
 		assertEquals(session.getState(), UserSessionState.READY_FOR_ITEM);
 	}
 	
-	@Test
+	@Test 
 	public void TestTryAddWeightWithoutItem() {
 		SelfCheckout sc = SelfCheckout.getInstance();
 		UserSession session = sc.startNewSession();
@@ -206,5 +207,22 @@ public class FullSystemTest {
 		baggingArea.removeAnItem(item1);
 
 		assertEquals(session.getState(), UserSessionState.READY_FOR_ITEM);
+	}
+	
+	
+	// test to see if adding item that's not in the database throws the proper exception
+	@Test
+	public void testTryAddItemNotInDataBase() {
+		SelfCheckout sc  = SelfCheckout.getInstance(); 
+		UserSession session = sc.startNewSession();
+		
+		BarcodeScanner scanner = sc.getHardware().scanner; 
+		Numeral[] dummyCode = {Numeral.one, Numeral.two};
+		BarcodedItem newItem = new BarcodedItem(new Barcode(dummyCode), new Mass(10.0));
+		
+		assertThrows(RuntimeException.class, () -> scanner.scan(newItem));
+		
+		
+		
 	}
 }

@@ -30,7 +30,7 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 		return UserSessionState.WAITING_FOR_BAGGING;
 		
 	}
-
+ 
 	@Override
 	public UserSessionState onWeightChanged(Mass mass) {
 		// Possible Weight Discrepancy
