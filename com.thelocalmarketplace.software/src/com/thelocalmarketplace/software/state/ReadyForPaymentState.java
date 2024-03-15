@@ -18,14 +18,10 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 	}
 
 	@Override
-	public void onStateUnset() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onStateUnset() {}
 
 	@Override
 	public UserSessionState onScanBarcode(Barcode barcode) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -53,7 +49,6 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 
 	@Override
 	public UserSessionState onCoinInserted(BigDecimal value) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

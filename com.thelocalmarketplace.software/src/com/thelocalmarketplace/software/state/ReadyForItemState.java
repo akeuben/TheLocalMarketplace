@@ -15,14 +15,11 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 		// Disable the coin slot to prevent the user from inserting a coin while the software
 		// is not in the correct state
 		SelfCheckout.getInstance().getHardware().coinSlot.disable();
-		return null; 
-		
+		return null;
 	}
 
 	@Override
-	public void onStateUnset() throws RuntimeException{
-		
-	}
+	public void onStateUnset() throws RuntimeException {}
 
 	@Override
 	public UserSessionState onScanBarcode(Barcode barcode) {
@@ -58,7 +55,6 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 
 	@Override
 	public UserSessionState onCoinInserted(BigDecimal value) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
