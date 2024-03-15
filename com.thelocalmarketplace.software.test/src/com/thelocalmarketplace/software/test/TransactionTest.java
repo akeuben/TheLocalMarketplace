@@ -9,6 +9,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.Mass.MassDifference;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
@@ -58,7 +60,8 @@ public class TransactionTest {
 	
 	@Test
 	public void testPositiveWeight() {
-		Assert.assertTrue(transaction.getExpectedWeight() >= 0);
+		int comparisonResult = transaction.getExpectedMass().compareTo(Mass.ZERO);
+		Assert.assertTrue(comparisonResult == 0 || comparisonResult == 1);
 	}
 	
 	@Test
@@ -69,14 +72,19 @@ public class TransactionTest {
 	@Test
 	public void testAddOneItemWeight() {
 		transaction.addItem(productOne);
-		Assert.assertEquals(transaction.getExpectedWeight(), productOne.getExpectedWeight(), 0);
+		Mass productOneMass = new Mass(productOne.getExpectedWeight());
+		Assert.assertTrue(productOneMass.compareTo(transaction.getExpectedMass()) == 0);
 	}
 	
 	@Test
 	public void testAddMultipleItemsWeight() {
 		transaction.addItem(productOne);
+		Mass productOneMass = new Mass(productOne.getExpectedWeight());
 		transaction.addItem(productTwo);
-		Assert.assertEquals(transaction.getExpectedWeight(), productOne.getExpectedWeight()+productTwo.getExpectedWeight(), 0);
+		Mass productTwoMass = new Mass(productTwo.getExpectedWeight());
+		Mass combinedProductMass = productOneMass.sum(productTwoMass);
+		
+		Assert.assertTrue(combinedProductMass.compareTo(transaction.getExpectedMass()) == 0);
 	}
 	
 	@Test
