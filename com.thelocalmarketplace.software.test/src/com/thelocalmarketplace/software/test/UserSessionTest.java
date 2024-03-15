@@ -1,15 +1,12 @@
 package com.thelocalmarketplace.software.test;
 
-import com.jjjwelectronics.Numeral;
-import com.jjjwelectronics.scanner.Barcode;
-import com.thelocalmarketplace.hardware.BarcodedProduct;
-import com.thelocalmarketplace.software.payment.Transaction;
-import com.thelocalmarketplace.software.session.UserSession;
-import com.thelocalmarketplace.software.state.UserSessionState;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import com.thelocalmarketplace.software.session.UserSession;
+import com.thelocalmarketplace.software.state.UserSessionState;
 
 public class UserSessionTest {
 

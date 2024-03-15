@@ -11,7 +11,10 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 
 	@Override
 	public UserSessionState onStateSet() {
-		return null; 	
+		// Enable the coin slot to allow the user to insert a coin while the software
+		// is in the correct state
+		SelfCheckout.getInstance().getHardware().coinSlot.enable();
+		return null; 
 	}
 
 	@Override

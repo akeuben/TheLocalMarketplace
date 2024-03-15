@@ -12,6 +12,9 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 
 	@Override
 	public UserSessionState onStateSet() {
+		// Disable the coin slot to prevent the user from inserting a coin while the software
+		// is not in the correct state
+		SelfCheckout.getInstance().getHardware().coinSlot.disable();
 		return null; 
 		
 	}

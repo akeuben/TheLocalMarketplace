@@ -1,14 +1,13 @@
 package com.thelocalmarketplace.software.test;
 
-import com.thelocalmarketplace.software.payment.CashPayment;
-import com.thelocalmarketplace.software.state.UserSessionState;
+import static org.junit.Assert.assertEquals;
+
+import java.math.BigDecimal;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
-import static org.junit.Assert.assertEquals;
+import com.thelocalmarketplace.software.payment.CashPayment;
 
 public class CashPaymentTest {
     @Before

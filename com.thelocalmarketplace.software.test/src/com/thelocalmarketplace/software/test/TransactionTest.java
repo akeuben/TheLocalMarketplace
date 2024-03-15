@@ -3,14 +3,12 @@ package com.thelocalmarketplace.software.test;
 import static org.junit.Assert.assertThrows;
 
 import java.math.BigDecimal;
-import java.util.Currency;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import com.jjjwelectronics.Mass;
-import com.jjjwelectronics.Mass.MassDifference;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
@@ -31,7 +29,7 @@ public class TransactionTest {
 	@Before
 	public void setup() {
 		this.transaction = new Transaction();
-		this.num = num.eight;
+		this.num = Numeral.eight;
 		this.bc= new Barcode(new Numeral[] {num});
 		//this.num = (Numeral)one((byte)1);
 		//this.coinOne = new Coin(Currency.getInstance("CAD"), new BigDecimal(1.0));

@@ -15,7 +15,14 @@ public class WaitingforBaggingState implements IUserSessionState<UserSessionStat
 
 	@Override
 	public UserSessionState onStateSet() {
+		// Disable the coin slot to prevent the user from inserting a coin while the software
+		// is not in the correct state
+		SelfCheckout.getInstance().getHardware().coinSlot.disable();
 		
+		// The mass may already be in range (for example, if the weight of the added item was really small.
+		// Go directly back to the READY_FOR_ITEM state
+		
+		// get the mass
 		Mass mass;
 		try {
 			mass = SelfCheckout.getInstance().getHardware().baggingArea.getCurrentMassOnTheScale();

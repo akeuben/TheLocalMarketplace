@@ -142,7 +142,6 @@ public class FullSystemTest {
 
 		BarcodeScanner scanner = SelfCheckout.getInstance().getHardware().scanner;
 		ElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().baggingArea;
-		CoinSlot coinSlot = SelfCheckout.getInstance().getHardware().coinSlot;
 		
 		BarcodedItem item1 = new BarcodedItem(barcode1, new Mass(100.0));
 
@@ -161,7 +160,7 @@ public class FullSystemTest {
 		// Check there is 1 item in the transaction
 		assertEquals(transaction.getProducts().length, 1);
 		
-		// Place the item in the bagging area
+		// Place the item in the bagging areas
 		baggingArea.addAnItem(item1);
 
 		// We should now be in the ready for item state
@@ -190,11 +189,8 @@ public class FullSystemTest {
 	public void TestTryAddWeightWithoutItem() {
 		SelfCheckout sc = SelfCheckout.getInstance();
 		UserSession session = sc.startNewSession();
-		Transaction transaction = session.getTransaction();
 
-		BarcodeScanner scanner = SelfCheckout.getInstance().getHardware().scanner;
 		ElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().baggingArea;
-		CoinSlot coinSlot = SelfCheckout.getInstance().getHardware().coinSlot;
 		
 		BarcodedItem item1 = new BarcodedItem(barcode1, new Mass(100.0));
 
