@@ -24,7 +24,6 @@ public class SelfCheckoutConfiguration {
 	public SelfCheckoutConfiguration() {
 		this(Currency.getInstance(Locale.CANADA), 100, 1000, 25, BigDecimal.ONE);
 	}
-}
 
 	public Currency getCurrency() {
 		return currency;
@@ -45,3 +44,4 @@ public class SelfCheckoutConfiguration {
 	public BigDecimal[] getCoinDenominations() {
 		return coinDenominations.clone();
 	}
+}

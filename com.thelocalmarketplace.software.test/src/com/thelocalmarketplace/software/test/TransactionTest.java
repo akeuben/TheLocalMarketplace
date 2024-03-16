@@ -92,6 +92,7 @@ public class TransactionTest {
 	    CashPayment valid = new CashPayment(BigDecimal.TEN);
 	    BigDecimal tCost = transaction.getTotalCost();
 	    transaction.addPayment(valid);
+	    assertEquals(valid, transaction.getPayments()[0]);
 	    BigDecimal remainder = new BigDecimal(10);
 	    BigDecimal newCost = transaction.getTotalCost();
 	    newCost = newCost.add(remainder); // Use add() method to add BigDecimal values

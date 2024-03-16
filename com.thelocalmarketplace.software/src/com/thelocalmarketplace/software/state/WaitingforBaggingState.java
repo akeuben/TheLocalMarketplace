@@ -27,14 +27,14 @@ public class WaitingforBaggingState implements IUserSessionState<UserSessionStat
 		try {
 			mass = SelfCheckout.getInstance().getHardware().baggingArea.getCurrentMassOnTheScale();
 		} catch (OverloadedDevice | RuntimeException e) { // Catch errors when retrieving mass from scale
-			return null;
+			return null; //TODO: Notify attendant of the error
 		}
 		
 		// Item is too light to initiate a mass change
 		Transaction currentTransaction = SelfCheckout.getInstance().getCurrentSession().getTransaction(); // Get current transaction
 		Mass expectedMass = currentTransaction.getExpectedMass(); // Get expected mass
 		Mass absoluteDifference = expectedMass.difference(mass).abs(); // Compare expected and actual mass of item placed in bagging area
-		
+		System.out.println(absoluteDifference.compareTo(MAXIMUM_MASS_DIFFERENCE));
 		if(absoluteDifference.compareTo(MAXIMUM_MASS_DIFFERENCE) == -1) { // If item falls within the scale's sensitivity window,
 			return UserSessionState.READY_FOR_ITEM; 					  // go back to ReadyForItemState
 		}

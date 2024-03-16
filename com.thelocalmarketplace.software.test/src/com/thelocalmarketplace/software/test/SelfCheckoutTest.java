@@ -1,7 +1,12 @@
 package com.thelocalmarketplace.software.test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+
+import java.math.BigDecimal;
+import java.util.Currency;
+import java.util.Locale;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -53,9 +58,9 @@ public class SelfCheckoutTest {
 	}
 
 	@Test
-	public void testIfConfigCorrectlyApplied {
+	public void testIfConfigCorrectlyApplied() {
 		Currency currencyTest = Currency.getInstance(Locale.CANADA);
-		BigDecimal[] denominationsTest = new BigDecimal[]{Big.Decimal.valueOf(0.25), BigDecimal.valueof(1.00)};
+		BigDecimal[] denominationsTest = new BigDecimal[]{BigDecimal.valueOf(0.25), BigDecimal.valueOf(1.00)};
 		int StorageCapTest = 250;
 		int DispenserCapTest = 50;
 		int TrayCapTest = 15;
@@ -65,22 +70,22 @@ public class SelfCheckoutTest {
 				DispenserCapTest,
 				StorageCapTest,
 				TrayCapTest,
-				denominationsTest,
+				denominationsTest
 				);
 
 		SelfCheckout check = SelfCheckout.initialize(config);
 		check.startNewSession();
 
 		assertEquals(Currency.getInstance(Locale.CANADA), config.getCurrency());
-		assertEquals(50 , config.getCoinDispenserCapacity);
-		assertEquals(250, config.getCoinStorageUnitCapacity);
-		assertEquals(15 , config.getCoinTrayCapacityCapacity);
-		assertArrayEquals(new BigDecimal[]{"0.25", "1.00"}, config.getCoinDenominations)
+		assertEquals(50 , config.getCoinDispenserCapacity());
+		assertEquals(250, config.getCoinStorageUnitCapacity());
+		assertEquals(15 , config.getCoinTrayCapacity());
+		assertArrayEquals(new BigDecimal[]{BigDecimal.valueOf(0.25), BigDecimal.valueOf(1.00)}, config.getCoinDenominations());
 
 		SelfCheckout.uninitialize();
 	}
   
-  @Test
+	@Test
 	public void testGetInstanceNoInstance() {
 		assertThrows(RuntimeException.class, () -> SelfCheckout.getInstance());
 	}

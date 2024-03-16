@@ -18,6 +18,10 @@ public class UserSession {
     public UserSession() {
     	this.transaction = new Transaction();
 		state = UserSessionState.READY_FOR_ITEM;
+		
+		// Set the initial state
+		UserSessionState newState = state.onStateSet();
+		if(newState != null) setState(newState);
     	
     	// Initialize the event handlers
     	this.coinValidatorHandler = new CoinValidatorHandler(this);
@@ -35,7 +39,10 @@ public class UserSession {
     	// Send relevant events and update the state field.
     	this.state.onStateUnset();
     	this.state = newState;
-    	this.state.onStateSet();
+    	newState = this.state.onStateSet();
+    	if(newState != null) {
+    		setState(newState);
+    	}
     }
     
     /**

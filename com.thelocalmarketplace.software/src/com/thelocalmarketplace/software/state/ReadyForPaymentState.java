@@ -36,7 +36,7 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 	public UserSessionState onScanBarcode(Barcode barcode) {
 		return null;
 	}
-
+	 
 	@Override
 	public UserSessionState onWeightChanged(Mass mass) {
 		// Possible Weight Discrepancy
