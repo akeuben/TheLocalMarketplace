@@ -20,7 +20,7 @@ public class Transaction {
     
     private BigDecimal totalCost = BigDecimal.ZERO;
 
-    private final HashMap<UUID, Payment> payments = new HashMap<>();
+    private final HashMap<UUID, IPayment> payments = new HashMap<>();
     
 
 
@@ -47,7 +47,7 @@ public class Transaction {
      * Adds a payment to the transaction by storing in HashMap payments
      * @param paymentMethod, type of payment method used, must be initialized so amountPaid is already defined
      */
-    public void addPayment(Payment payment) {
+    public void addPayment(IPayment payment) {
     	UUID transactionId = UUID.randomUUID(); // Generate a unique ID for this transaction/payment
     	payments.put(transactionId, payment); // Add payment to HashMap
     	totalCost = totalCost.subtract(payment.getAmountPaid());
@@ -90,8 +90,8 @@ public class Transaction {
 	}
 
 
-	public Payment[] getPayments() {
-		Payment[] payments = new Payment[0];
+	public IPayment[] getPayments() {
+		IPayment[] payments = new IPayment[0];
 		payments = this.payments.values().toArray(payments);
 		return payments;
 	}

@@ -79,4 +79,10 @@ public class SelfCheckoutTest {
 
 		SelfCheckout.uninitialize();
 	}
+  
+  @Test
+	public void testGetInstanceNoInstance() {
+		assertThrows(RuntimeException.class, () -> SelfCheckout.getInstance());
+	}
+	
 }

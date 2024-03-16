@@ -2,7 +2,6 @@ package com.thelocalmarketplace.software.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
 
 import java.math.BigDecimal;
 import java.util.Currency;
@@ -131,9 +130,28 @@ public class FullSystemTest {
 		} catch (DisabledException | CashOverloadException e) {
 			throw new RuntimeException();
 		}
-		System.out.println(transaction.getTotalCost());
-		//assertEquals(transaction.getTotalCost().compareTo(BigDecimal.valueOf(9.99)), 0);
 		
+		BigDecimal expectedCost = BigDecimal.valueOf(9.99);
+		
+		assertEquals(transaction.getTotalCost().compareTo(expectedCost), 0);
+		
+		for(int i = 0; i < 9; i++) {
+			try {
+				coinSlot.receive(dollarCoin);
+				expectedCost = expectedCost.subtract(BigDecimal.ONE);
+				assertEquals(transaction.getTotalCost().compareTo(expectedCost), 0);
+			} catch (DisabledException | CashOverloadException e) {
+				throw new RuntimeException();
+			}
+		}
+		
+		assertEquals(transaction.getTotalCost().compareTo(BigDecimal.valueOf(0.99)), 0);
+		try {
+			coinSlot.receive(dollarCoin);
+		} catch (DisabledException | CashOverloadException e) {
+			throw new RuntimeException();
+		}
+		assertNull(SelfCheckout.getInstance().getCurrentSession());
 	}
 	
 	@Test
@@ -222,8 +240,5 @@ public class FullSystemTest {
 		BarcodedItem newItem = new BarcodedItem(new Barcode(dummyCode), new Mass(10.0));
 		scanner.scan(newItem); 
 		assertEquals(session.getState(), UserSessionState.READY_FOR_ITEM);
-		
-		
-		
 	}
 }

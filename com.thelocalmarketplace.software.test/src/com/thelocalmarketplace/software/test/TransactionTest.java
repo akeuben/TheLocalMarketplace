@@ -1,5 +1,7 @@
 package com.thelocalmarketplace.software.test;
 
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 import java.math.BigDecimal;
@@ -13,38 +15,25 @@ import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
+import com.thelocalmarketplace.software.payment.CashPayment;
 import com.thelocalmarketplace.software.payment.Transaction;
 
 public class TransactionTest {
-	//private Coin coinOne;
-	//private Coin coinTwo;
 	private Transaction transaction;
 	private Product productOne;
 	private Product productTwo;
 	private Numeral num;
 	private Barcode bc;
-	//private BarcodedProduct productZeroCost;
-	//private BarcodedProduct productZeroWeight;
-	
+    
 	@Before
 	public void setup() {
 		this.transaction = new Transaction();
 		this.num = Numeral.eight;
 		this.bc= new Barcode(new Numeral[] {num});
-		//this.num = (Numeral)one((byte)1);
-		//this.coinOne = new Coin(Currency.getInstance("CAD"), new BigDecimal(1.0));
-		//this.coinTwo = new Coin(Currency.getInstance("CAD"), new BigDecimal(1.0));
 		this.productOne = new BarcodedProduct(bc, "test1", 100, 1);
 		this.productTwo = new BarcodedProduct(bc, "test2", 200, 2);
-		//this.productZeroCost = new BarcodedProduct(null, "test1", 0, 1);
-		//this.productZeroWeight = new BarcodedProduct(null, "test2", 1, 0);
 		
 	}
-	
-	//@Test
-	//public void testNullItemBarcode() {
-		//assertThrows(NullPointerException.class, () -> Transaction.addItem((Barcode)null));
-	//}
 	
 	@Test
 	public void testNullItemProduct() {
@@ -98,4 +87,21 @@ public class TransactionTest {
 		Assert.assertEquals(transaction.getTotalCost().compareTo(BigDecimal.valueOf(3.00)), 0);
 	}
 	
+	@Test
+	public void testValidPayment() {
+	    CashPayment valid = new CashPayment(BigDecimal.TEN);
+	    BigDecimal tCost = transaction.getTotalCost();
+	    transaction.addPayment(valid);
+	    BigDecimal remainder = new BigDecimal(10);
+	    BigDecimal newCost = transaction.getTotalCost();
+	    newCost = newCost.add(remainder); // Use add() method to add BigDecimal values
+	    assertEquals(tCost, newCost); // Use assertEquals for comparison
+	}
+
+	
+	@Test
+    public void testAddItem() {
+        transaction.addItem(productOne);
+        assertEquals(1, transaction.getProducts().length);
+    }
 }
