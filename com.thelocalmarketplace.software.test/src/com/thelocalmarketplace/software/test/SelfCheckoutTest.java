@@ -51,4 +51,10 @@ public class SelfCheckoutTest {
 		assertEquals(check.endCurrentSession(), false);
 		SelfCheckout.uninitialize();
 	}
+
+	@Test
+	public void testGetInstanceNoInstance() {
+		assertThrows(RuntimeException.class, () -> SelfCheckout.getInstance());
+	}
+	
 }
