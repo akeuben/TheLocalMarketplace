@@ -25,3 +25,23 @@ public class SelfCheckoutConfiguration {
 		this(Currency.getInstance(Locale.CANADA), 100, 1000, 25, BigDecimal.ONE);
 	}
 }
+
+	public Currency getCurrency() {
+		return currency;
+	}
+
+	public int getCoinDispenserCapacity() {
+		return coinDispenserCapacity;
+	}
+
+	public int getCoinStorageUnitCapacity() {
+		return coinStorageUnitCapacity;
+	}
+
+	public int getCoinTrayCapacity() {
+		return coinTrayCapacity;
+	}
+
+	public BigDecimal[] getCoinDenominations() {
+		return coinDenominations.clone();
+	}
