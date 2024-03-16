@@ -85,6 +85,11 @@ public class SelfCheckout {
 		}
 		currentSession = new UserSession();
 		
+		// Remove old listeners
+		hardware.scanner.deregisterAll();
+		hardware.baggingArea.deregisterAll();
+		hardware.coinValidator.detachAll();
+		
 		// Register listeners
 		hardware.scanner.register(currentSession.getBarcodeHandler());
 		hardware.baggingArea.register(currentSession.getElectronicScaleHandler());
@@ -100,11 +105,6 @@ public class SelfCheckout {
 	 */
 	public boolean endCurrentSession() {
 		if(currentSession == null) return false;
-		
-		// Register listeners
-		hardware.scanner.deregister(currentSession.getBarcodeHandler());
-		hardware.baggingArea.deregister(currentSession.getElectronicScaleHandler());
-		hardware.coinValidator.detach(currentSession.getCoinValidatorHandler());
 		
 		currentSession = null;
 		return true;
