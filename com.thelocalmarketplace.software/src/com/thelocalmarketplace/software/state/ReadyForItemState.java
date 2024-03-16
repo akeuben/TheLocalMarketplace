@@ -24,13 +24,17 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 	@Override
 	public UserSessionState onScanBarcode(Barcode barcode) {
 		Product barcodeProduct = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
-		Transaction currentTransaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();
-		currentTransaction.addItem(barcodeProduct);
-		
-		return UserSessionState.WAITING_FOR_BAGGING;
+		// want to check to see if the product exists within the database
+		if(barcodeProduct != null) {
+			Transaction currentTransaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();
+			currentTransaction.addItem(barcodeProduct);
+			
+			return UserSessionState.WAITING_FOR_BAGGING;	
+		}
+		return null; 
 		
 	}
-
+ 
 	@Override
 	public UserSessionState onWeightChanged(Mass mass) {
 		// Possible Weight Discrepancy

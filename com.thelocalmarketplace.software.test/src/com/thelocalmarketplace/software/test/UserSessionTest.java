@@ -29,7 +29,7 @@ public class UserSessionTest {
         UserSessionState newstate = session.getState();
         assertEquals(newstate, UserSessionState.READY_FOR_PAYMENT);
     }
-
+ 
     @Test
     public void testChangingState2() {
         session.setState(UserSessionState.WAITING_FOR_BAGGING);
