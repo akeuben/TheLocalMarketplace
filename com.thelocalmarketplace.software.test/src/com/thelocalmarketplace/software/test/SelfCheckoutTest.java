@@ -51,4 +51,32 @@ public class SelfCheckoutTest {
 		assertEquals(check.endCurrentSession(), false);
 		SelfCheckout.uninitialize();
 	}
+
+	@Test
+	public void testIfConfigCorrectlyApplied {
+		Currency currencyTest = Currency.getInstance(Locale.CANADA);
+		BigDecimal[] denominationsTest = new BigDecimal[]{Big.Decimal.valueOf(0.25), BigDecimal.valueof(1.00)};
+		int StorageCapTest = 250;
+		int DispenserCapTest = 50;
+		int TrayCapTest = 15;
+
+		SelfCheckoutConfiguration config = new SelfCheckoutConfiguration(
+				currencyTest,
+				DispenserCapTest,
+				StorageCapTest,
+				TrayCapTest,
+				denominationsTest,
+				);
+
+		SelfCheckout check = SelfCheckout.initialize(config);
+		check.startNewSession();
+
+		assertEquals(Currency.getInstance(Locale.CANADA), config.getCurrency());
+		assertEquals(50 , config.getCoinDispenserCapacity);
+		assertEquals(250, config.getCoinStorageUnitCapacity);
+		assertEquals(15 , config.getCoinTrayCapacityCapacity);
+		assertArrayEquals(new BigDecimal[]{"0.25", "1.00"}, config.getCoinDenominations)
+
+		SelfCheckout.uninitialize();
+	}
 }
