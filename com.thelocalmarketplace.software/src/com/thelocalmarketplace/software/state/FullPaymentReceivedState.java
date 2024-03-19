@@ -38,6 +38,9 @@ public class FullPaymentReceivedState implements IUserSessionState<UserSessionSt
             totalCharsToPrint += workingString.replaceAll("\\s", "").length();
         }
 
+        //because the printer can know how many more chars and lines it has left we can probably
+        //use totalCharToPrint to see if the receipt is even printable
+        //assuming it is then move on to the rest
         try {
             if(hardwarePrinter.inkRemaining() < totalCharsToPrint | hardwarePrinter.paperRemaining() < (totalCharsToPrint/60) ){
                 //here prob just jump to notifying the attendant station because this receipt wont be able to fully print
@@ -47,10 +50,7 @@ public class FullPaymentReceivedState implements IUserSessionState<UserSessionSt
         }
 
 
-        //because the printer class knows how many more chars and line it has left we can probably
-        //use totalCharToPrint to see if the receipt is even printable
-        //assuming it is then move on to the rest
-        //NOTE:
+
 
         for (String str : itemizedTransaction){
             char[] charArray = str.toCharArray();
