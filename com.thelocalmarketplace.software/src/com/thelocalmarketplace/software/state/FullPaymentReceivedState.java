@@ -66,6 +66,9 @@ public class FullPaymentReceivedState implements IUserSessionState<UserSessionSt
                 //60 characters on the line have been exceeded so figure out what we want to do when that happens?
             }
         }
+
+        hardwarePrinter.cutPaper();
+        hardwarePrinter.removeReceipt();
         return null;
     }
 
