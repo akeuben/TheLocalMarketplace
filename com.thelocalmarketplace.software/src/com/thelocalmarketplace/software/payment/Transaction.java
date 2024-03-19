@@ -72,7 +72,7 @@ public class Transaction {
     /**
      *
      * Adds a payment to the transaction by storing in HashMap payments
-     * @param paymentMethod, type of payment method used, must be initialized so amountPaid is already defined
+     * @param payment, type of payment method used, must be initialized so amountPaid is already defined
      */
     public void addPayment(IPayment payment) {
     	UUID transactionId = UUID.randomUUID(); // Generate a unique ID for this transaction/payment
@@ -115,6 +115,10 @@ public class Transaction {
 		products = this.products.toArray(products);
 		return products;
 	}
+
+    public ArrayList<BarcodedProduct> getBarcodedProducts(){
+        return products;
+    }
 
 
 	public IPayment[] getPayments() {
