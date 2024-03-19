@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import com.jjjwelectronics.Mass;
+import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
 
 public class Transaction {
@@ -40,7 +41,7 @@ public class Transaction {
     /**
      * Items contained in an instance of transaction TODO Create constructor
      */
-    private final ArrayList<Product> products = new ArrayList<>();
+    private final ArrayList<BarcodedProduct> products = new ArrayList<>();
     
     private Mass expectedMass = Mass.ZERO;
     
@@ -56,7 +57,7 @@ public class Transaction {
      * Adds cost of item to total cost
      * @param product item being added to transaction/products
      */
-    public void addItem(Product product) {
+    public void addItem(BarcodedProduct product) {
         if (product != null) {
             products.add(product);
             totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));

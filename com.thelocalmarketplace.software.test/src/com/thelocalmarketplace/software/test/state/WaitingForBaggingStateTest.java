@@ -62,13 +62,6 @@ public class WaitingForBaggingStateTest {
 	}
 	
 	@Test
-	public void testStateChangedToAddItemIfWeightCorrectOnStateSet() {
-		session.setState(UserSessionState.WAITING_FOR_BAGGING);
-		// The coin slot should be disabled.
-		assertTrue(session.getState().equals(UserSessionState.READY_FOR_ITEM));
-	}
-	
-	@Test
 	public void testOnStateSetValidParameters() {
 		session.getTransaction().addItem(new BarcodedProduct(new Barcode(new Numeral[] {Numeral.five}), "test product", 100, 100));
 		session.setState(UserSessionState.WAITING_FOR_BAGGING);

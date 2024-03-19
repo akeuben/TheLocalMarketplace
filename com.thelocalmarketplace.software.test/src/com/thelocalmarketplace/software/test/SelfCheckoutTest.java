@@ -87,7 +87,8 @@ public class SelfCheckoutTest {
 	@Test
 	public void testIfConfigCorrectlyApplied() {
 		Currency currencyTest = Currency.getInstance(Locale.CANADA);
-		BigDecimal[] denominationsTest = new BigDecimal[]{BigDecimal.valueOf(0.25), BigDecimal.valueOf(1.00)};
+		BigDecimal[] coinDenominationsTest = new BigDecimal[]{BigDecimal.valueOf(0.25), BigDecimal.valueOf(1.00)};
+		BigDecimal[] banknoteDenominationsTest = new BigDecimal[]{BigDecimal.valueOf(10), BigDecimal.valueOf(20)};
 		int StorageCapTest = 250;
 		int DispenserCapTest = 50;
 		int TrayCapTest = 15;
@@ -98,7 +99,10 @@ public class SelfCheckoutTest {
 				DispenserCapTest,
 				StorageCapTest,
 				TrayCapTest,
-				denominationsTest
+				coinDenominationsTest,
+				banknoteDenominationsTest,
+				100,
+				100
 				);
 
 		SelfCheckout check = SelfCheckout.initialize(config);

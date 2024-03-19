@@ -45,28 +45,7 @@ public class WaitingforBaggingState implements IUserSessionState<UserSessionStat
 		// is not in the correct state
 		SelfCheckout.getInstance().getHardware().coinSlot.disable();
 		
-		// The mass may already be in range (for example, if the weight of the added item was really small.
-		// Go directly back to the READY_FOR_ITEM state
-		
-		// get the mass
-		Mass mass;
-		try {
-			mass = SelfCheckout.getInstance().getHardware().baggingArea.getCurrentMassOnTheScale();
-		} catch (OverloadedDevice | RuntimeException e) { // Catch errors when retrieving mass from scale
-			return null; //TODO: Notify attendant of the error
-		}
-		
-		// Item is too light to initiate a mass change
-		Transaction currentTransaction = SelfCheckout.getInstance().getCurrentSession().getTransaction(); // Get current transaction
-		Mass expectedMass = currentTransaction.getExpectedMass(); // Get expected mass
-		Mass absoluteDifference = expectedMass.difference(mass).abs(); // Compare expected and actual mass of item placed in bagging area
-		System.out.println(absoluteDifference.compareTo(MAXIMUM_MASS_DIFFERENCE));
-		if(absoluteDifference.compareTo(MAXIMUM_MASS_DIFFERENCE) == -1) { // If item falls within the scale's sensitivity window,
-			return UserSessionState.READY_FOR_ITEM; 					  // go back to ReadyForItemState
-		}
-			
-		return null; // If item is not the correct weight, weight for correct item to be placed/removed from bagging area
-		
+		return null;
 	}
 
 	@Override

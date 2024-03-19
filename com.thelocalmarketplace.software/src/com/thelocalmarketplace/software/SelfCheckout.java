@@ -85,14 +85,17 @@ public class SelfCheckout {
 	public static SelfCheckout initialize(SelfCheckoutConfiguration configuration) throws RuntimeException {
 		if(instance != null) throw new RuntimeException("There is already a self checkout initialized!");
 		
-		instance = new SelfCheckout(configuration);
-		
 		// Initialize the hardware
 		AbstractSelfCheckoutStation.configureCurrency(configuration.currency);
+		AbstractSelfCheckoutStation.configureBanknoteDenominations(configuration.banknoteDenominations);
+		AbstractSelfCheckoutStation.configureBanknoteStorageUnitCapacity(configuration.banknoteStorageCapacity);
+		AbstractSelfCheckoutStation.configureReusableBagDispenserCapacity(configuration.reusableBagDispenserCapacity);
 		AbstractSelfCheckoutStation.configureCoinDenominations(configuration.coinDenominations);
 		AbstractSelfCheckoutStation.configureCoinDispenserCapacity(configuration.coinDispenserCapacity);
 		AbstractSelfCheckoutStation.configureCoinStorageUnitCapacity(configuration.coinStorageUnitCapacity);
 		AbstractSelfCheckoutStation.configureCoinTrayCapacity(configuration.coinTrayCapacity);
+		
+		instance = new SelfCheckout(configuration);
 		
 		return instance;
 	}

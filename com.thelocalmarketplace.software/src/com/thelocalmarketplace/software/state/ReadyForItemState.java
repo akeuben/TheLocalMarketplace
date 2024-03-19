@@ -30,7 +30,7 @@ import java.math.BigDecimal;
 
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.scanner.Barcode;
-import com.thelocalmarketplace.hardware.Product;
+import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.payment.Transaction; 
@@ -50,7 +50,7 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 
 	@Override
 	public UserSessionState onScanBarcode(Barcode barcode) {
-		Product barcodeProduct = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
+		BarcodedProduct barcodeProduct = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
 		// want to check to see if the product exists within the database
 		if(barcodeProduct != null) {
 			Transaction currentTransaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();

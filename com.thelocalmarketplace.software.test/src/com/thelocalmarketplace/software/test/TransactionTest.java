@@ -39,14 +39,13 @@ import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
-import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.payment.CashPayment;
 import com.thelocalmarketplace.software.payment.Transaction;
 
 public class TransactionTest {
 	private Transaction transaction;
-	private Product productOne;
-	private Product productTwo;
+	private BarcodedProduct productOne;
+	private BarcodedProduct productTwo;
 	private Numeral num;
 	private Barcode bc;
     
@@ -61,7 +60,7 @@ public class TransactionTest {
 	
 	@Test
 	public void testNullItemProduct() {
-		assertThrows(NullPointerException.class, () -> transaction.addItem((BarcodedProduct)null));
+		assertThrows(NullPointerException.class, () -> transaction.addItem(null));
 	}
 	
 	@Test

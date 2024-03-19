@@ -34,24 +34,30 @@ public class SelfCheckoutConfiguration {
 	
 	public Currency currency;
 	public BigDecimal[] coinDenominations;
+	public BigDecimal[] banknoteDenominations;
 	
 	public int coinDispenserCapacity;
 	public int coinStorageUnitCapacity;
 	public int coinTrayCapacity;
+	public int banknoteStorageCapacity;
+	public int reusableBagDispenserCapacity;
 	
 	public MachineRating rating;
 	
-	public SelfCheckoutConfiguration(MachineRating rating, Currency currency, int coinDispenserCapacity, int coinStorageUnitCapacity, int coinTrayCapacity, BigDecimal... coinDenominations) {
+	public SelfCheckoutConfiguration(MachineRating rating, Currency currency, int coinDispenserCapacity, int coinStorageUnitCapacity, int coinTrayCapacity, BigDecimal[] coinDenominations, BigDecimal[] banknoteDenominations, int banknoteStorageCapacity, int reusableBagDispenserCapacity) {
 		this.rating = rating;
 		this.coinDenominations = coinDenominations;
 		this.currency = currency;
 		this.coinDispenserCapacity = coinDispenserCapacity;
 		this.coinStorageUnitCapacity = coinStorageUnitCapacity;
 		this.coinTrayCapacity = coinTrayCapacity;
+		this.banknoteDenominations = banknoteDenominations;
+		this.banknoteStorageCapacity = banknoteStorageCapacity;
+		this.reusableBagDispenserCapacity = reusableBagDispenserCapacity;
 	}
 	
 	public SelfCheckoutConfiguration() {
-		this(MachineRating.BRONZE, Currency.getInstance(Locale.CANADA), 100, 1000, 25, BigDecimal.ONE);
+		this(MachineRating.BRONZE, Currency.getInstance(Locale.CANADA), 100, 1000, 25, new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 100, 100);
 	}
 
 	public Currency getCurrency() {

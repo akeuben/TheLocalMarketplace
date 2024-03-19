@@ -128,7 +128,7 @@ public class FullSystemTest {
 		assertEquals(session.getState(), UserSessionState.READY_FOR_ITEM);
 		
 		// Add product 1
-		scanner.scan(new BarcodedItem(barcode1, new Mass(100.0)));
+		for(int i = 0; i < 100; i++) scanner.scan(new BarcodedItem(barcode1, new Mass(100.0)));
 		
 		// We should now be waiting for the item to be bagged
 		assertEquals(session.getState(), UserSessionState.WAITING_FOR_BAGGING);
@@ -194,7 +194,7 @@ public class FullSystemTest {
 		assertEquals(session.getState(), UserSessionState.READY_FOR_ITEM);
 		
 		// Add product 1
-		scanner.scan(new BarcodedItem(barcode1, new Mass(100.0)));
+		for(int i = 0; i < 100; i++) scanner.scan(new BarcodedItem(barcode1, new Mass(100.0)));
 		
 		// We should now be waiting for the item to be bagged
 		assertEquals(session.getState(), UserSessionState.WAITING_FOR_BAGGING);
