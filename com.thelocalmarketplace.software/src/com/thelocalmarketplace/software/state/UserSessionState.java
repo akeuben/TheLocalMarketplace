@@ -46,7 +46,12 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	 * This state is used when the system
 	 * is ready to accept payment
 	 */
-	READY_FOR_PAYMENT(new ReadyForPaymentState());
+	READY_FOR_PAYMENT(new ReadyForPaymentState()),
+	/**
+	 * This state is used when the system has received full payment and
+	 * can end the customers session
+	 */
+	FULL_PAYMENT_RECEIVED(new FullPaymentReceivedState());
 	
 	private IUserSessionState<UserSessionState> state;
 	

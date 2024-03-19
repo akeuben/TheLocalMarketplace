@@ -5,7 +5,10 @@ import com.jjjwelectronics.IDeviceListener;
 import com.jjjwelectronics.printer.ReceiptPrinterListener;
 import com.jjjwelectronics.scale.ElectronicScaleListener;
 
+import java.util.ArrayList;
+
 public class ReceiptPrinterHandler extends AbstractUserSessionHandler implements ReceiptPrinterListener {
+
     public ReceiptPrinterHandler(UserSession session) { super(session); }
 
     @Override

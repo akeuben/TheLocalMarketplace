@@ -1,4 +1,5 @@
 package com.thelocalmarketplace.software.session;
+import com.jjjwelectronics.printer.ReceiptPrinterListener;
 import com.thelocalmarketplace.software.payment.Transaction;
 import com.thelocalmarketplace.software.state.UserSessionState;
 
@@ -36,7 +37,7 @@ public class UserSession {
     private CoinValidatorHandler coinValidatorHandler;
     private BarcodeHandler barcodeHandler;
     private ElectronicScaleHandler electronicScaleHandler;
-    
+    private ReceiptPrinterHandler receiptPrinterHandler;
     /**
      * Create a user session. This holds all data pertaining
      * to the user during a transaction at a self checkout machine.
@@ -53,6 +54,7 @@ public class UserSession {
     	this.coinValidatorHandler = new CoinValidatorHandler(this);
     	this.barcodeHandler = new BarcodeHandler(this);
     	this.electronicScaleHandler = new ElectronicScaleHandler(this);
+		this.receiptPrinterHandler = new ReceiptPrinterHandler(this);
     }
     
     /**
@@ -110,4 +112,10 @@ public class UserSession {
 	public ElectronicScaleHandler getElectronicScaleHandler() {
 		return electronicScaleHandler;
 	}
+
+	/**
+	 * Get the ReceiptPrinterHandler for the current session
+	 * @return Current ReceiptPrinterHandler
+	 */
+	public ReceiptPrinterHandler getReceiptPrinterHandler() { return receiptPrinterHandler; }
 }
