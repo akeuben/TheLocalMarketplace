@@ -31,7 +31,7 @@ import com.thelocalmarketplace.software.state.UserSessionState;
 
 public class UserSession {
 
-    private UserSessionState state = UserSessionState.READY_FOR_ITEM;
+    private UserSessionState state;
     private Transaction transaction;
 
     private CoinValidatorHandler coinValidatorHandler;

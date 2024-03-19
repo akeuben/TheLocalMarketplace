@@ -78,7 +78,7 @@ public class SelfCheckout {
 	
 	/**
 	 * Initializes the self checkout machine
-	 * @param type The type of machine
+	 * @param configuration The type of machine
 	 * @return The instance of the self checkout
 	 * @throws RuntimeException If there is already a self checkout instance
 	 */
@@ -134,11 +134,13 @@ public class SelfCheckout {
 		hardware.mainScanner.deregisterAll();
 		hardware.baggingArea.deregisterAll();
 		hardware.coinValidator.detachAll();
+		hardware.printer.deregisterAll();
 		
 		// Register listeners
 		hardware.mainScanner.register(currentSession.getBarcodeHandler());
 		hardware.baggingArea.register(currentSession.getElectronicScaleHandler());
 		hardware.coinValidator.attach(currentSession.getCoinValidatorHandler());
+		hardware.printer.register(currentSession.getReceiptPrinterHandler());
 		
 		return currentSession;
 	}
