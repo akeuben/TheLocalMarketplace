@@ -39,6 +39,7 @@ import org.junit.Test;
 
 import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
+import com.thelocalmarketplace.software.SelfCheckoutConfiguration.MachineRating;
 
 public class SelfCheckoutTest {
 	
@@ -92,6 +93,7 @@ public class SelfCheckoutTest {
 		int TrayCapTest = 15;
 
 		SelfCheckoutConfiguration config = new SelfCheckoutConfiguration(
+				SelfCheckoutConfiguration.MachineRating.BRONZE,
 				currencyTest,
 				DispenserCapTest,
 				StorageCapTest,

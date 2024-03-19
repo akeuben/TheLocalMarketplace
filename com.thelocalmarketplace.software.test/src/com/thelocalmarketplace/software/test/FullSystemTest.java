@@ -38,10 +38,10 @@ import org.junit.Test;
 
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
-import com.jjjwelectronics.scale.ElectronicScale;
+import com.jjjwelectronics.scale.IElectronicScale;
 import com.jjjwelectronics.scanner.Barcode;
-import com.jjjwelectronics.scanner.BarcodeScanner;
 import com.jjjwelectronics.scanner.BarcodedItem;
+import com.jjjwelectronics.scanner.IBarcodeScanner;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.coin.Coin;
@@ -121,8 +121,8 @@ public class FullSystemTest {
 		UserSession session = sc.startNewSession();
 		Transaction transaction = session.getTransaction();
 
-		BarcodeScanner scanner = SelfCheckout.getInstance().getHardware().scanner;
-		ElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().baggingArea;
+		IBarcodeScanner scanner = SelfCheckout.getInstance().getHardware().mainScanner;
+		IElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().baggingArea;
 		CoinSlot coinSlot = SelfCheckout.getInstance().getHardware().coinSlot;
 
 		assertEquals(session.getState(), UserSessionState.READY_FOR_ITEM);
@@ -186,8 +186,8 @@ public class FullSystemTest {
 		UserSession session = sc.startNewSession();
 		Transaction transaction = session.getTransaction();
 
-		BarcodeScanner scanner = SelfCheckout.getInstance().getHardware().scanner;
-		ElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().baggingArea;
+		IBarcodeScanner scanner = SelfCheckout.getInstance().getHardware().mainScanner;
+		IElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().baggingArea;
 		
 		BarcodedItem item1 = new BarcodedItem(barcode1, new Mass(100.0));
 
@@ -236,7 +236,7 @@ public class FullSystemTest {
 		SelfCheckout sc = SelfCheckout.getInstance();
 		UserSession session = sc.startNewSession();
 
-		ElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().baggingArea;
+		IElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().baggingArea;
 		
 		BarcodedItem item1 = new BarcodedItem(barcode1, new Mass(100.0));
 
@@ -261,7 +261,7 @@ public class FullSystemTest {
 		SelfCheckout sc  = SelfCheckout.getInstance(); 
 		UserSession session = sc.startNewSession();
 		
-		BarcodeScanner scanner = sc.getHardware().scanner; 
+		IBarcodeScanner scanner = sc.getHardware().mainScanner; 
 		Numeral[] dummyCode = {Numeral.one, Numeral.two};
 		BarcodedItem newItem = new BarcodedItem(new Barcode(dummyCode), new Mass(10.0));
 		scanner.scan(newItem); 

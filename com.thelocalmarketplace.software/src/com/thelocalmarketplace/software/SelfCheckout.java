@@ -1,5 +1,10 @@
 package com.thelocalmarketplace.software;
 
+import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
+import com.thelocalmarketplace.hardware.SelfCheckoutStationBronze;
+import com.thelocalmarketplace.hardware.SelfCheckoutStationGold;
+import com.thelocalmarketplace.hardware.SelfCheckoutStationSilver;
+
 /**
  * SENG 300 Project - Group 1:
  * 
@@ -26,7 +31,6 @@ package com.thelocalmarketplace.software;
  * Winston Wang - ????????
  */
 
-import com.thelocalmarketplace.hardware.SelfCheckoutStation;
 import com.thelocalmarketplace.software.session.UserSession;
 
 import powerutility.PowerGrid;
@@ -37,12 +41,24 @@ public class SelfCheckout {
 	
 	private UserSession currentSession;
 	
-	private SelfCheckoutStation hardware;
+	private AbstractSelfCheckoutStation hardware;
 	
-	private SelfCheckout() {
+	private SelfCheckout(SelfCheckoutConfiguration configuration) {
 		currentSession = null;
 		
-		hardware = new SelfCheckoutStation();
+		switch(configuration.rating) {
+		case BRONZE:
+			hardware = new SelfCheckoutStationBronze();
+			break;
+		case GOLD:
+			hardware = new SelfCheckoutStationGold();
+			break;
+		case SILVER:
+			hardware = new SelfCheckoutStationSilver();
+			break;
+		default:
+			throw new RuntimeException("Invalid configuration");
+		}
 		PowerGrid.engageUninterruptiblePowerSource();
 		hardware.plugIn(PowerGrid.instance());
 		hardware.turnOn();
@@ -69,14 +85,14 @@ public class SelfCheckout {
 	public static SelfCheckout initialize(SelfCheckoutConfiguration configuration) throws RuntimeException {
 		if(instance != null) throw new RuntimeException("There is already a self checkout initialized!");
 		
-		instance = new SelfCheckout();
+		instance = new SelfCheckout(configuration);
 		
 		// Initialize the hardware
-		SelfCheckoutStation.configureCurrency(configuration.currency);
-		SelfCheckoutStation.configureCoinDenominations(configuration.coinDenominations);
-		SelfCheckoutStation.configureCoinDispenserCapacity(configuration.coinDispenserCapacity);
-		SelfCheckoutStation.configureCoinStorageUnitCapacity(configuration.coinStorageUnitCapacity);
-		SelfCheckoutStation.configureCoinTrayCapacity(configuration.coinTrayCapacity);
+		AbstractSelfCheckoutStation.configureCurrency(configuration.currency);
+		AbstractSelfCheckoutStation.configureCoinDenominations(configuration.coinDenominations);
+		AbstractSelfCheckoutStation.configureCoinDispenserCapacity(configuration.coinDispenserCapacity);
+		AbstractSelfCheckoutStation.configureCoinStorageUnitCapacity(configuration.coinStorageUnitCapacity);
+		AbstractSelfCheckoutStation.configureCoinTrayCapacity(configuration.coinTrayCapacity);
 		
 		return instance;
 	}
@@ -112,12 +128,12 @@ public class SelfCheckout {
 		currentSession = new UserSession();
 		
 		// Remove old listeners
-		hardware.scanner.deregisterAll();
+		hardware.mainScanner.deregisterAll();
 		hardware.baggingArea.deregisterAll();
 		hardware.coinValidator.detachAll();
 		
 		// Register listeners
-		hardware.scanner.register(currentSession.getBarcodeHandler());
+		hardware.mainScanner.register(currentSession.getBarcodeHandler());
 		hardware.baggingArea.register(currentSession.getElectronicScaleHandler());
 		hardware.coinValidator.attach(currentSession.getCoinValidatorHandler());
 		
@@ -140,7 +156,7 @@ public class SelfCheckout {
 	 * Gets the hardware for the self checkout station.
 	 * @return The hardware of the self checkout station.
 	 */
-	public SelfCheckoutStation getHardware() {
+	public AbstractSelfCheckoutStation getHardware() {
 		return hardware;
 	}
 }

@@ -30,7 +30,7 @@ import java.math.BigDecimal;
 
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.scanner.Barcode;
-import com.jjjwelectronics.scanner.BarcodeScanner;
+import com.jjjwelectronics.scanner.IBarcodeScanner;
 import com.tdc.coin.Coin;
 
 public interface IUserSessionState<T> {
@@ -51,7 +51,7 @@ public interface IUserSessionState<T> {
 	void onStateUnset();
 	
 	/**
-	 * Called when a {@link Barcode} is scanned by any {@link BarcodeScanner}
+	 * Called when a {@link Barcode} is scanned by any {@link IBarcodeScanner}
 	 * on the self checkout station.
 	 * @param barcode The {@link Barcode} that was scanned
 	 * @return The state to transition to after this function returns, or null to stay on the same state.

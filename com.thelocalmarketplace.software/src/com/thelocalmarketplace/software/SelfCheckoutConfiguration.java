@@ -39,7 +39,10 @@ public class SelfCheckoutConfiguration {
 	public int coinStorageUnitCapacity;
 	public int coinTrayCapacity;
 	
-	public SelfCheckoutConfiguration(Currency currency, int coinDispenserCapacity, int coinStorageUnitCapacity, int coinTrayCapacity, BigDecimal... coinDenominations) {
+	public MachineRating rating;
+	
+	public SelfCheckoutConfiguration(MachineRating rating, Currency currency, int coinDispenserCapacity, int coinStorageUnitCapacity, int coinTrayCapacity, BigDecimal... coinDenominations) {
+		this.rating = rating;
 		this.coinDenominations = coinDenominations;
 		this.currency = currency;
 		this.coinDispenserCapacity = coinDispenserCapacity;
@@ -48,7 +51,7 @@ public class SelfCheckoutConfiguration {
 	}
 	
 	public SelfCheckoutConfiguration() {
-		this(Currency.getInstance(Locale.CANADA), 100, 1000, 25, BigDecimal.ONE);
+		this(MachineRating.BRONZE, Currency.getInstance(Locale.CANADA), 100, 1000, 25, BigDecimal.ONE);
 	}
 
 	public Currency getCurrency() {
@@ -69,5 +72,9 @@ public class SelfCheckoutConfiguration {
 
 	public BigDecimal[] getCoinDenominations() {
 		return coinDenominations.clone();
+	}
+	
+	public static enum MachineRating {
+		GOLD, SILVER, BRONZE
 	}
 }
