@@ -57,7 +57,6 @@ public class TransactionTest {
 		this.bc= new Barcode(new Numeral[] {num});
 		this.productOne = new BarcodedProduct(bc, "test1", 100, 1);
 		this.productTwo = new BarcodedProduct(bc, "test2", 200, 2);
-		
 	}
 	
 	@Test
