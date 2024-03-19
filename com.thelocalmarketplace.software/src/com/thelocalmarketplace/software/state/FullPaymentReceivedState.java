@@ -35,7 +35,8 @@ public class FullPaymentReceivedState implements IUserSessionState<UserSessionSt
             workingString += " : $";
             workingString += String.valueOf(product.getPrice());
             itemizedTransaction.add(workingString);
-            totalCharsToPrint += workingString.replaceAll("\\s", "").length();
+            String strippedString = workingString.replaceAll("\\s", "");
+            totalCharsToPrint += strippedString.length();
         }
 
         //because the printer can know how many more chars and lines it has left we can probably
@@ -50,24 +51,21 @@ public class FullPaymentReceivedState implements IUserSessionState<UserSessionSt
         }
 
 
-
-
-        for (String str : itemizedTransaction){
-            char[] charArray = str.toCharArray();
-            for (char c : charArray){
-                try {
+        for (String barcodePriceString : itemizedTransaction) {
+            char[] charArray = barcodePriceString.toCharArray();
+            try {
+                for (char c : charArray) {
                     hardwarePrinter.print(c);
                 }
-                catch (EmptyDevice empty){
-
-                }
-                catch (OverloadedDevice overload){
-
-                }
+                hardwarePrinter.print('\n');
             }
-
+            catch(EmptyDevice empty){
+                //do something if the ink or paper runs out (notfiy attendant station somehow)
+            }
+            catch(OverloadedDevice overload){
+                //60 characters on the line have been exceeded so figure out what we want to do when that happens?
+            }
         }
-
         return null;
     }
 
