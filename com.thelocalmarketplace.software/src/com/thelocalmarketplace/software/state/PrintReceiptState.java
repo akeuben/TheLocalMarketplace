@@ -6,14 +6,13 @@ import com.jjjwelectronics.OverloadedDevice;
 import com.jjjwelectronics.printer.IReceiptPrinter;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
-import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.payment.Transaction;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-public class FullPaymentReceivedState implements IUserSessionState<UserSessionState> {
+public class PrintReceiptState implements IUserSessionState<UserSessionState> {
 
     private Transaction finalTransactionRecord;
     private ArrayList<String> itemizedTransaction;
@@ -69,7 +68,9 @@ public class FullPaymentReceivedState implements IUserSessionState<UserSessionSt
 
         hardwarePrinter.cutPaper();
         hardwarePrinter.removeReceipt();
-        return null;
+
+        //After receipt printing the use case states the station should return to a ready state
+        return UserSessionState.READY_FOR_ITEM;
     }
 
     @Override
