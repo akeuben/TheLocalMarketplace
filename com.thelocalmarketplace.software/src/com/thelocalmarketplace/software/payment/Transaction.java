@@ -49,7 +49,6 @@ public class Transaction {
     private final HashMap<UUID, IPayment> payments = new HashMap<>();
     
 
-
     /**
      * Adds a product into the current transaction
      * Adds weight to total expected weight

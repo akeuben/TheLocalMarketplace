@@ -36,6 +36,7 @@ public class UserSession {
     private CoinValidatorHandler coinValidatorHandler;
     private BarcodeHandler barcodeHandler;
     private ElectronicScaleHandler electronicScaleHandler;
+    private UIHandler uiHandler;
     
     /**
      * Create a user session. This holds all data pertaining
@@ -109,5 +110,13 @@ public class UserSession {
 	 */
 	public ElectronicScaleHandler getElectronicScaleHandler() {
 		return electronicScaleHandler;
+	}
+	
+	/**
+	 * Get the UIListener for the current session
+	 * @return The UIListener
+	 */
+	public UIHandler getUIHandler() {
+		return uiHandler;
 	}
 }
