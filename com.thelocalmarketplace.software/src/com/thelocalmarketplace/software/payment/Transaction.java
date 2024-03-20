@@ -33,7 +33,9 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.OverloadedDevice;
 import com.thelocalmarketplace.hardware.Product;
+import com.thelocalmarketplace.software.SelfCheckout;
 
 public class Transaction {
 
@@ -64,6 +66,17 @@ public class Transaction {
         else {
             throw new NullPointerException("product");
         }
+    }
+    
+    /**
+     * updates transaction weight to include bag weight
+     */
+    public void addBag() {
+		try {
+		expectedMass = expectedMass.sum(SelfCheckout.getInstance().getHardware().baggingArea.getCurrentMassOnTheScale());
+		} catch (OverloadedDevice | RuntimeException e) { // Catch errors when retrieving mass from scale
+			//TODO
+		}
     }
 
 
