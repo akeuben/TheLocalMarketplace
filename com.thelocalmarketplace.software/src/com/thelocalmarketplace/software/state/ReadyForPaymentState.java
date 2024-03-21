@@ -105,7 +105,7 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 
 	@Override
 	public boolean checkStateGate() {
-		return false;
+		return true;
 	}
 
 }

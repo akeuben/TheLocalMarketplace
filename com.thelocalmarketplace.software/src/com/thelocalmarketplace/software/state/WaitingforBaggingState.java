@@ -73,4 +73,9 @@ public class WaitingforBaggingState implements IUserSessionState<UserSessionStat
 	public UserSessionState onCoinInserted(BigDecimal value) {
 		return null; // State does not change if user inserts coin
 	}
+
+	@Override
+	public boolean checkStateGate() {
+		return true;
+	}
 }
