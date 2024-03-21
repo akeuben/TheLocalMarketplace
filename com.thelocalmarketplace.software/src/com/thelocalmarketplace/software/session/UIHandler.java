@@ -20,13 +20,20 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 		// TODO Change state to block further customer actions
 		super.getUserSession().getTransaction().removeItem(product);
 		// TODO Change state to allow further customer actions
-		// TODO Indicate to customer to remove item from baggin area or shopping cart
+		// TODO Indicate to customer to remove item from bagging area or shopping cart
 		
 	}
 
 	@Override
-	public void bulkyItemSelected() {
-		// TODO Auto-generated method stub
+	public void bulkyItemSelected(Product product) {
+		// TODO Change state to block further customer actions
+		// TODO Signal to attendant (Cannot be implemented yet)
+		boolean attendantApproves = true; //TODO Change to signal to attendant, getting a boolean response
+		if (attendantApproves) {
+			super.getUserSession().getTransaction().addBulkyItem(product);
+		}
+
+
 		
 	}
 
