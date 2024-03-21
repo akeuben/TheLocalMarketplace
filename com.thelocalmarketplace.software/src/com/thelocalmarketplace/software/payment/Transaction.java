@@ -83,12 +83,22 @@ public class Transaction {
     /**
      *
      * Adds a payment to the transaction by storing in HashMap payments
-     * @param paymentMethod, type of payment method used, must be initialized so amountPaid is already defined
+     * @param payment, type of payment method used, must be initialized so amountPaid is already defined
      */
     public void addPayment(IPayment payment) {
     	UUID transactionId = UUID.randomUUID(); // Generate a unique ID for this transaction/payment
     	payments.put(transactionId, payment); // Add payment to HashMap
     	totalCost = totalCost.subtract(payment.getAmountPaid());
+    }
+
+    /**
+     * Removes an item from the transaction
+     * @param product item being removed from transaction/products
+     */
+    public void removeItem(Product product) {
+    	products.remove(product);
+    	totalCost = totalCost.subtract(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
+    	expectedMass = expectedMass.difference(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM)));
     }
     
     
