@@ -20,8 +20,9 @@ public class DebitPayment implements CardReaderListener, IPayment {
 	private BigDecimal amountPaid = BigDecimal.valueOf(0);
 
 	
-	//TODO understand utilization of listener 
-	//TODO configure for the different self checkout types
+	// TODO understand utilization of listener 
+	// TODO configure for the different self checkout types
+	// TODO signature verification
 	
 	
 	/**
@@ -38,7 +39,7 @@ public class DebitPayment implements CardReaderListener, IPayment {
 		if (type.equals("swipe")) {
 			// if a swipe payment wants to be made then call the apporopriate method
 			boolean success = swipePayment();
-			if(success) {
+			if(success == true) {
 				// in the event the transaction is sucessful set paid amount to the due amount
 				this.amountPaid = this.amountDue; 	
 			}
@@ -60,7 +61,8 @@ public class DebitPayment implements CardReaderListener, IPayment {
 		this.amountDue = SelfCheckout.getInstance().getCurrentSession().getTransaction().getTotalCost();
 		System.out.println("Please swipe your debit card.");
 		try {
-			Card.CardSwipeData data = this.userCard.swipe();
+			// dont't swipe from the card class but from the card reader of the self checkout machine
+			Card.CardData data = SelfCheckout.getInstance().getHardware().cardReader.swipe(this.userCard);
 			System.out.println("Card has been successfully swiped.");
 			
 			System.out.println("Please enter your signature");
@@ -70,11 +72,9 @@ public class DebitPayment implements CardReaderListener, IPayment {
 			if (blockNum != -1) {
 				// if the hold is successful then post the transaction
 				boolean posted = this.bank.postTransaction(data.getNumber(), blockNum, this.amountDue.doubleValue());
-				if (!posted) {
-					// if transaction unsuccessful then release the hold
+					// Whether transaction is valid or not release the hold
 					this.bank.releaseHold(data.getNumber(), blockNum);
 
-				}
 				// once that is all done then return the result of the transaction being posted
 				return posted;
 
@@ -89,25 +89,24 @@ public class DebitPayment implements CardReaderListener, IPayment {
 
 	@Override
 	public void aDeviceHasBeenEnabled(IDevice<? extends IDeviceListener> device) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public void aDeviceHasBeenDisabled(IDevice<? extends IDeviceListener> device) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void aDeviceHasBeenTurnedOn(IDevice<? extends IDeviceListener> device) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
 	@Override
 	public void aDeviceHasBeenTurnedOff(IDevice<? extends IDeviceListener> device) {
-		// TODO Auto-generated method stub
+		
 
 	}
 
@@ -119,7 +118,7 @@ public class DebitPayment implements CardReaderListener, IPayment {
 
 	@Override
 	public void aCardHasBeenSwiped() {
-		// TODO Auto-generated method stub
+		
 
 	}
 
