@@ -42,29 +42,42 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
         //use totalCharToPrint to see if the receipt is even printable
         //assuming it is then move on to the rest
         try {
-            if(hardwarePrinter.inkRemaining() < totalCharsToPrint | hardwarePrinter.paperRemaining() < (totalCharsToPrint/60) ){
-                //here prob just jump to notifying the attendant station because this receipt wont be able to fully print
+            if(hardwarePrinter.inkRemaining() < totalCharsToPrint){
+                SelfCheckout.getInstance().getCurrentSession().getReceiptPrinterHandler().thePrinterIsOutOfInk();
+            } else if (hardwarePrinter.paperRemaining() < (totalCharsToPrint/60)) {
+                SelfCheckout.getInstance().getCurrentSession().getReceiptPrinterHandler().thePrinterIsOutOfPaper();
             }
         } catch (UnsupportedOperationException e){
-            //this means we have the bronze receipt printer so we just have to print the receipt and wait until it goes empty
+            //this means we have the bronze receipt printer, so we just have to print the receipt and wait until it goes empty
         }
-
 
         //loop through the formatted customer transaction
         for (String barcodePriceString : itemizedTransaction) {
             char[] charArray = barcodePriceString.toCharArray();
-            try {
                 for (char c : charArray) {
-                    hardwarePrinter.print(c);
+                    try {
+                        hardwarePrinter.print(c);
+                    }
+                    catch(EmptyDevice empty){
+                        //its not possible to tell if its the ink or paper that ran out so set both flags
+                        SelfCheckout.getInstance().getCurrentSession().getReceiptPrinterHandler().thePrinterIsOutOfPaper();
+                        SelfCheckout.getInstance().getCurrentSession().getReceiptPrinterHandler().thePrinterIsOutOfInk();
+                    }
+                    catch(OverloadedDevice overload){
+                        //60 characters on the line have been exceeded so figure out what we want to do when that happens?
+                    }
                 }
-                hardwarePrinter.print('\n');//once an item has been printed out fully move to the next line
-            }
-            catch(EmptyDevice empty){
-                //do something if the ink or paper runs out (notfiy attendant station somehow)
-            }
-            catch(OverloadedDevice overload){
-                //60 characters on the line have been exceeded so figure out what we want to do when that happens?
-            }
+                try{
+                    hardwarePrinter.print('\n');//once an item has been printed out fully move to the next line
+                } catch (EmptyDevice e) {
+                    //newline char doesn't use ink but will throw out of paper
+                    SelfCheckout.getInstance().getCurrentSession().getReceiptPrinterHandler().thePrinterIsOutOfPaper();
+                } catch (OverloadedDevice e) {
+                    //this really should never happen based on what the printer class looks like but
+                    System.out.println("something bad happened in print receipt state");
+                    throw new RuntimeException(e);
+                }
+
         }
 
         hardwarePrinter.cutPaper();
