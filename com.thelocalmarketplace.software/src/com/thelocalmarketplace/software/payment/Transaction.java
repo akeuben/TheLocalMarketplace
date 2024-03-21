@@ -67,6 +67,23 @@ public class Transaction {
             throw new NullPointerException("product");
         }
     }
+
+    /**
+     * Removes weight of bulky item from transaction
+     * @param product item being added to transaction/products
+     */
+    public void handleBulkyItem(Product product)
+    {
+    	if (product != null) {
+            products.add(product);
+            // Removes expected
+            expectedMass = expectedMass.difference(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM)));
+            // Expected mass is no
+        }
+        else {
+            throw new NullPointerException("product");
+        }
+    }
     
     /**
      * updates transaction weight to include bag weight
