@@ -16,8 +16,8 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 	}
 
 	@Override
-	public void removeItemSelected() {
-		// TODO Auto-generated method stub
+	public void removeItemSelected(Product product) {
+		super.getUserSession().getTransaction().removeItem(product);
 		
 	}
 
