@@ -9,12 +9,13 @@ import java.math.BigDecimal;
 public class PrinterNeedsRefillState implements IUserSessionState<UserSessionState> {
     @Override
     public UserSessionState onStateSet() {
+        SelfCheckout.getInstance().attendantStationFlagged = true;
         return null;
     }
 
     @Override
     public void onStateUnset() {
-
+        SelfCheckout.getInstance().attendantStationFlagged = false;
     }
 
     @Override
@@ -33,8 +34,8 @@ public class PrinterNeedsRefillState implements IUserSessionState<UserSessionSta
     }
 
     @Override
-    public boolean checkStateGate() {
-        //if the need refill flags are set this returns false
-        return !SelfCheckout.getInstance().getCurrentSession().getReceiptPrinterHandler().refillFlagsSet();
+    public UserSessionState onPrinterRefilled() {
+        SelfCheckout.getInstance().getCurrentSession().setState(UserSessionState.READY_FOR_PAYMENT);
+        return null;
     }
 }

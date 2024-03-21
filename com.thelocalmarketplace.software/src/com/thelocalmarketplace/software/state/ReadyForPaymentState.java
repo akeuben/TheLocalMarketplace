@@ -104,8 +104,8 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 	}
 
 	@Override
-	public boolean checkStateGate() {
-		return true;
+	public UserSessionState onPrinterRefilled() {
+		return null;
 	}
 
 }

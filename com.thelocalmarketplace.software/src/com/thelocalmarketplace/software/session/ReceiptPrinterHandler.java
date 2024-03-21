@@ -4,6 +4,7 @@ import com.jjjwelectronics.IDevice;
 import com.jjjwelectronics.IDeviceListener;
 import com.jjjwelectronics.printer.ReceiptPrinterListener;
 import com.jjjwelectronics.scale.ElectronicScaleListener;
+import com.thelocalmarketplace.software.SelfCheckout;
 
 import java.util.ArrayList;
 
@@ -57,11 +58,17 @@ public class ReceiptPrinterHandler extends AbstractUserSessionHandler implements
     @Override
     public void paperHasBeenAddedToThePrinter() {
         fillPaperFlag = false;
+        if(!refillFlagsSet()){
+            SelfCheckout.getInstance().getCurrentSession().getState().onPrinterRefilled();
+        }
     }
 
     @Override
     public void inkHasBeenAddedToThePrinter() {
         fillInkFlag = false;
+        if(!refillFlagsSet()){
+            SelfCheckout.getInstance().getCurrentSession().getState().onPrinterRefilled();
+        }
     }
 
     public boolean refillFlagsSet(){

@@ -72,10 +72,5 @@ public interface IUserSessionState<T> {
 	 */
 	T onCoinInserted(BigDecimal value);
 
-	/**
-	 * Called by user session when changing state
-	 * in some case a state may need to stay unchanged
-	 * until certain conditions are met
-	 */
-	boolean checkStateGate();
+	T onPrinterRefilled();
 }

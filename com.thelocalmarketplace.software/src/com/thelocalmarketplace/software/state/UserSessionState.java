@@ -90,5 +90,8 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	}
 
 	@Override
-	public boolean checkStateGate() { return state.checkStateGate(); }
+	public UserSessionState onPrinterRefilled() {
+		return null;
+	}
+
 }

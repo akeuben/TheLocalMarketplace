@@ -44,8 +44,10 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
         try {
             if(hardwarePrinter.inkRemaining() < totalCharsToPrint){
                 SelfCheckout.getInstance().getCurrentSession().getReceiptPrinterHandler().thePrinterIsOutOfInk();
+                SelfCheckout.getInstance().getCurrentSession().setState(UserSessionState.PRINTER_NEEDS_REFILL);
             } else if (hardwarePrinter.paperRemaining() < (totalCharsToPrint/60)) {
                 SelfCheckout.getInstance().getCurrentSession().getReceiptPrinterHandler().thePrinterIsOutOfPaper();
+                SelfCheckout.getInstance().getCurrentSession().setState(UserSessionState.PRINTER_NEEDS_REFILL);
             }
         } catch (UnsupportedOperationException e){
             //this means we have the bronze receipt printer, so we just have to print the receipt and wait until it goes empty
@@ -62,9 +64,16 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
                         //its not possible to tell if its the ink or paper that ran out so set both flags
                         SelfCheckout.getInstance().getCurrentSession().getReceiptPrinterHandler().thePrinterIsOutOfPaper();
                         SelfCheckout.getInstance().getCurrentSession().getReceiptPrinterHandler().thePrinterIsOutOfInk();
+                        SelfCheckout.getInstance().getCurrentSession().setState(UserSessionState.PRINTER_NEEDS_REFILL);
                     }
                     catch(OverloadedDevice overload){
-                        //60 characters on the line have been exceeded so figure out what we want to do when that happens?
+                        try {
+                            hardwarePrinter.print('\n');
+                            hardwarePrinter.print(c);
+                        } catch (EmptyDevice | OverloadedDevice e) {
+                            throw new RuntimeException(e);//if another error happens here ill be surprised
+                        }
+
                     }
                 }
                 try{
@@ -72,6 +81,7 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
                 } catch (EmptyDevice e) {
                     //newline char doesn't use ink but will throw out of paper
                     SelfCheckout.getInstance().getCurrentSession().getReceiptPrinterHandler().thePrinterIsOutOfPaper();
+                    SelfCheckout.getInstance().getCurrentSession().setState(UserSessionState.PRINTER_NEEDS_REFILL);
                 } catch (OverloadedDevice e) {
                     //this really should never happen based on what the printer class looks like but
                     System.out.println("something bad happened in print receipt state");
@@ -84,7 +94,8 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
         hardwarePrinter.removeReceipt();
 
         //After receipt printing the use case states the station should return to a ready state
-        return UserSessionState.READY_FOR_ITEM;
+        SelfCheckout.getInstance().getCurrentSession().setState(UserSessionState.READY_FOR_ITEM);
+        return null;
     }
 
     @Override
@@ -108,7 +119,7 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
     }
 
     @Override
-    public boolean checkStateGate() {
-        return true;
+    public UserSessionState onPrinterRefilled() {
+        return null;
     }
 }

@@ -43,7 +43,7 @@ public class SelfCheckout {
 	
 	private AbstractSelfCheckoutStation hardware;
 
-	private boolean attendantStationFlagged; //placeholder for any case where the attendant station may be flagged
+	public boolean attendantStationFlagged; //placeholder for any case where the attendant station may be flagged
 	
 	private SelfCheckout(SelfCheckoutConfiguration configuration) {
 		currentSession = null;
