@@ -5,16 +5,16 @@ public interface UIObserver {
 	/**
 	 * announces when user selects option to add their own bags
 	 */
-	void addBag();
+	void addBagSelected();
 	
 	/**
 	 * announces when user selects option to remove item from order
 	 */
-	void removeItem();
+	void removeItemSelected();
 	
 	/**
 	 * announces when user selects option to add bulky item to order
 	 */
-	void bulkyItem();
+	void bulkyItemSelected();
 
 }
