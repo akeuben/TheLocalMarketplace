@@ -2,6 +2,7 @@ package com.thelocalmarketplace.software.state;
 
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.scanner.Barcode;
+import com.thelocalmarketplace.software.SelfCheckout;
 
 import java.math.BigDecimal;
 
@@ -33,6 +34,7 @@ public class PrinterNeedsRefillState implements IUserSessionState<UserSessionSta
 
     @Override
     public boolean checkStateGate() {
-        return false;
+        //if the need refill flags are set this returns false
+        return !SelfCheckout.getInstance().getCurrentSession().getReceiptPrinterHandler().refillFlagsSet();
     }
 }

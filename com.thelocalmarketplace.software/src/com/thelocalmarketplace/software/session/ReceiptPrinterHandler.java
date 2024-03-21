@@ -63,4 +63,13 @@ public class ReceiptPrinterHandler extends AbstractUserSessionHandler implements
     public void inkHasBeenAddedToThePrinter() {
         fillInkFlag = false;
     }
+
+    public boolean refillFlagsSet(){
+        if (fillInkFlag | fillPaperFlag){
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
 }
