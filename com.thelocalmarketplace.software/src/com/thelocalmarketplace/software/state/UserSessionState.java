@@ -51,7 +51,12 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	 * This state is used when the system has received full payment and
 	 * can end the customers session
 	 */
-	PRINT_RECEIPT(new PrintReceiptState());
+	PRINT_RECEIPT(new PrintReceiptState()),
+	/**
+	 * This state is used when the printer cannot fully print a customer receipt
+	 * and needs to notify the attendant station
+	 */
+	PRINTER_NEEDS_REFILL(new PrinterNeedsRefillState());
 	
 	private IUserSessionState<UserSessionState> state;
 	

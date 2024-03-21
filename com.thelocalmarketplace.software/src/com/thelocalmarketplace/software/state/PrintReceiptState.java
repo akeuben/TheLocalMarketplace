@@ -50,13 +50,14 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
         }
 
 
+        //loop through the formatted customer transaction
         for (String barcodePriceString : itemizedTransaction) {
             char[] charArray = barcodePriceString.toCharArray();
             try {
                 for (char c : charArray) {
                     hardwarePrinter.print(c);
                 }
-                hardwarePrinter.print('\n');
+                hardwarePrinter.print('\n');//once an item has been printed out fully move to the next line
             }
             catch(EmptyDevice empty){
                 //do something if the ink or paper runs out (notfiy attendant station somehow)
