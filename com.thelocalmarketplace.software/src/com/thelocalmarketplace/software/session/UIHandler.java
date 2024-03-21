@@ -17,7 +17,10 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 
 	@Override
 	public void removeItemSelected(Product product) {
+		// TODO Change state to block further customer actions
 		super.getUserSession().getTransaction().removeItem(product);
+		// TODO Change state to allow further customer actions
+		// TODO Indicate to customer to remove item from baggin area or shopping cart
 		
 	}
 
