@@ -103,4 +103,9 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 	    return null;
 	}
 
+	@Override
+	public boolean checkStateGate() {
+		return false;
+	}
+
 }

@@ -71,4 +71,11 @@ public interface IUserSessionState<T> {
 	 * @return The state to transition to after this function returns, or null to stay on the same state.
 	 */
 	T onCoinInserted(BigDecimal value);
+
+	/**
+	 * Called by user session when changing state
+	 * in some case a state may need to stay unchanged
+	 * until certain conditions are met
+	 */
+	boolean checkStateGate();
 }

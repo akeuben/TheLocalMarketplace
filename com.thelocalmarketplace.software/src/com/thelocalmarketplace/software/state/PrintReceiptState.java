@@ -93,4 +93,9 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
     public UserSessionState onCoinInserted(BigDecimal value) {
         return null;
     }
+
+    @Override
+    public boolean checkStateGate() {
+        return false;
+    }
 }

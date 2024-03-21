@@ -88,4 +88,7 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	public UserSessionState onCoinInserted(BigDecimal value) {
 		return state.onCoinInserted(value);
 	}
+
+	@Override
+	public boolean checkStateGate() { return state.checkStateGate(); }
 }

@@ -9,6 +9,9 @@ import java.util.ArrayList;
 
 public class ReceiptPrinterHandler extends AbstractUserSessionHandler implements ReceiptPrinterListener {
 
+    private boolean fillInkFlag = false;
+    private boolean fillPaperFlag = false;
+
     public ReceiptPrinterHandler(UserSession session) { super(session); }
 
     @Override
@@ -33,31 +36,31 @@ public class ReceiptPrinterHandler extends AbstractUserSessionHandler implements
 
     @Override
     public void thePrinterIsOutOfPaper() {
-
+        fillPaperFlag = true;
     }
 
     @Override
     public void thePrinterIsOutOfInk() {
-
+        fillInkFlag = true;
     }
 
     @Override
     public void thePrinterHasLowInk() {
-
+        fillInkFlag = true;
     }
 
     @Override
     public void thePrinterHasLowPaper() {
-
+        fillPaperFlag = true;
     }
 
     @Override
     public void paperHasBeenAddedToThePrinter() {
-
+        fillPaperFlag = false;
     }
 
     @Override
     public void inkHasBeenAddedToThePrinter() {
-
+        fillInkFlag = false;
     }
 }

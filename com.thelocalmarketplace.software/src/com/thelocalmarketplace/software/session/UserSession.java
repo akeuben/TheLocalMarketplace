@@ -62,15 +62,18 @@ public class UserSession {
      * @param newState The new state to set
      */
     public void setState(UserSessionState newState) {
-    	if(newState == this.state) return;
-    	
-    	// Send relevant events and update the state field.
-    	this.state.onStateUnset();
-    	this.state = newState;
-    	newState = this.state.onStateSet();
-    	if(newState != null) {
-    		setState(newState);
-    	}
+		boolean stateIsAllowedToChange = this.state.checkStateGate();
+		if(stateIsAllowedToChange){
+			if(newState == this.state) return;
+
+			// Send relevant events and update the state field.
+			this.state.onStateUnset();
+			this.state = newState;
+			newState = this.state.onStateSet();
+			if(newState != null) {
+				setState(newState);
+			}
+		}
     }
     
     /**

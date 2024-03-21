@@ -30,4 +30,9 @@ public class PrinterNeedsRefillState implements IUserSessionState<UserSessionSta
     public UserSessionState onCoinInserted(BigDecimal value) {
         return null;
     }
+
+    @Override
+    public boolean checkStateGate() {
+        return false;
+    }
 }

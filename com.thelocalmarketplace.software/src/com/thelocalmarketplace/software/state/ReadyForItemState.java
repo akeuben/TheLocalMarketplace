@@ -89,4 +89,9 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 		return null;
 	}
 
+	@Override
+	public boolean checkStateGate() {
+		return false;
+	}
+
 }
