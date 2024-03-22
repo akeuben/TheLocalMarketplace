@@ -33,6 +33,10 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import com.jjjwelectronics.Mass;
+import com.tdc.CashOverloadException;
+import com.tdc.DisabledException;
+import com.tdc.banknote.Banknote;
+import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.SelfCheckout;
@@ -124,7 +128,7 @@ public class Transaction {
 		return payments;
 	}
 
-    public void calculateChange() {
+    public void calculateChange() throws DisabledException, CashOverloadException {
         if (totalCost.compareTo(BigDecimal.ZERO) < 0) {
             SelfCheckout instance = SelfCheckout.getInstance();
             BigDecimal change = totalCost.negate();
