@@ -57,7 +57,13 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	 * is waiting for item to be removed
 	 * from baggage area
 	 */
-	WAITING_FOR_ITEM_REMOVAL(new WaitingForItemRemovalState);
+	WAITING_FOR_ITEM_REMOVAL(new WaitingForItemRemovalState()),
+	/**
+	 * This state is used when user is adding bags
+	 */
+	
+	ADD_BAG(new AddBagState());
+	
 
 	private IUserSessionState<UserSessionState> state;
 	
