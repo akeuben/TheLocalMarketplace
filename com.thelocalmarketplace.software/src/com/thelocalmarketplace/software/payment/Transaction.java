@@ -167,6 +167,8 @@ public class Transaction {
             }
 
             instance.getHardware().banknoteOutput.dispense(); // dispense banknotes we collected
+            instance.getHardware().coinTray.collectCoins(); // User takes out coins that were calculated during change phase
+            // dispense clears out banknoteOutput, but what about coinTray?
         }
     }
 }
