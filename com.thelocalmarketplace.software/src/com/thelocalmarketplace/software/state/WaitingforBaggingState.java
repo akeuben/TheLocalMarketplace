@@ -31,6 +31,7 @@ import java.math.BigInteger;
 
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.OverloadedDevice;
+import com.jjjwelectronics.card.Card.CardData;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.payment.Transaction;
@@ -72,5 +73,10 @@ public class WaitingforBaggingState implements IUserSessionState<UserSessionStat
 	@Override
 	public UserSessionState onCoinInserted(BigDecimal value) {
 		return null; // State does not change if user inserts coin
+	}
+	
+	@Override 
+	public UserSessionState onCardDataRead(CardData data) {
+		return null; 
 	}
 }

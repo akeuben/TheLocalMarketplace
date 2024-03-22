@@ -29,6 +29,7 @@ package com.thelocalmarketplace.software.state;
 import java.math.BigDecimal;
 
 import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.card.Card.CardData;
 import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.IBarcodeScanner;
 import com.tdc.coin.Coin;
@@ -71,4 +72,11 @@ public interface IUserSessionState<T> {
 	 * @return The state to transition to after this function returns, or null to stay on the same state.
 	 */
 	T onCoinInserted(BigDecimal value);
+	
+	/**
+	 * Called when a {@link Card} has it's data read by the card reader through tap, swipe or insert.
+	 * @param data The Card data of the card that was just read.
+	 * @return The state that should be transition to after the function executes, null if state is same. 
+	 */
+	T onCardDataRead(CardData data);
 }

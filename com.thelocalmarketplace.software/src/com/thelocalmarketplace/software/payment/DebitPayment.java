@@ -12,40 +12,17 @@ import com.thelocalmarketplace.hardware.external.CardIssuer;
 import com.thelocalmarketplace.software.SelfCheckout;
 import java.util.Scanner; 
 
-public class DebitPayment implements CardReaderListener, IPayment {
+public class DebitPayment extends AbstractCardPayment implements CardReaderListener{
 
-	private Card userCard;
-	private CardIssuer bank;
 	private BigDecimal amountDue;
-	private BigDecimal amountPaid = BigDecimal.valueOf(0);
 
+	// TODO signature verification, still not sure on this one 
+	// TODO how to differentiate between debit and credit, seems there is literally no discernable way
+	// for now going to write up some tests with what we have
 	
-	// TODO understand utilization of listener 
-	// TODO configure for the different self checkout types
-	// TODO signature verification
-	
-	
-	/**
-	 * Initializes DebitPayment instance, where the bank the card belongs to, the card itself and type of payment needs to be specified
-	 * @param bank The bank that the card belongs to
-	 * @param userCard Card of the customer 
-	 * @param type Type of payment that is wished to be made by the user (whether swipe, tap etc.)
-	 */
-	
-	public DebitPayment(CardIssuer bank, Card userCard, String type) {
-		this.bank = bank;
-		this.userCard = userCard;
-
-		if (type.equals("swipe")) {
-			// if a swipe payment wants to be made then call the apporopriate method
-			boolean success = swipePayment();
-			if(success == true) {
-				// in the event the transaction is sucessful set paid amount to the due amount
-				this.amountPaid = this.amountDue; 	
-			}
-			
-			
-		}
+	public DebitPayment() {
+		super(BigDecimal.ZERO);
+		
 	}
 
 	/**
@@ -54,36 +31,32 @@ public class DebitPayment implements CardReaderListener, IPayment {
 	 */
 	
 	
-	public boolean swipePayment() {
+	public boolean swipePayment(CardData data) {
 		
-		Scanner sc = new Scanner(System.in);
+		
 		
 		this.amountDue = SelfCheckout.getInstance().getCurrentSession().getTransaction().getTotalCost();
-		System.out.println("Please swipe your debit card.");
-		try {
-			// dont't swipe from the card class but from the card reader of the self checkout machine
-			Card.CardData data = SelfCheckout.getInstance().getHardware().cardReader.swipe(this.userCard);
-			System.out.println("Card has been successfully swiped.");
+		// check to see if the bank that corresponds to the card's type exists 
+		if(BankDataBase.getInstance().getDataBase().containsKey(data.getType().toLowerCase())) {
 			
-			System.out.println("Please enter your signature");
-			String sig = sc.nextLine(); // TODO figure out what to do with the signature
-			// after swiping authorize the transaction
-			long blockNum = this.bank.authorizeHold(data.getNumber(), this.amountDue.doubleValue());
-			if (blockNum != -1) {
-				// if the hold is successful then post the transaction
-				boolean posted = this.bank.postTransaction(data.getNumber(), blockNum, this.amountDue.doubleValue());
-					// Whether transaction is valid or not release the hold
-					this.bank.releaseHold(data.getNumber(), blockNum);
+				CardIssuer bank = BankDataBase.getInstance().getDataBase().get(data.getType().toLowerCase());
+			
+			
+				long blockNum = bank.authorizeHold(data.getNumber(), this.amountDue.doubleValue());
+				if (blockNum != -1) {
+					// if the hold is successful then post the transaction
+					boolean posted = bank.postTransaction(data.getNumber(), blockNum, this.amountDue.doubleValue());
+						// Whether transaction is valid or not release the hold
+						bank.releaseHold(data.getNumber(), blockNum);
+						// transaction was successful so update the amount that was paid
+						setAmountPaid(this.amountDue);
+					// once that is all done then return the result of the transaction being posted
+					return posted;
 
-				// once that is all done then return the result of the transaction being posted
-				return posted;
+				}	
 
-			}
-
-		} catch (IOException e) {
-			System.out.println("Error while swiping debit card, please try again.");
 		}
-
+		// if the bank doesn't exist then simply return false
 		return false;
 	}
 
@@ -111,12 +84,6 @@ public class DebitPayment implements CardReaderListener, IPayment {
 	}
 
 	@Override
-	public BigDecimal getAmountPaid() {
-		
-		return this.amountPaid;
-	}
-
-	@Override
 	public void aCardHasBeenSwiped() {
 		
 
@@ -124,7 +91,6 @@ public class DebitPayment implements CardReaderListener, IPayment {
 
 	@Override
 	public void theDataFromACardHasBeenRead(CardData data) {
-		// TODO Auto-generated method stub
 
 	}
 
