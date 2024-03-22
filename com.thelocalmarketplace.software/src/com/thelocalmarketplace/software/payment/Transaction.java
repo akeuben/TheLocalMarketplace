@@ -72,7 +72,7 @@ public class Transaction {
      * Removes weight of bulky item from transaction
      * @param product item being added to transaction/products
      */
-    public void handleBulkyItem(Product product)
+    public void addBulkyItem(Product product)
     {
     	if (product != null) {
             products.add(product);
@@ -88,12 +88,8 @@ public class Transaction {
     /**
      * updates transaction weight to include bag weight
      */
-    public void addBag() {
-		try {
-		expectedMass = expectedMass.sum(SelfCheckout.getInstance().getHardware().baggingArea.getCurrentMassOnTheScale());
-		} catch (OverloadedDevice | RuntimeException e) { // Catch errors when retrieving mass from scale
-			//TODO
-		}
+    public void addBag(Mass bagMass) {
+		expectedMass = expectedMass.sum(bagMass);
     }
 
 

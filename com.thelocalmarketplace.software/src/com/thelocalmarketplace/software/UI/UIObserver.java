@@ -1,5 +1,7 @@
 package com.thelocalmarketplace.software.UI;
 
+import com.thelocalmarketplace.hardware.Product;
+
 public interface UIObserver {
 	
 	/**

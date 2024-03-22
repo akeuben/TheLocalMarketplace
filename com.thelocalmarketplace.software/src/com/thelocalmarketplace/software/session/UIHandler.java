@@ -1,8 +1,10 @@
 package com.thelocalmarketplace.software.session;
 
+import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.UI.UIObserver;
 import com.thelocalmarketplace.software.payment.Transaction;
+import com.thelocalmarketplace.software.state.AddBagState;
 
 public class UIHandler extends AbstractUserSessionHandler implements UIObserver {
 
@@ -12,13 +14,14 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 
 	@Override
 	public void addBagSelected() {
-		super.getUserSession().getTransaction().addBag();
+		//super.getUserSession().getTransaction().addBag();
+		//TODO change state to add bag state
 	}
 
 	@Override
 	public void removeItemSelected(Product product) {
 		// TODO Change state to block further customer actions
-		super.getUserSession().getTransaction().removeItem();
+		super.getUserSession().getTransaction().removeItem(product);
 		// TODO Change state to allow further customer actions
 		// TODO Indicate to customer to remove item from bagging area or shopping cart
 		
