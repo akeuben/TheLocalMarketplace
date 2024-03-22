@@ -97,6 +97,7 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 	    
 	    //Checking when the balance goes down to zero 
 	    if (transaction.getTotalCost().compareTo(BigDecimal.ZERO) <= 0) {
+			transaction.calculateChange();
 	        SelfCheckout.getInstance().endCurrentSession();
 	    }
 	    

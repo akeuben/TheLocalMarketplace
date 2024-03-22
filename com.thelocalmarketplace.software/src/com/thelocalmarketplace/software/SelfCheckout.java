@@ -40,6 +40,7 @@ public class SelfCheckout {
 	private static SelfCheckout instance;
 	
 	private UserSession currentSession;
+	private SelfCheckoutConfiguration configuration;
 	
 	private AbstractSelfCheckoutStation hardware;
 	
@@ -96,6 +97,7 @@ public class SelfCheckout {
 		AbstractSelfCheckoutStation.configureCoinTrayCapacity(configuration.coinTrayCapacity);
 		
 		instance = new SelfCheckout(configuration);
+		instance.configuration = configuration;
 		
 		return instance;
 	}
@@ -109,6 +111,10 @@ public class SelfCheckout {
 		instance.endCurrentSession();
 		
 		instance = null;
+	}
+
+	public SelfCheckoutConfiguration getConfiguration() {
+		return configuration;
 	}
 	
 	/**

@@ -35,6 +35,7 @@ import java.util.UUID;
 import com.jjjwelectronics.Mass;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
+import com.thelocalmarketplace.software.SelfCheckout;
 
 public class Transaction {
 
@@ -122,4 +123,46 @@ public class Transaction {
 		payments = this.payments.values().toArray(payments);
 		return payments;
 	}
+
+    public void calculateChange() {
+        if (totalCost.compareTo(BigDecimal.ZERO) < 0) {
+            SelfCheckout instance = SelfCheckout.getInstance();
+            BigDecimal change = totalCost.negate();
+            BigDecimal[] banknoteDenominations =instance.getConfiguration().banknoteDenominations;
+            BigDecimal[] coinDenominations = instance.getConfiguration().coinDenominations;
+            
+            final int BANKNOTE = 0;
+            final int COIN = 1;
+            while (change.compareTo(BigDecimal.ZERO) > 0) {
+                int dispense = -1;
+                BigDecimal value = BigDecimal.valueOf(-1);
+                for (BigDecimal banknote : banknoteDenominations) {
+                    if (change.compareTo(banknote) >= 0 && banknote.compareTo(value) > 0) {
+                        value = banknote;
+                        dispense = BANKNOTE;
+                    }
+                }
+                for (BigDecimal coin : coinDenominations) {
+                    if (change.compareTo(coin) >= 0 && coin.compareTo(value) > 0) {
+                        value = coin;
+                        dispense = COIN;
+                    }
+                }
+                if (dispense == -1) {
+                    break;
+                } else {
+                    change.subtract(value);         // storage?
+                    if (dispense == BANKNOTE) {
+                        // banknotedispensation
+                        instance.getHardware().banknoteOutput.receive(new Banknote(instance.getConfiguration().getCurrency(), value));
+                    } else {
+                        // coin tray
+                        instance.getHardware().coinTray.receive(new Coin(instance.getConfiguration().getCurrency(), value));
+                    }
+                }
+            }
+
+            instance.getHardware().banknoteOutput.dispense(); // dispense banknotes we collected
+        }
+    }
 }
