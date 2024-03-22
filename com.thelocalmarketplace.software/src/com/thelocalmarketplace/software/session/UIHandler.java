@@ -25,8 +25,8 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 		super.getUserSession().getTransaction().removeItem(product);
 		super.getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
 		// Waits for user to remove item from bagging area
-		if (getUserSession().getTransaction().getExpectedMass() != getUserSession().getTransaction().getExpectedMass() + product.getExpectedWeight()) {
-
+		//TODO Not sure how this should be implemented. Is there a way to get the current mass of the scale???
+		if (super.getUserSession().getTransaction().getExpectedMass() != super.getUserSession().getTransaction().getExpectedMass() + product.getExpectedWeight()) {
 			// Changes state back to READY_FOR_ITEM when item is removed
 			super.getUserSession().setState(UserSessionState.READY_FOR_ITEM);
 		}
@@ -36,10 +36,9 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 
 	@Override
 	public void bulkyItemSelected(Product product) {
-		// TODO Change state to block further customer actions
-		// TODO Signal to attendant (Cannot be implemented yet)
-		boolean attendantApproves = true; //TODO Change to signal to attendant, getting a boolean response
-		if (attendantApproves) {
+		super.getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
+		// Once state changes back to normal, will add the bulky item to the transaction
+		//TODO Wait for attendant to change state of transaction back to normal, then add item.
 			super.getUserSession().getTransaction().addBulkyItem(product);
 		}
 
