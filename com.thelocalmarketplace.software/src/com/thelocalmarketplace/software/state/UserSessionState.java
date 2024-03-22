@@ -46,8 +46,19 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	 * This state is used when the system
 	 * is ready to accept payment
 	 */
-	READY_FOR_PAYMENT(new ReadyForPaymentState());
-	
+	READY_FOR_PAYMENT(new ReadyForPaymentState()),
+	/**
+	 * This state is used when the system
+	 * is waiting for attendant to approve
+	 */
+	WAITING_FOR_ATTENDANT(new WaitingForAttendantState()),
+	/**
+	 * This state is used when the system
+	 * is waiting for item to be removed
+	 * from baggage area
+	 */
+	WAITING_FOR_ITEM_REMOVAL(new WaitingForItemRemovalState);
+
 	private IUserSessionState<UserSessionState> state;
 	
 	private UserSessionState(IUserSessionState<UserSessionState> sessionState) {
