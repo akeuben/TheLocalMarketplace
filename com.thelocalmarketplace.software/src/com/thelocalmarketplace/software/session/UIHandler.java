@@ -5,6 +5,8 @@ import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.UI.UIObserver;
 import com.thelocalmarketplace.software.payment.Transaction;
 import com.thelocalmarketplace.software.state.AddBagState;
+import com.thelocalmarketplace.software.state.UserSessionState;
+import com.thelocalmarketplace.software.state.WaitingforBaggingState;
 
 public class UIHandler extends AbstractUserSessionHandler implements UIObserver {
 
@@ -20,11 +22,16 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 
 	@Override
 	public void removeItemSelected(Product product) {
-		// TODO Change state to block further customer actions
 		super.getUserSession().getTransaction().removeItem(product);
-		// TODO Change state to allow further customer actions
-		// TODO Indicate to customer to remove item from bagging area or shopping cart
-		
+		super.getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
+		// Waits for user to remove item from bagging area
+		if (getUserSession().getTransaction().getExpectedMass() != getUserSession().getTransaction().getExpectedMass() + product.getExpectedWeight()) {
+
+			// Changes state back to READY_FOR_ITEM when item is removed
+			super.getUserSession().setState(UserSessionState.READY_FOR_ITEM);
+		}
+
+
 	}
 
 	@Override
