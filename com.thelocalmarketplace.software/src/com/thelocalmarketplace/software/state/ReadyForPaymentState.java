@@ -33,7 +33,7 @@ import com.jjjwelectronics.card.Card.CardData;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.payment.CashPayment;
-import com.thelocalmarketplace.software.payment.DebitPayment;
+import com.thelocalmarketplace.software.payment.CardPayment;
 import com.thelocalmarketplace.software.payment.Transaction;
 
 public class ReadyForPaymentState implements IUserSessionState<UserSessionState> {
@@ -107,7 +107,7 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 	@Override 
 	public UserSessionState onCardDataRead(CardData data) {
 		// create a card payment instance, for now it will be debit but I might refactor those two classes into one
-		DebitPayment payment = new DebitPayment();
+		CardPayment payment = new CardPayment();
 		Transaction transaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();; 
 		payment.swipePayment(data); 
 		System.out.println("Paid amount: " + payment.getAmountPaid().doubleValue());

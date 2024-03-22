@@ -12,19 +12,19 @@ import com.thelocalmarketplace.hardware.external.CardIssuer;
 import com.thelocalmarketplace.software.SelfCheckout;
 import java.util.Scanner; 
 
-public class DebitPayment extends AbstractCardPayment implements CardReaderListener{
+public class CardPayment implements CardReaderListener, IPayment{
 
 	private BigDecimal amountDue;
 
-	// TODO signature verification, still not sure on this one 
-	// TODO how to differentiate between debit and credit, seems there is literally no discernable way
-	// for now going to write up some tests with what we have
-	
-	public DebitPayment() {
-		super(BigDecimal.ZERO);
+	private BigDecimal amountPaid; 
+	public CardPayment() {
+		this.amountPaid = BigDecimal.ZERO;
 		
 	}
 
+	
+	
+	
 	/**
 	 * Will attempt to post a transaction using a debit card via swiping
 	 * @return result of transaction, true if successful, false if not
@@ -93,5 +93,14 @@ public class DebitPayment extends AbstractCardPayment implements CardReaderListe
 	public void theDataFromACardHasBeenRead(CardData data) {
 
 	}
-
+	
+	@Override
+	public BigDecimal getAmountPaid() {
+		
+		return this.amountPaid;
+	}
+	
+	protected void setAmountPaid(BigDecimal amountPaid) {
+		this.amountPaid = amountPaid; 
+	}
 }
