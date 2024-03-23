@@ -2,13 +2,17 @@ package com.thelocalmarketplace.software.state;
 
 import java.math.BigDecimal;
 
+import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.scanner.Barcode;
+
 public class WaitingForAttendantState implements IUserSessionState<UserSessionState> { {
 
 }
 
     @Override
     public UserSessionState onStateSet() {
-        return null;
+    	//for now attendant state will automatically override back to ready for item
+        return UserSessionState.READY_FOR_ITEM;
     }
 
     @Override

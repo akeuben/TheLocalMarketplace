@@ -14,13 +14,20 @@ public class AddBagState implements IUserSessionState {
 	public Object onStateSet() {
 		//disable scanner to prevent any other items being added to transaction
 		SelfCheckout.getInstance().getHardware().scanner.disable();
-		return null;
+		
+		Transaction currentTransaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();
+		Mass bagMass = new Mass(0);
+		try {
+			bagMass = SelfCheckout.getInstance().getHardware().baggingArea.getCurrentMassOnTheScale();
+		} catch (OverloadedDevice|RuntimeException e) {
+				return null;
+		}
+		currentTransaction.addBag(bagMass);
+		return UserSessionState.WAITING_FOR_ATTENDANT;
 	}
 
 	@Override
 	public void onStateUnset() {
-		//enable scanner to allow items to be added to transaction again
-		SelfCheckout.getInstance().getHardware().scanner.enable();
 	}
 
 	@Override
@@ -30,14 +37,6 @@ public class AddBagState implements IUserSessionState {
 
 	@Override
 	public Object onWeightChanged(Mass mass) {
-		Transaction currentTransaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();
-		Mass bagMass = new Mass(0);
-		try {
-			bagMass = SelfCheckout.getInstance().getHardware().baggingArea.getCurrentMassOnTheScale();
-		} catch (OverloadedDevice|RuntimeException e) {
-				return null;
-		}
-		currentTransaction.addBag(bagMass);
 		return null;
 	}
 

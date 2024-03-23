@@ -54,6 +54,7 @@ public class UserSession {
     	this.coinValidatorHandler = new CoinValidatorHandler(this);
     	this.barcodeHandler = new BarcodeHandler(this);
     	this.electronicScaleHandler = new ElectronicScaleHandler(this);
+    	this.uiHandler = new UIHandler(this);
     }
     
     /**

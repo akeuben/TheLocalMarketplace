@@ -2,6 +2,9 @@ package com.thelocalmarketplace.software.state;
 
 import java.math.BigDecimal;
 
+import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.scanner.Barcode;
+
 public class WaitingForItemRemovalState implements IUserSessionState<UserSessionState> {
     @Override
     public UserSessionState onStateSet() {

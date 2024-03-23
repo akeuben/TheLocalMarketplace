@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.Mass.MassDifference;
 import com.jjjwelectronics.OverloadedDevice;
 import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.SelfCheckout;
@@ -77,7 +78,8 @@ public class Transaction {
     	if (product != null) {
             products.add(product);
             // Removes expected
-            expectedMass = expectedMass.difference(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM)));
+            totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
+            //expectedMass = expectedMass.difference(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM)));
             // Expected mass is no
         }
         else {
@@ -111,7 +113,7 @@ public class Transaction {
     public void removeItem(Product product) {
     	products.remove(product);
     	totalCost = totalCost.subtract(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
-    	expectedMass = expectedMass.difference(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM)));
+    	expectedMass = expectedMass.difference(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight()*Mass.MICROGRAMS_PER_GRAM)))).abs();
     }
     
     
