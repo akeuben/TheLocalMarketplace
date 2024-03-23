@@ -96,6 +96,10 @@ public class ReceiptPrinterHandler extends AbstractUserSessionHandler implements
         }
     }
 
+    /**
+     * checks to see if the printer need refilling
+     * @return true if needs refill flags are set
+     */
     public boolean refillFlagsSet(){
         if (fillInkFlag | fillPaperFlag){
             return true;

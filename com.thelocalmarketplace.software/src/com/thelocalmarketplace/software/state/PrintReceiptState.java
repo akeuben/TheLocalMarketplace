@@ -95,8 +95,14 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
                         try {
                             hardwarePrinter.print('\n');
                             hardwarePrinter.print(c);
-                        } catch (EmptyDevice | OverloadedDevice e) {
+                        } catch (OverloadedDevice e) {
                             throw new RuntimeException(e);//if another error happens here ill be surprised
+                        }
+                        catch(EmptyDevice empty){
+                            //its not possible to tell if its the ink or paper that ran out so set both flags
+                            SelfCheckout.getInstance().getCurrentSession().getReceiptPrinterHandler().thePrinterIsOutOfPaper();
+                            SelfCheckout.getInstance().getCurrentSession().getReceiptPrinterHandler().thePrinterIsOutOfInk();
+                            SelfCheckout.getInstance().getCurrentSession().setState(UserSessionState.PRINTER_NEEDS_REFILL);
                         }
 
                     }
