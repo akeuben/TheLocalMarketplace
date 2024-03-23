@@ -22,17 +22,17 @@ public class AddBagStateTest {
 	private BarcodedItem bag;
 	private Numeral num;
 	private Barcode bc;
-	
+	private BarcodedItem bagTooHeavy;
 	
 	@Before
 	public void setup() {
 		SelfCheckout.uninitialize();
 		SelfCheckout.initialize(new SelfCheckoutConfiguration());
-		session = SelfCheckout.getInstance().startNewSession();
+		this.session = SelfCheckout.getInstance().startNewSession();
 		this.num = Numeral.eight;
 		this.bc= new Barcode(new Numeral[] {num});
 		this.bag= new BarcodedItem(bc, new Mass(10));
-		//this.productTwo = new BarcodedProduct(bc, "test2", 200, 2);
+		this.bagTooHeavy= new BarcodedItem(bc,new Mass(999999999));
 	}
 	
 	@Test
@@ -42,6 +42,12 @@ public class AddBagStateTest {
 		assertEquals(session.getTransaction().getExpectedMass(), bag.getMass());
 	}
 	
+	@Test
+	public void testAddTooMuchWeight() {
+		SelfCheckout.getInstance().getHardware().baggingArea.addAnItem(bagTooHeavy);
+		session.getUIHandler().addBagSelected();
+		assertEquals(session.getState(), UserSessionState.ADD_BAG);
+	}
 	
 	@Test
 	public void testStateAfterAddBag() {
