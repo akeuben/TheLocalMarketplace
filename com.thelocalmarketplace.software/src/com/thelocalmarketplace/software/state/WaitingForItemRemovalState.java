@@ -3,12 +3,15 @@ package com.thelocalmarketplace.software.state;
 import java.math.BigDecimal;
 
 import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.OverloadedDevice;
 import com.jjjwelectronics.scanner.Barcode;
+import com.thelocalmarketplace.software.SelfCheckout;
+import com.thelocalmarketplace.software.payment.Transaction;
 
 public class WaitingForItemRemovalState implements IUserSessionState<UserSessionState> {
     @Override
     public UserSessionState onStateSet() {
-        return null;
+    	return null;
     }
 
     @Override

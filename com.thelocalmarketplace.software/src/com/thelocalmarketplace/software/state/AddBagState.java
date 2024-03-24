@@ -19,6 +19,7 @@ public class AddBagState implements IUserSessionState {
 		Mass bagMass = new Mass(0);
 		try {
 			bagMass = SelfCheckout.getInstance().getHardware().baggingArea.getCurrentMassOnTheScale();
+			bagMass = bagMass.difference(currentTransaction.getExpectedMass()).abs();
 		} catch (OverloadedDevice|RuntimeException e) {
 				return null;
 		}

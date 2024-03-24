@@ -18,5 +18,5 @@ public interface UIObserver {
 	 * announces when user selects option to add bulky item to order
 	 */
 	void bulkyItemSelected(Product product);
-
+	
 }
