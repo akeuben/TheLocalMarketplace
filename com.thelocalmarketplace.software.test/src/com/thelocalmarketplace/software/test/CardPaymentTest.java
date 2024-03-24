@@ -5,6 +5,7 @@ import org.junit.Test;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.card.Card;
+import com.jjjwelectronics.card.CardReaderGold;
 import com.jjjwelectronics.card.Card.CardData;
 import com.jjjwelectronics.scale.IElectronicScale;
 import com.jjjwelectronics.scanner.Barcode;
@@ -17,11 +18,17 @@ import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration.MachineRating;
 import com.thelocalmarketplace.software.payment.BankDataBase;
+import com.thelocalmarketplace.software.payment.CardPayment;
 import com.thelocalmarketplace.software.payment.Transaction;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.state.UserSessionState;
 
+import powerutility.PowerGrid;
+
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -44,7 +51,6 @@ public class CardPaymentTest {
 	private Card credit; 
 	private Card fake; 
 	private CardIssuer bank; 
-	
 	
 	
 	@Before
@@ -71,7 +77,7 @@ public class CardPaymentTest {
 		HashMap<String, CardIssuer> map = new HashMap<>(); 
 		map.put("visa", bank); 
 		BankDataBase.initialize(map);
-		
+			
 		
 	}
 	
@@ -102,8 +108,56 @@ public class CardPaymentTest {
 		assertNull(sc.getCurrentSession());
 		
 		
-		
-		
 	}
+	
+	
+	@Test
+    public void testSwipePayment() {
+        SelfCheckout sc = SelfCheckout.getInstance();
+        UserSession session = sc.startNewSession();
+        Transaction transaction = session.getTransaction();
+        IBarcodeScanner scanner = sc.getHardware().mainScanner; 
+		IElectronicScale baggingArea = sc.getHardware().baggingArea; 
+		// scan the product then add it to the baggingArea
+		scanner.scan(new BarcodedItem(barcode, new Mass(100)));
+		baggingArea.addAnItem(new BarcodedItem(barcode, new Mass(100)));
+
+        // Prepare card data (simulate swiping the card)
+        CardData cardData = null;
+		try {
+			cardData = debit.swipe();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+
+        // Initialize CardPayment and attempt payment
+        CardPayment payment = new CardPayment();
+        boolean result = payment.swipePayment(cardData);
+
+        // Assert payment success
+        assertTrue("Payment should succeed", result);
+        // Verify the amount paid is equal to the transaction amount
+        assertEquals("Amount paid should match transaction total", transaction.getTotalCost(), payment.getAmountPaid());
+    }
+	
+	
+
+
+	
+	
+
+	
+	
+	
+
+
+	
+
+	
+	
+	
+	
+	
+	
 	
 }
