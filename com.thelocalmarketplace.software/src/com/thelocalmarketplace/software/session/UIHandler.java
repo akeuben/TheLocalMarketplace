@@ -16,11 +16,13 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 
 	@Override
 	public void addBagSelected() {
-		UserSessionState newState = getUserSession().getState().ADD_BAG;
+		//sets state to add bag state
+		getUserSession().setState(UserSessionState.ADD_BAG);
+		//new state changed back to waiting for item after add bag completed
+		UserSessionState newState = getUserSession().getState().onStateSet();
 		if (newState!=null) {
 			getUserSession().setState(newState);
 		}
-		//super.getUserSession().setState(UserSessionState.ADD_BAG);
 	}
 
 	@Override
