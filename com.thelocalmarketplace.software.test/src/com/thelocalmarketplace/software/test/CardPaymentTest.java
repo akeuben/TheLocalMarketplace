@@ -141,6 +141,41 @@ public class CardPaymentTest {
     }
 	
 	
+	@Test
+    public void testSwipePaymentOnFake() {
+        SelfCheckout sc = SelfCheckout.getInstance();
+        UserSession session = sc.startNewSession();
+        Transaction transaction = session.getTransaction();
+        IBarcodeScanner scanner = sc.getHardware().mainScanner; 
+		IElectronicScale baggingArea = sc.getHardware().baggingArea; 
+		// scan the product then add it to the baggingArea
+		scanner.scan(new BarcodedItem(barcode, new Mass(100)));
+		baggingArea.addAnItem(new BarcodedItem(barcode, new Mass(100)));
+
+        // Prepare card data (simulate swiping the card)
+        CardData cardData = null;
+		try {
+			cardData = fake.swipe();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+
+        // Initialize CardPayment and attempt payment
+        CardPayment payment = new CardPayment();
+        boolean result = payment.swipePayment(cardData);
+
+        // Assert payment fail
+        assertFalse("Payment should fail", result);
+        
+    }
+	
+	
+	
+	
+	
+
+	
+	
 
 
 	
