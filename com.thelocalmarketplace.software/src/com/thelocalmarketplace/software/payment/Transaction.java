@@ -129,7 +129,7 @@ public class Transaction {
 		return payments;
 	}
 
-    public void calculateChange() throws DisabledException, CashOverloadException, NoCashAvailableException {
+    public void calculateChange() throws Exception  {
         if (totalCost.compareTo(BigDecimal.ZERO) < 0) {
             SelfCheckout instance = SelfCheckout.getInstance();
             BigDecimal change = totalCost.negate();
@@ -138,34 +138,42 @@ public class Transaction {
             
             final int BANKNOTE = 0;
             final int COIN = 1;
-            while (change.compareTo(BigDecimal.ZERO) > 0) {
-                int dispense = -1;
-                BigDecimal value = BigDecimal.valueOf(-1);
-                for (BigDecimal banknote : banknoteDenominations) {
-                    if (change.compareTo(banknote) >= 0 && banknote.compareTo(value) > 0 && instance.getHardware().banknoteDispensers.get(banknote).size() > 0) {
-                        value = banknote;
-                        dispense = BANKNOTE;
-                    }
-                }
-                for (BigDecimal coin : coinDenominations) {
-                    if (change.compareTo(coin) >= 0 && coin.compareTo(value) > 0 && instance.getHardware().coinDispensers.get(coin).size() > 0) {
-                        value = coin;
-                        dispense = COIN;
-                    }
-                }
-                if (dispense == -1) {           // unable to find anything to dispense
-                    break;
-                } else {
-                    change.subtract(value);
-                    if (dispense == BANKNOTE) {
-                        // banknotedispensation
-                        instance.getHardware().coinDispensers.get(value).emit();
-                    } else {
-                        // coin tray
-                        instance.getHardware().banknoteDispensers.get(value).emit();
-                    }
-                }
+            
+            try {
+	            while (change.compareTo(BigDecimal.ZERO) > 0) {
+	                int dispense = -1;
+	                BigDecimal value = BigDecimal.valueOf(-1);
+	                for (BigDecimal banknote : banknoteDenominations) {
+	                    if (change.compareTo(banknote) >= 0 && banknote.compareTo(value) > 0 && instance.getHardware().banknoteDispensers.get(banknote).size() > 0) {
+	                        value = banknote;
+	                        dispense = BANKNOTE;
+	                    }
+	                }
+	                for (BigDecimal coin : coinDenominations) {
+	                    if (change.compareTo(coin) >= 0 && coin.compareTo(value) > 0 && instance.getHardware().coinDispensers.get(coin).size() > 0) {
+	                        value = coin;
+	                        dispense = COIN;
+	                    }
+	                }
+	                if (dispense == -1) {           // unable to find anything to dispense
+	                    break;
+	                } else {
+	                    change.subtract(value);
+	                    if (dispense == COIN) {
+	                        // Coin Dispensation
+	                        instance.getHardware().coinDispensers.get(value).emit();
+	                    } else {
+	                        // Banknote Dispensation
+	                        instance.getHardware().banknoteDispensers.get(value).emit();
+	                    }
+	                }
+	            }
+            }catch (DisabledException | CashOverloadException | NoCashAvailableException e) {
+            	// Print error message
+                System.err.println("Exception occurred while calculating change: " + e.getMessage());
+                // Rethrow the exception to be handled by the caller
+                throw e;
             }
-        }
+         }
     }
 }
