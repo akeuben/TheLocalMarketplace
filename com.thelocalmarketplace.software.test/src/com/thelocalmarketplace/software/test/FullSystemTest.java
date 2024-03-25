@@ -44,12 +44,17 @@ import com.jjjwelectronics.scanner.BarcodedItem;
 import com.jjjwelectronics.scanner.IBarcodeScanner;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
+import com.tdc.IComponent;
+import com.tdc.IComponentObserver;
 import com.tdc.coin.Coin;
 import com.tdc.coin.CoinSlot;
+import com.tdc.coin.CoinValidator;
+import com.tdc.coin.CoinValidatorObserver;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
+import com.thelocalmarketplace.software.SelfCheckoutConfiguration.MachineRating;
 import com.thelocalmarketplace.software.payment.Transaction;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.state.UserSessionState;
@@ -65,7 +70,16 @@ public class FullSystemTest {
 	@Before
 	public void setup() {
 		SelfCheckout.uninitialize();
-		SelfCheckout.initialize(new SelfCheckoutConfiguration());
+		SelfCheckout.initialize(new SelfCheckoutConfiguration(
+			MachineRating.GOLD, 
+			Currency.getInstance(Locale.CANADA), 
+			100, 
+			1000, 
+			25, 
+			new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 
+			100, 
+			100
+		));
 		
 		barcode1 = new Barcode(new Numeral[] {
 			Numeral.one,
@@ -115,6 +129,48 @@ public class FullSystemTest {
 		fakeCoin = new Coin(Currency.getInstance(Locale.CHINA), BigDecimal.TEN);
 	}
 	
+	private static class CoinValidatorObserverStub implements CoinValidatorObserver {
+
+		public boolean invalidCoinDetected = false;
+		
+		@Override
+		public void enabled(IComponent<? extends IComponentObserver> component) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void disabled(IComponent<? extends IComponentObserver> component) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void turnedOn(IComponent<? extends IComponentObserver> component) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void turnedOff(IComponent<? extends IComponentObserver> component) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void validCoinDetected(CoinValidator validator, BigDecimal value) {
+			// TODO Auto-generated method stub
+			invalidCoinDetected = false;
+		}
+
+		@Override
+		public void invalidCoinDetected(CoinValidator validator) {
+			// TODO Auto-generated method stub
+			invalidCoinDetected = true;
+		}
+		
+	}
+	
 	@Test
 	public void TestSingleItemTransaction() {
 		SelfCheckout sc = SelfCheckout.getInstance();
@@ -150,9 +206,14 @@ public class FullSystemTest {
 		session.setState(UserSessionState.READY_FOR_PAYMENT);
 		assertEquals(session.getState(), UserSessionState.READY_FOR_PAYMENT);
 		
+		CoinValidatorObserverStub stub = new CoinValidatorObserverStub();
+		SelfCheckout.getInstance().getHardware().coinValidator.attach(stub);
+		
 		// Pay 1 dollar
 		try {
-			coinSlot.receive(dollarCoin);
+			do {
+				coinSlot.receive(dollarCoin);
+			} while(stub.invalidCoinDetected);
 		} catch (DisabledException | CashOverloadException e) {
 			throw new RuntimeException();
 		}
@@ -163,7 +224,9 @@ public class FullSystemTest {
 		
 		for(int i = 0; i < 9; i++) {
 			try {
-				coinSlot.receive(dollarCoin);
+				do {
+					coinSlot.receive(dollarCoin);
+				} while(stub.invalidCoinDetected);
 				expectedCost = expectedCost.subtract(BigDecimal.ONE);
 				assertEquals(transaction.getTotalCost().compareTo(expectedCost), 0);
 			} catch (DisabledException | CashOverloadException e) {
@@ -173,7 +236,9 @@ public class FullSystemTest {
 		
 		assertEquals(transaction.getTotalCost().compareTo(BigDecimal.valueOf(0.99)), 0);
 		try {
-			coinSlot.receive(dollarCoin);
+			do {
+				coinSlot.receive(dollarCoin);
+			} while(stub.invalidCoinDetected);
 		} catch (DisabledException | CashOverloadException e) {
 			throw new RuntimeException();
 		}

@@ -33,8 +33,11 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.Mass.MassDifference;
+import com.jjjwelectronics.OverloadedDevice;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
+import com.thelocalmarketplace.software.SelfCheckout;
 
 public class Transaction {
 
@@ -49,7 +52,6 @@ public class Transaction {
 
     private final HashMap<UUID, IPayment> payments = new HashMap<>();
     
-
 
     /**
      * Adds a product into the current transaction
@@ -68,16 +70,54 @@ public class Transaction {
         }
     }
 
+    /**
+     * Removes weight of bulky item from transaction
+     * @param product item being added to transaction/products
+     */
+    public void skipBagging(BarcodedProduct product)
+    {
+    	if (product != null) {
+    		Mass bulkyItemMass = new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM)));
+			MassDifference massDiff = expectedMass.difference(bulkyItemMass);
+			
+			if (massDiff.compareTo(Mass.ZERO) < 0) {
+				expectedMass = Mass.ZERO;
+			} else {
+				expectedMass = massDiff.abs(); // Use the absolute value to ensure it's positive.
+			}
+        }
+        else {
+            throw new NullPointerException("product");
+        }
+    }
+    
+    /**
+     * updates transaction weight to include bag weight
+     */
+    public void addBag(Mass bagMass) {
+		expectedMass = expectedMass.sum(bagMass);
+    }
+
 
     /**
      *
      * Adds a payment to the transaction by storing in HashMap payments
-     * @param paymentMethod, type of payment method used, must be initialized so amountPaid is already defined
+     * @param payment, type of payment method used, must be initialized so amountPaid is already defined
      */
     public void addPayment(IPayment payment) {
     	UUID transactionId = UUID.randomUUID(); // Generate a unique ID for this transaction/payment
     	payments.put(transactionId, payment); // Add payment to HashMap
     	totalCost = totalCost.subtract(payment.getAmountPaid());
+    }
+
+    /**
+     * Removes an item from the transaction
+     * @param product item being removed from transaction/products
+     */
+    public void removeItem(BarcodedProduct product) {
+    	products.remove(product);
+    	totalCost = totalCost.subtract(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
+    	expectedMass = expectedMass.difference(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight()*Mass.MICROGRAMS_PER_GRAM)))).abs();
     }
     
     

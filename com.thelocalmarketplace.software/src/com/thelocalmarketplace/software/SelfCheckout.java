@@ -32,6 +32,7 @@ import com.thelocalmarketplace.hardware.SelfCheckoutStationGold;
 import com.thelocalmarketplace.hardware.SelfCheckoutStationSilver;
 
 import com.thelocalmarketplace.software.session.UserSession;
+import com.thelocalmarketplace.software.state.UserSessionState;
 
 import powerutility.PowerGrid;
 
@@ -128,6 +129,8 @@ public class SelfCheckout {
 			throw new RuntimeException("There is already an active user session.");
 		}
 		currentSession = new UserSession();
+    	
+		currentSession.setState(UserSessionState.READY_FOR_ITEM);
 		
 		// Remove old listeners
 		hardware.mainScanner.deregisterAll();

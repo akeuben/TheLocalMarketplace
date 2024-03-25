@@ -39,23 +39,32 @@ import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.software.SelfCheckout;
+import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.payment.CashPayment;
 import com.thelocalmarketplace.software.payment.Transaction;
+import com.thelocalmarketplace.software.session.UserSession;
 
 public class TransactionTest {
+	private UserSession session;
 	private Transaction transaction;
 	private BarcodedProduct productOne;
 	private BarcodedProduct productTwo;
+	private BarcodedProduct bulkyItem;
 	private Numeral num;
 	private Barcode bc;
     
 	@Before
 	public void setup() {
-		this.transaction = new Transaction();
+		SelfCheckout.uninitialize();
+		SelfCheckout.initialize(new SelfCheckoutConfiguration());
+		this.session = SelfCheckout.getInstance().startNewSession();
+		this.transaction = session.getTransaction();
 		this.num = Numeral.eight;
 		this.bc= new Barcode(new Numeral[] {num});
 		this.productOne = new BarcodedProduct(bc, "test1", 100, 1);
 		this.productTwo = new BarcodedProduct(bc, "test2", 200, 2);
+		this.bulkyItem = new BarcodedProduct(bc,"bulky item", 50, 100);
 	}
 	
 	@Test
@@ -109,6 +118,38 @@ public class TransactionTest {
 		transaction.addItem(productTwo);
 		Assert.assertEquals(transaction.getTotalCost().compareTo(BigDecimal.valueOf(3.00)), 0);
 	}
+	
+	@Test
+	public void testRemoveItemWeight() {
+		transaction.addItem(productOne);
+		transaction.addItem(productTwo);
+		session.getUIHandler().removeItemSelected(productTwo);
+		Mass productOneMass = new Mass(productOne.getExpectedWeight());
+		Assert.assertTrue(productOneMass.compareTo(transaction.getExpectedMass()) == 0);
+	}
+	
+	@Test
+	public void testRemoveItemCost() {
+		transaction.addItem(productOne);
+		transaction.addItem(productTwo);
+		session.getUIHandler().removeItemSelected(productTwo);
+		BigDecimal productOneCost = BigDecimal.valueOf(productOne.getPrice()).divide(BigDecimal.valueOf(100));
+		Assert.assertTrue(productOneCost.compareTo(transaction.getTotalCost())==0);
+	}
+	
+	@Test
+	public void testAddBulkyItemWeight() {
+		session.getUIHandler().skipBaggingSelected(bulkyItem);
+		Assert.assertTrue(transaction.getExpectedMass().compareTo(new Mass(0))==0);
+	}
+	
+	@Test
+	public void testAddBulkyItemCost() {
+		session.getTransaction().addItem(bulkyItem);
+		session.getUIHandler().skipBaggingSelected(bulkyItem);
+		Assert.assertTrue(transaction.getTotalCost().compareTo(BigDecimal.valueOf(bulkyItem.getPrice()).divide(BigDecimal.valueOf(100)))==0);
+	}
+	
 	
 	@Test
 	public void testValidPayment() {

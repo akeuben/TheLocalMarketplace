@@ -57,7 +57,16 @@ public class SelfCheckoutConfiguration {
 	}
 	
 	public SelfCheckoutConfiguration() {
-		this(MachineRating.BRONZE, Currency.getInstance(Locale.CANADA), 100, 1000, 25, new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 100, 100);
+		this(
+			MachineRating.BRONZE, 
+			Currency.getInstance(Locale.CANADA), 
+			100, 
+			1000, 
+			25, 
+			new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 
+			100, 
+			100
+		);
 	}
 
 	public Currency getCurrency() {
