@@ -42,10 +42,14 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 	@Override
 	public void bulkyItemSelected(Product product) {
 		//item is added to transaction then attendant needs to be verified
-		super.getUserSession().getTransaction().addBulkyItem(product);
-		super.getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
-		// Once state changes back to normal, will add the bulky item to the transaction
+		super.getUserSession().getTransaction().addItem(product);
 		//TODO Wait for attendant to change state of transaction back to normal, then add item.
+		super.getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
+		// Once state changes back to normal, will add the bulky item to the transaction (currently working with no attendant feedback)
+		super.getUserSession().setState(UserSessionState.READY_FOR_ITEM);
+		super.getUserSession().getTransaction().addBulkyItem(product);
+		
+		
 	}
 
 }

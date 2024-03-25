@@ -76,11 +76,14 @@ public class Transaction {
     public void addBulkyItem(Product product)
     {
     	if (product != null) {
-            products.add(product);
-            // Removes expected
-            totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
-            //expectedMass = expectedMass.difference(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM)));
-            // Expected mass is no
+    		 Mass bulkyItemMass = new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM)));
+    	        MassDifference massDiff = expectedMass.difference(bulkyItemMass);
+    	        
+    	        if (massDiff.compareTo(Mass.ZERO) < 0) {
+    	            expectedMass = Mass.ZERO;
+    	        } else {
+    	            expectedMass = massDiff.abs(); // Use the absolute value to ensure it's positive.
+    	        }
         }
         else {
             throw new NullPointerException("product");
