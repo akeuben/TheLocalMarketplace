@@ -15,6 +15,7 @@ import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.SelfCheckout;
+
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration.MachineRating;
 import com.thelocalmarketplace.software.payment.BankDataBase;
@@ -23,10 +24,12 @@ import com.thelocalmarketplace.software.payment.Transaction;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.state.UserSessionState;
 
+import powerutility.NoPowerException;
 import powerutility.PowerGrid;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
@@ -56,6 +59,7 @@ public class CardPaymentTest {
 	@Before
 	public void setup() {
 		SelfCheckout.uninitialize(); 
+		BankDataBase.uninitialize();
 		// as of right now this self checkout is bronze, may set to gold to remove some probability
 		SelfCheckout.initialize(new SelfCheckoutConfiguration(MachineRating.GOLD, Currency.getInstance(Locale.CANADA), 100, 1000, 25, new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 100, 100));
 		barcode = new Barcode(new Numeral []{Numeral.one, Numeral.two, Numeral.three});
@@ -170,25 +174,47 @@ public class CardPaymentTest {
     }
 	
 	
+	/**
+	 * Test to see ensure that database will not run twice
+	 */
 	
+	@Test (expected = RuntimeException.class)
+	public void testDoubleInitialize() {
+		HashMap<String, CardIssuer> map = new HashMap<>(); 
+		map.put("visa", bank); 
+		BankDataBase.initialize(map);
+	}
 	
+	/**
+	 * Tests to see if payment will fail if cardReader attempts to swipe a null card
+	 */
 	
+	@Test
+	public void swipeNull() {
+		SelfCheckout sc = SelfCheckout.getInstance(); 
+		assertThrows(NullPointerException.class, () -> sc.getHardware().cardReader.swipe(null));
+	}
+	
+	/**
+	 * Tests to see if payment will fail if cardData is null
+	 */
+	
+	@Test (expected = NullPointerException.class)
+	public void cardDataNull() {
+		 SelfCheckout sc = SelfCheckout.getInstance();
+	        UserSession session = sc.startNewSession();
+	        Transaction transaction = session.getTransaction();
+	        IBarcodeScanner scanner = sc.getHardware().mainScanner; 
+			IElectronicScale baggingArea = sc.getHardware().baggingArea; 
+			// scan the product then add it to the baggingArea
+			scanner.scan(new BarcodedItem(barcode, new Mass(100)));
+			baggingArea.addAnItem(new BarcodedItem(barcode, new Mass(100)));
 
-	
-	
-
-
-	
-	
-
-	
-	
-	
-
-
-	
-
-	
+	        // Prepare card data (simulate swiping the card)
+	        CardData cardData = null;
+	        CardPayment payment = new CardPayment();
+	        payment.swipePayment(cardData);
+	}
 	
 	
 	

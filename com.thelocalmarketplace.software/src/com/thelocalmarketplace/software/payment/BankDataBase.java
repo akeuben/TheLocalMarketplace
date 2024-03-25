@@ -35,5 +35,17 @@ public class BankDataBase {
 	public HashMap<String, CardIssuer> getDataBase(){
 		return this.database; 
 	}
+	
+	/**
+	 * Uninitializes BankDataBase
+	 * @return
+	 */
+	
+	public static void uninitialize() {
+		if(instance == null) return;
+		
+		instance = null;
+	}
+	
 
 }
