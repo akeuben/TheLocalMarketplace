@@ -41,7 +41,7 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	 * This state is used when the system
 	 * is waiting for an item to be added to the bagging area
 	 */
-	WAITING_FOR_BAGGING(new WaitingforBaggingState()),
+	WAITING_FOR_BAGGING(new WaitingForBaggingState()),
 	/**
 	 * This state is used when the system
 	 * is ready to accept payment

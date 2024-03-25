@@ -35,7 +35,7 @@ import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.payment.Transaction;
 
-public class WaitingforBaggingState implements IUserSessionState<UserSessionState> {
+public class WaitingForBaggingState implements IUserSessionState<UserSessionState> {
 	
 	private final Mass MAXIMUM_MASS_DIFFERENCE = new Mass(BigInteger.valueOf(10*Mass.MICROGRAMS_PER_GRAM)); // Maximum weight discrepancy allowed
 

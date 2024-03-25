@@ -1,12 +1,8 @@
 package com.thelocalmarketplace.software.session;
 
 import com.thelocalmarketplace.hardware.Product;
-import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.UI.UIObserver;
-import com.thelocalmarketplace.software.payment.Transaction;
-import com.thelocalmarketplace.software.state.AddBagState;
 import com.thelocalmarketplace.software.state.UserSessionState;
-import com.thelocalmarketplace.software.state.WaitingforBaggingState;
 
 /**
  * SENG 300 Project - Group 1:
