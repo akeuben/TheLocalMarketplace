@@ -25,7 +25,7 @@ import com.thelocalmarketplace.software.state.UserSessionState;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
 
 public class UserSession {
