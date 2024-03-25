@@ -153,4 +153,5 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
     public UserSessionState onPrinterRefilled() {
         return null;
     }
+
 }
