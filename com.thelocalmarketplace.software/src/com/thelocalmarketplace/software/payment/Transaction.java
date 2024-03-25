@@ -35,6 +35,7 @@ import java.util.UUID;
 import com.jjjwelectronics.Mass;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
+import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
@@ -128,7 +129,7 @@ public class Transaction {
 		return payments;
 	}
 
-    public void calculateChange() throws DisabledException, CashOverloadException {
+    public void calculateChange() throws DisabledException, CashOverloadException, NoCashAvailableException {
         if (totalCost.compareTo(BigDecimal.ZERO) < 0) {
             SelfCheckout instance = SelfCheckout.getInstance();
             BigDecimal change = totalCost.negate();
@@ -141,34 +142,30 @@ public class Transaction {
                 int dispense = -1;
                 BigDecimal value = BigDecimal.valueOf(-1);
                 for (BigDecimal banknote : banknoteDenominations) {
-                    if (change.compareTo(banknote) >= 0 && banknote.compareTo(value) > 0) {
+                    if (change.compareTo(banknote) >= 0 && banknote.compareTo(value) > 0 && instance.getHardware().banknoteDispensers.get(banknote).size() > 0) {
                         value = banknote;
                         dispense = BANKNOTE;
                     }
                 }
                 for (BigDecimal coin : coinDenominations) {
-                    if (change.compareTo(coin) >= 0 && coin.compareTo(value) > 0) {
+                    if (change.compareTo(coin) >= 0 && coin.compareTo(value) > 0 && instance.getHardware().coinDispensers.get(coin).size() > 0) {
                         value = coin;
                         dispense = COIN;
                     }
                 }
-                if (dispense == -1) {
+                if (dispense == -1) {           // unable to find anything to dispense
                     break;
                 } else {
-                    change.subtract(value);         // storage?
+                    change.subtract(value);
                     if (dispense == BANKNOTE) {
                         // banknotedispensation
-                        instance.getHardware().banknoteOutput.receive(new Banknote(instance.getConfiguration().getCurrency(), value));
+                        instance.getHardware().coinDispensers.get(value).emit();
                     } else {
                         // coin tray
-                        instance.getHardware().coinTray.receive(new Coin(instance.getConfiguration().getCurrency(), value));
+                        instance.getHardware().banknoteDispensers.get(value).emit();
                     }
                 }
             }
-
-            instance.getHardware().banknoteOutput.dispense(); // dispense banknotes we collected
-            instance.getHardware().coinTray.collectCoins(); // User takes out coins that were calculated during change phase
-            // dispense clears out banknoteOutput, but what about coinTray?
         }
     }
 }
