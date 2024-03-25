@@ -23,7 +23,7 @@ package com.thelocalmarketplace.software.payment;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
 
 import java.math.BigDecimal;
@@ -35,6 +35,7 @@ import java.util.UUID;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Mass.MassDifference;
 import com.jjjwelectronics.OverloadedDevice;
+import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.SelfCheckout;
 
@@ -43,7 +44,7 @@ public class Transaction {
     /**
      * Items contained in an instance of transaction TODO Create constructor
      */
-    private final ArrayList<Product> products = new ArrayList<>();
+    private final ArrayList<BarcodedProduct> products = new ArrayList<>();
     
     private Mass expectedMass = Mass.ZERO;
     
@@ -58,7 +59,7 @@ public class Transaction {
      * Adds cost of item to total cost
      * @param product item being added to transaction/products
      */
-    public void addItem(Product product) {
+    public void addItem(BarcodedProduct product) {
         if (product != null) {
             products.add(product);
             totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
@@ -73,17 +74,17 @@ public class Transaction {
      * Removes weight of bulky item from transaction
      * @param product item being added to transaction/products
      */
-    public void addBulkyItem(Product product)
+    public void skipBagging(BarcodedProduct product)
     {
     	if (product != null) {
-    		 Mass bulkyItemMass = new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM)));
-    	        MassDifference massDiff = expectedMass.difference(bulkyItemMass);
-    	        
-    	        if (massDiff.compareTo(Mass.ZERO) < 0) {
-    	            expectedMass = Mass.ZERO;
-    	        } else {
-    	            expectedMass = massDiff.abs(); // Use the absolute value to ensure it's positive.
-    	        }
+    		Mass bulkyItemMass = new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM)));
+			MassDifference massDiff = expectedMass.difference(bulkyItemMass);
+			
+			if (massDiff.compareTo(Mass.ZERO) < 0) {
+				expectedMass = Mass.ZERO;
+			} else {
+				expectedMass = massDiff.abs(); // Use the absolute value to ensure it's positive.
+			}
         }
         else {
             throw new NullPointerException("product");
@@ -113,7 +114,7 @@ public class Transaction {
      * Removes an item from the transaction
      * @param product item being removed from transaction/products
      */
-    public void removeItem(Product product) {
+    public void removeItem(BarcodedProduct product) {
     	products.remove(product);
     	totalCost = totalCost.subtract(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
     	expectedMass = expectedMass.difference(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight()*Mass.MICROGRAMS_PER_GRAM)))).abs();

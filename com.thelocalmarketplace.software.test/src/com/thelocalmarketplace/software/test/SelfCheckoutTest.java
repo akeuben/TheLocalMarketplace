@@ -23,7 +23,7 @@ package com.thelocalmarketplace.software.test;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
 
 import static org.junit.Assert.assertArrayEquals;
@@ -39,6 +39,7 @@ import org.junit.Test;
 
 import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
+import com.thelocalmarketplace.software.SelfCheckoutConfiguration.MachineRating;
 
 public class SelfCheckoutTest {
 	
@@ -86,17 +87,22 @@ public class SelfCheckoutTest {
 	@Test
 	public void testIfConfigCorrectlyApplied() {
 		Currency currencyTest = Currency.getInstance(Locale.CANADA);
-		BigDecimal[] denominationsTest = new BigDecimal[]{BigDecimal.valueOf(0.25), BigDecimal.valueOf(1.00)};
+		BigDecimal[] coinDenominationsTest = new BigDecimal[]{BigDecimal.valueOf(0.25), BigDecimal.valueOf(1.00)};
+		BigDecimal[] banknoteDenominationsTest = new BigDecimal[]{BigDecimal.valueOf(10), BigDecimal.valueOf(20)};
 		int StorageCapTest = 250;
 		int DispenserCapTest = 50;
 		int TrayCapTest = 15;
 
 		SelfCheckoutConfiguration config = new SelfCheckoutConfiguration(
+				SelfCheckoutConfiguration.MachineRating.BRONZE,
 				currencyTest,
 				DispenserCapTest,
 				StorageCapTest,
 				TrayCapTest,
-				denominationsTest
+				coinDenominationsTest,
+				banknoteDenominationsTest,
+				100,
+				100
 				);
 
 		SelfCheckout check = SelfCheckout.initialize(config);

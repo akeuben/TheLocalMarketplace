@@ -23,11 +23,16 @@ package com.thelocalmarketplace.software;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
 
-import com.thelocalmarketplace.hardware.SelfCheckoutStation;
+import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
+import com.thelocalmarketplace.hardware.SelfCheckoutStationBronze;
+import com.thelocalmarketplace.hardware.SelfCheckoutStationGold;
+import com.thelocalmarketplace.hardware.SelfCheckoutStationSilver;
+
 import com.thelocalmarketplace.software.session.UserSession;
+import com.thelocalmarketplace.software.state.UserSessionState;
 
 import powerutility.PowerGrid;
 
@@ -37,12 +42,24 @@ public class SelfCheckout {
 	
 	private UserSession currentSession;
 	
-	private SelfCheckoutStation hardware;
+	private AbstractSelfCheckoutStation hardware;
 	
-	private SelfCheckout() {
+	private SelfCheckout(SelfCheckoutConfiguration configuration) {
 		currentSession = null;
 		
-		hardware = new SelfCheckoutStation();
+		switch(configuration.rating) {
+		case BRONZE:
+			hardware = new SelfCheckoutStationBronze();
+			break;
+		case GOLD:
+			hardware = new SelfCheckoutStationGold();
+			break;
+		case SILVER:
+			hardware = new SelfCheckoutStationSilver();
+			break;
+		default:
+			throw new RuntimeException("Invalid configuration");
+		}
 		PowerGrid.engageUninterruptiblePowerSource();
 		hardware.plugIn(PowerGrid.instance());
 		hardware.turnOn();
@@ -69,14 +86,16 @@ public class SelfCheckout {
 	public static SelfCheckout initialize(SelfCheckoutConfiguration configuration) throws RuntimeException {
 		if(instance != null) throw new RuntimeException("There is already a self checkout initialized!");
 		
-		instance = new SelfCheckout();
-		
 		// Initialize the hardware
-		SelfCheckoutStation.configureCurrency(configuration.currency);
-		SelfCheckoutStation.configureCoinDenominations(configuration.coinDenominations);
-		SelfCheckoutStation.configureCoinDispenserCapacity(configuration.coinDispenserCapacity);
-		SelfCheckoutStation.configureCoinStorageUnitCapacity(configuration.coinStorageUnitCapacity);
-		SelfCheckoutStation.configureCoinTrayCapacity(configuration.coinTrayCapacity);
+		AbstractSelfCheckoutStation.configureCurrency(configuration.currency);
+		AbstractSelfCheckoutStation.configureBanknoteDenominations(configuration.banknoteDenominations);
+		AbstractSelfCheckoutStation.configureBanknoteStorageUnitCapacity(configuration.banknoteStorageCapacity);
+		AbstractSelfCheckoutStation.configureReusableBagDispenserCapacity(configuration.reusableBagDispenserCapacity);
+		AbstractSelfCheckoutStation.configureCoinDenominations(configuration.coinDenominations);
+		AbstractSelfCheckoutStation.configureCoinDispenserCapacity(configuration.coinDispenserCapacity);
+		AbstractSelfCheckoutStation.configureCoinStorageUnitCapacity(configuration.coinStorageUnitCapacity);
+		AbstractSelfCheckoutStation.configureCoinTrayCapacity(configuration.coinTrayCapacity);
+		instance = new SelfCheckout(configuration);
 		
 		return instance;
 	}
@@ -110,15 +129,18 @@ public class SelfCheckout {
 			throw new RuntimeException("There is already an active user session.");
 		}
 		currentSession = new UserSession();
+    	
+		currentSession.setState(UserSessionState.READY_FOR_ITEM);
 		
 		// Remove old listeners
-		hardware.scanner.deregisterAll();
+		hardware.mainScanner.deregisterAll();
 		hardware.baggingArea.deregisterAll();
 		hardware.coinValidator.detachAll();
 		
 		// Register listeners
-		hardware.scanner.register(currentSession.getBarcodeHandler());
+		hardware.mainScanner.register(currentSession.getBarcodeHandler());
 		hardware.baggingArea.register(currentSession.getElectronicScaleHandler());
+		hardware.cardReader.register(currentSession.getCardReaderHandler());
 		hardware.coinValidator.attach(currentSession.getCoinValidatorHandler());
 		
 		return currentSession;
@@ -140,7 +162,7 @@ public class SelfCheckout {
 	 * Gets the hardware for the self checkout station.
 	 * @return The hardware of the self checkout station.
 	 */
-	public SelfCheckoutStation getHardware() {
+	public AbstractSelfCheckoutStation getHardware() {
 		return hardware;
 	}
 }

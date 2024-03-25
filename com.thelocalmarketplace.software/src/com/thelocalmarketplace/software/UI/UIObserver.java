@@ -1,5 +1,6 @@
 package com.thelocalmarketplace.software.UI;
 
+import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
 
 /**
@@ -38,11 +39,11 @@ public interface UIObserver {
 	/**
 	 * announces when user selects option to remove item from order
 	 */
-	void removeItemSelected(Product product);
+	void removeItemSelected(BarcodedProduct product);
 	
 	/**
-	 * announces when user selects option to add bulky item to order
+	 * announces when user selects option to skip bagging the current product
 	 */
-	void bulkyItemSelected(Product product);
+	void skipBaggingSelected(BarcodedProduct product);
 	
 }

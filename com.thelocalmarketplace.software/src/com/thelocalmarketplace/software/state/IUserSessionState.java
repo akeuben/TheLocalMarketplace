@@ -23,14 +23,15 @@ package com.thelocalmarketplace.software.state;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
 
 import java.math.BigDecimal;
 
 import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.card.Card.CardData;
 import com.jjjwelectronics.scanner.Barcode;
-import com.jjjwelectronics.scanner.BarcodeScanner;
+import com.jjjwelectronics.scanner.IBarcodeScanner;
 import com.tdc.coin.Coin;
 
 public interface IUserSessionState<T> {
@@ -51,7 +52,7 @@ public interface IUserSessionState<T> {
 	void onStateUnset();
 	
 	/**
-	 * Called when a {@link Barcode} is scanned by any {@link BarcodeScanner}
+	 * Called when a {@link Barcode} is scanned by any {@link IBarcodeScanner}
 	 * on the self checkout station.
 	 * @param barcode The {@link Barcode} that was scanned
 	 * @return The state to transition to after this function returns, or null to stay on the same state.
@@ -71,4 +72,11 @@ public interface IUserSessionState<T> {
 	 * @return The state to transition to after this function returns, or null to stay on the same state.
 	 */
 	T onCoinInserted(BigDecimal value);
+	
+	/**
+	 * Called when a {@link Card} has it's data read by the card reader through tap, swipe or insert.
+	 * @param data The Card data of the card that was just read.
+	 * @return The state that should be transition to after the function executes, null if state is same. 
+	 */
+	T onCardDataRead(CardData data);
 }

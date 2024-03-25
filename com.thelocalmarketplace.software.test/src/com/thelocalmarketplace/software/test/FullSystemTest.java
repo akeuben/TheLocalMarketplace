@@ -26,7 +26,7 @@ import static org.junit.Assert.assertNull;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
 
 import java.math.BigDecimal;
@@ -38,18 +38,23 @@ import org.junit.Test;
 
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
-import com.jjjwelectronics.scale.ElectronicScale;
+import com.jjjwelectronics.scale.IElectronicScale;
 import com.jjjwelectronics.scanner.Barcode;
-import com.jjjwelectronics.scanner.BarcodeScanner;
 import com.jjjwelectronics.scanner.BarcodedItem;
+import com.jjjwelectronics.scanner.IBarcodeScanner;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
+import com.tdc.IComponent;
+import com.tdc.IComponentObserver;
 import com.tdc.coin.Coin;
 import com.tdc.coin.CoinSlot;
+import com.tdc.coin.CoinValidator;
+import com.tdc.coin.CoinValidatorObserver;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
+import com.thelocalmarketplace.software.SelfCheckoutConfiguration.MachineRating;
 import com.thelocalmarketplace.software.payment.Transaction;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.state.UserSessionState;
@@ -65,7 +70,16 @@ public class FullSystemTest {
 	@Before
 	public void setup() {
 		SelfCheckout.uninitialize();
-		SelfCheckout.initialize(new SelfCheckoutConfiguration());
+		SelfCheckout.initialize(new SelfCheckoutConfiguration(
+			MachineRating.GOLD, 
+			Currency.getInstance(Locale.CANADA), 
+			100, 
+			1000, 
+			25, 
+			new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 
+			100, 
+			100
+		));
 		
 		barcode1 = new Barcode(new Numeral[] {
 			Numeral.one,
@@ -115,20 +129,62 @@ public class FullSystemTest {
 		fakeCoin = new Coin(Currency.getInstance(Locale.CHINA), BigDecimal.TEN);
 	}
 	
+	private static class CoinValidatorObserverStub implements CoinValidatorObserver {
+
+		public boolean invalidCoinDetected = false;
+		
+		@Override
+		public void enabled(IComponent<? extends IComponentObserver> component) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void disabled(IComponent<? extends IComponentObserver> component) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void turnedOn(IComponent<? extends IComponentObserver> component) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void turnedOff(IComponent<? extends IComponentObserver> component) {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void validCoinDetected(CoinValidator validator, BigDecimal value) {
+			// TODO Auto-generated method stub
+			invalidCoinDetected = false;
+		}
+
+		@Override
+		public void invalidCoinDetected(CoinValidator validator) {
+			// TODO Auto-generated method stub
+			invalidCoinDetected = true;
+		}
+		
+	}
+	
 	@Test
 	public void TestSingleItemTransaction() {
 		SelfCheckout sc = SelfCheckout.getInstance();
 		UserSession session = sc.startNewSession();
 		Transaction transaction = session.getTransaction();
 
-		BarcodeScanner scanner = SelfCheckout.getInstance().getHardware().scanner;
-		ElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().baggingArea;
+		IBarcodeScanner scanner = SelfCheckout.getInstance().getHardware().mainScanner;
+		IElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().baggingArea;
 		CoinSlot coinSlot = SelfCheckout.getInstance().getHardware().coinSlot;
 
 		assertEquals(session.getState(), UserSessionState.READY_FOR_ITEM);
 		
 		// Add product 1
-		scanner.scan(new BarcodedItem(barcode1, new Mass(100.0)));
+		for(int i = 0; i < 100; i++) scanner.scan(new BarcodedItem(barcode1, new Mass(100.0)));
 		
 		// We should now be waiting for the item to be bagged
 		assertEquals(session.getState(), UserSessionState.WAITING_FOR_BAGGING);
@@ -150,9 +206,14 @@ public class FullSystemTest {
 		session.setState(UserSessionState.READY_FOR_PAYMENT);
 		assertEquals(session.getState(), UserSessionState.READY_FOR_PAYMENT);
 		
+		CoinValidatorObserverStub stub = new CoinValidatorObserverStub();
+		SelfCheckout.getInstance().getHardware().coinValidator.attach(stub);
+		
 		// Pay 1 dollar
 		try {
-			coinSlot.receive(dollarCoin);
+			do {
+				coinSlot.receive(dollarCoin);
+			} while(stub.invalidCoinDetected);
 		} catch (DisabledException | CashOverloadException e) {
 			throw new RuntimeException();
 		}
@@ -163,7 +224,9 @@ public class FullSystemTest {
 		
 		for(int i = 0; i < 9; i++) {
 			try {
-				coinSlot.receive(dollarCoin);
+				do {
+					coinSlot.receive(dollarCoin);
+				} while(stub.invalidCoinDetected);
 				expectedCost = expectedCost.subtract(BigDecimal.ONE);
 				assertEquals(transaction.getTotalCost().compareTo(expectedCost), 0);
 			} catch (DisabledException | CashOverloadException e) {
@@ -173,7 +236,9 @@ public class FullSystemTest {
 		
 		assertEquals(transaction.getTotalCost().compareTo(BigDecimal.valueOf(0.99)), 0);
 		try {
-			coinSlot.receive(dollarCoin);
+			do {
+				coinSlot.receive(dollarCoin);
+			} while(stub.invalidCoinDetected);
 		} catch (DisabledException | CashOverloadException e) {
 			throw new RuntimeException();
 		}
@@ -186,15 +251,15 @@ public class FullSystemTest {
 		UserSession session = sc.startNewSession();
 		Transaction transaction = session.getTransaction();
 
-		BarcodeScanner scanner = SelfCheckout.getInstance().getHardware().scanner;
-		ElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().baggingArea;
+		IBarcodeScanner scanner = SelfCheckout.getInstance().getHardware().mainScanner;
+		IElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().baggingArea;
 		
 		BarcodedItem item1 = new BarcodedItem(barcode1, new Mass(100.0));
 
 		assertEquals(session.getState(), UserSessionState.READY_FOR_ITEM);
 		
 		// Add product 1
-		scanner.scan(new BarcodedItem(barcode1, new Mass(100.0)));
+		for(int i = 0; i < 100; i++) scanner.scan(new BarcodedItem(barcode1, new Mass(100.0)));
 		
 		// We should now be waiting for the item to be bagged
 		assertEquals(session.getState(), UserSessionState.WAITING_FOR_BAGGING);
@@ -236,7 +301,7 @@ public class FullSystemTest {
 		SelfCheckout sc = SelfCheckout.getInstance();
 		UserSession session = sc.startNewSession();
 
-		ElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().baggingArea;
+		IElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().baggingArea;
 		
 		BarcodedItem item1 = new BarcodedItem(barcode1, new Mass(100.0));
 
@@ -255,16 +320,19 @@ public class FullSystemTest {
 	}
 	
 	
-	// test to see if adding item that's not in the database throws the proper exception
 	@Test
 	public void testTryAddItemNotInDataBase() {
 		SelfCheckout sc  = SelfCheckout.getInstance(); 
 		UserSession session = sc.startNewSession();
 		
-		BarcodeScanner scanner = sc.getHardware().scanner; 
+		IBarcodeScanner scanner = sc.getHardware().mainScanner; 
 		Numeral[] dummyCode = {Numeral.one, Numeral.two};
 		BarcodedItem newItem = new BarcodedItem(new Barcode(dummyCode), new Mass(10.0));
 		scanner.scan(newItem); 
 		assertEquals(session.getState(), UserSessionState.READY_FOR_ITEM);
 	}
+	
+	
+	
+	
 }

@@ -1,5 +1,6 @@
 package com.thelocalmarketplace.software.session;
 
+import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.UI.UIObserver;
 import com.thelocalmarketplace.software.state.UserSessionState;
@@ -39,7 +40,7 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 	@Override
 	public void addBagSelected() {
 		//sets state to add bag state
-		getUserSession().setState(UserSessionState.ADD_BAG);
+		getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
 		//new state changed back to waiting for item after add bag completed
 		UserSessionState newState = getUserSession().getState().onStateSet();
 		if (newState!=null) {
@@ -48,7 +49,7 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 	}
 
 	@Override
-	public void removeItemSelected(Product product) {
+	public void removeItemSelected(BarcodedProduct product) {
 		super.getUserSession().getTransaction().removeItem(product);
 		super.getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
 		// Waits for user to remove item from bagging area
@@ -62,16 +63,12 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 	}
 
 	@Override
-	public void bulkyItemSelected(Product product) {
-		//item is added to transaction then attendant needs to be verified
-		super.getUserSession().getTransaction().addItem(product);
-		//TODO Wait for attendant to change state of transaction back to normal, then add item.
+	public void skipBaggingSelected(BarcodedProduct product) {
+		// TODO: Wait for attendant to change state of transaction back to normal, then add item.
 		super.getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
-		// Once state changes back to normal, will add the bulky item to the transaction (currently working with no attendant feedback)
+		// TODO: Once state changes back to normal, will add the bulky item to the transaction (currently working with no attendant feedback)
+		super.getUserSession().getTransaction().skipBagging(product);
 		super.getUserSession().setState(UserSessionState.READY_FOR_ITEM);
-		super.getUserSession().getTransaction().addBulkyItem(product);
-		
-		
 	}
 
 }

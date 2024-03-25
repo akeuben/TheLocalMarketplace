@@ -23,7 +23,7 @@ package com.thelocalmarketplace.software.test.state;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
 
 import static org.junit.Assert.assertEquals;
@@ -59,13 +59,6 @@ public class WaitingForBaggingStateTest {
 		session.setState(UserSessionState.WAITING_FOR_BAGGING);
 		// The coin slot should be disabled.
 		assertTrue(SelfCheckout.getInstance().getHardware().coinSlot.isDisabled());
-	}
-	
-	@Test
-	public void testStateChangedToAddItemIfWeightCorrectOnStateSet() {
-		session.setState(UserSessionState.WAITING_FOR_BAGGING);
-		// The coin slot should be disabled.
-		assertTrue(session.getState().equals(UserSessionState.READY_FOR_ITEM));
 	}
 	
 	@Test

@@ -23,7 +23,7 @@ package com.thelocalmarketplace.software.test;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
 
 import static org.junit.Assert.assertEquals;
@@ -39,7 +39,6 @@ import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
-import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.payment.CashPayment;
@@ -49,9 +48,9 @@ import com.thelocalmarketplace.software.session.UserSession;
 public class TransactionTest {
 	private UserSession session;
 	private Transaction transaction;
-	private Product productOne;
-	private Product productTwo;
-	private Product bulkyItem;
+	private BarcodedProduct productOne;
+	private BarcodedProduct productTwo;
+	private BarcodedProduct bulkyItem;
 	private Numeral num;
 	private Barcode bc;
     
@@ -66,13 +65,11 @@ public class TransactionTest {
 		this.productOne = new BarcodedProduct(bc, "test1", 100, 1);
 		this.productTwo = new BarcodedProduct(bc, "test2", 200, 2);
 		this.bulkyItem = new BarcodedProduct(bc,"bulky item", 50, 100);
-		
-		
 	}
 	
 	@Test
 	public void testNullItemProduct() {
-		assertThrows(NullPointerException.class, () -> transaction.addItem((BarcodedProduct)null));
+		assertThrows(NullPointerException.class, () -> transaction.addItem(null));
 	}
 	
 	@Test
@@ -142,13 +139,14 @@ public class TransactionTest {
 	
 	@Test
 	public void testAddBulkyItemWeight() {
-		session.getUIHandler().bulkyItemSelected(bulkyItem);
+		session.getUIHandler().skipBaggingSelected(bulkyItem);
 		Assert.assertTrue(transaction.getExpectedMass().compareTo(new Mass(0))==0);
 	}
 	
 	@Test
 	public void testAddBulkyItemCost() {
-		session.getUIHandler().bulkyItemSelected(bulkyItem);
+		session.getTransaction().addItem(bulkyItem);
+		session.getUIHandler().skipBaggingSelected(bulkyItem);
 		Assert.assertTrue(transaction.getTotalCost().compareTo(BigDecimal.valueOf(bulkyItem.getPrice()).divide(BigDecimal.valueOf(100)))==0);
 	}
 	

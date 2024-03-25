@@ -23,12 +23,13 @@ package com.thelocalmarketplace.software.state;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
 
 import java.math.BigDecimal;
 
 import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.card.Card.CardData;
 import com.jjjwelectronics.scanner.Barcode;
 
 public enum UserSessionState implements IUserSessionState<UserSessionState> {
@@ -51,20 +52,8 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	 * This state is used when the system
 	 * is waiting for attendant to approve
 	 */
-	WAITING_FOR_ATTENDANT(new WaitingForAttendantState()),
-	/**
-	 * This state is used when the system
-	 * is waiting for item to be removed
-	 * from baggage area
-	 */
-	WAITING_FOR_ITEM_REMOVAL(new WaitingForItemRemovalState()),
-	/**
-	 * This state is used when user is adding bags
-	 */
+	WAITING_FOR_ATTENDANT(new WaitingForAttendantState());
 	
-	ADD_BAG(new AddBagState());
-	
-
 	private IUserSessionState<UserSessionState> state;
 	
 	private UserSessionState(IUserSessionState<UserSessionState> sessionState) {
@@ -95,4 +84,9 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	public UserSessionState onCoinInserted(BigDecimal value) {
 		return state.onCoinInserted(value);
 	}
+	@Override
+	public UserSessionState onCardDataRead(CardData data) {
+		return state.onCardDataRead(data);
+	}
+	
 }

@@ -23,15 +23,20 @@ package com.thelocalmarketplace.software.state;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
 
 import java.math.BigDecimal;
 
 import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.OverloadedDevice;
+import com.jjjwelectronics.card.Card.CardData;
+import com.jjjwelectronics.scale.AbstractElectronicScale;
+import com.jjjwelectronics.scale.IElectronicScale;
 import com.jjjwelectronics.scanner.Barcode;
-import com.thelocalmarketplace.hardware.Product;
+import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
+import com.thelocalmarketplace.software.Globals;
 import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.payment.Transaction; 
 
@@ -42,6 +47,22 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 		// Disable the coin slot to prevent the user from inserting a coin while the software
 		// is not in the correct state
 		SelfCheckout.getInstance().getHardware().coinSlot.disable();
+
+		Transaction currentTransaction = SelfCheckout.getInstance().getCurrentSession().getTransaction(); // Get current transaction
+		Mass expectedMass = currentTransaction.getExpectedMass(); // Get expected mass
+		IElectronicScale scale = SelfCheckout.getInstance().getHardware().baggingArea;
+		if(!(scale instanceof AbstractElectronicScale)) return null;
+		
+		Mass absoluteDifference;
+		try {
+			absoluteDifference = expectedMass.difference(((AbstractElectronicScale) scale).getCurrentMassOnTheScale()).abs();
+		} catch (OverloadedDevice e) {
+			throw new RuntimeException("The scale is currently overloaded.");
+		} // Compare expected and actual mass of item placed in bagging area
+		
+		if(absoluteDifference.compareTo(Globals.MAXIMUM_WEIGHT_DISCREPENCY) > 1) { // If item falls within the scale's sensitivity window,
+			return UserSessionState.WAITING_FOR_BAGGING; 					  // go back to ReadyForItemState
+		}
 		return null;
 	}
 
@@ -50,7 +71,7 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 
 	@Override
 	public UserSessionState onScanBarcode(Barcode barcode) {
-		Product barcodeProduct = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
+		BarcodedProduct barcodeProduct = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
 		// want to check to see if the product exists within the database
 		if(barcodeProduct != null) {
 			Transaction currentTransaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();
@@ -87,6 +108,11 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 	@Override
 	public UserSessionState onCoinInserted(BigDecimal value) {
 		return null;
+	}
+	
+	// do nothing and stay in same state 
+	public UserSessionState onCardDataRead(CardData data) {
+		return null; 
 	}
 
 }

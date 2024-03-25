@@ -29,11 +29,10 @@ import java.math.BigDecimal;
  */
 
 import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.card.Card.CardData;
 import com.jjjwelectronics.scanner.Barcode;
 
-public class WaitingForAttendantState implements IUserSessionState<UserSessionState> { {
-
-}
+public class WaitingForAttendantState implements IUserSessionState<UserSessionState> {
 
     @Override
     public UserSessionState onStateSet() {
@@ -60,4 +59,9 @@ public class WaitingForAttendantState implements IUserSessionState<UserSessionSt
     public UserSessionState onCoinInserted(BigDecimal value) {
         return null;
     }
+
+	@Override
+	public UserSessionState onCardDataRead(CardData data) {
+		return null;
+	}
 }
