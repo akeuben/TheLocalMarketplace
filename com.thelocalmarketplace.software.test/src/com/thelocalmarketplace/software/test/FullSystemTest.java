@@ -255,7 +255,6 @@ public class FullSystemTest {
 	}
 	
 	
-	// test to see if adding item that's not in the database throws the proper exception
 	@Test
 	public void testTryAddItemNotInDataBase() {
 		SelfCheckout sc  = SelfCheckout.getInstance(); 
@@ -267,4 +266,8 @@ public class FullSystemTest {
 		scanner.scan(newItem); 
 		assertEquals(session.getState(), UserSessionState.READY_FOR_ITEM);
 	}
+	
+	
+	
+	
 }

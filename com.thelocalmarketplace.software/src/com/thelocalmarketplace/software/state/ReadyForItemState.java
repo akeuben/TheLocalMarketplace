@@ -29,6 +29,7 @@ package com.thelocalmarketplace.software.state;
 import java.math.BigDecimal;
 
 import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.card.Card.CardData;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
@@ -87,6 +88,11 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 	@Override
 	public UserSessionState onCoinInserted(BigDecimal value) {
 		return null;
+	}
+	
+	// do nothing and stay in same state 
+	public UserSessionState onCardDataRead(CardData data) {
+		return null; 
 	}
 
 }

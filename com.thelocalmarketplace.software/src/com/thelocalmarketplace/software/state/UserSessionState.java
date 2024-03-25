@@ -29,6 +29,7 @@ package com.thelocalmarketplace.software.state;
 import java.math.BigDecimal;
 
 import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.card.Card.CardData;
 import com.jjjwelectronics.scanner.Barcode;
 
 public enum UserSessionState implements IUserSessionState<UserSessionState> {
@@ -78,4 +79,9 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	public UserSessionState onCoinInserted(BigDecimal value) {
 		return state.onCoinInserted(value);
 	}
+	@Override
+	public UserSessionState onCardDataRead(CardData data) {
+		return state.onCardDataRead(data);
+	}
+	
 }

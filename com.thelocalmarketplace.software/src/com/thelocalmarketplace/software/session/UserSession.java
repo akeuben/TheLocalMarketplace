@@ -36,6 +36,7 @@ public class UserSession {
     private CoinValidatorHandler coinValidatorHandler;
     private BarcodeHandler barcodeHandler;
     private ElectronicScaleHandler electronicScaleHandler;
+    private CardReaderHandler cardReaderHandler; 
     
     /**
      * Create a user session. This holds all data pertaining
@@ -53,6 +54,7 @@ public class UserSession {
     	this.coinValidatorHandler = new CoinValidatorHandler(this);
     	this.barcodeHandler = new BarcodeHandler(this);
     	this.electronicScaleHandler = new ElectronicScaleHandler(this);
+    	this.cardReaderHandler = new CardReaderHandler(this); 
     }
     
     /**
@@ -109,5 +111,13 @@ public class UserSession {
 	 */
 	public ElectronicScaleHandler getElectronicScaleHandler() {
 		return electronicScaleHandler;
+	}
+	
+	/**
+	 * Get the CardReaderListener for the current session
+	 * @return The CardReaderHandlerListener
+	 */
+	public CardReaderHandler getCardReaderHandler() {
+		return this.cardReaderHandler; 
 	}
 }

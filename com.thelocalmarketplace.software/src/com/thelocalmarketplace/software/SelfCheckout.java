@@ -94,7 +94,6 @@ public class SelfCheckout {
 		AbstractSelfCheckoutStation.configureCoinDispenserCapacity(configuration.coinDispenserCapacity);
 		AbstractSelfCheckoutStation.configureCoinStorageUnitCapacity(configuration.coinStorageUnitCapacity);
 		AbstractSelfCheckoutStation.configureCoinTrayCapacity(configuration.coinTrayCapacity);
-		
 		instance = new SelfCheckout(configuration);
 		
 		return instance;
@@ -138,6 +137,7 @@ public class SelfCheckout {
 		// Register listeners
 		hardware.mainScanner.register(currentSession.getBarcodeHandler());
 		hardware.baggingArea.register(currentSession.getElectronicScaleHandler());
+		hardware.cardReader.register(currentSession.getCardReaderHandler());
 		hardware.coinValidator.attach(currentSession.getCoinValidatorHandler());
 		
 		return currentSession;
