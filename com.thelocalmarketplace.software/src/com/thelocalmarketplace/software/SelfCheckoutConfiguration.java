@@ -23,7 +23,7 @@ package com.thelocalmarketplace.software;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
 
 import java.math.BigDecimal;
@@ -57,7 +57,16 @@ public class SelfCheckoutConfiguration {
 	}
 	
 	public SelfCheckoutConfiguration() {
-		this(MachineRating.BRONZE, Currency.getInstance(Locale.CANADA), 100, 1000, 25, new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 100, 100);
+		this(
+			MachineRating.BRONZE, 
+			Currency.getInstance(Locale.CANADA), 
+			100, 
+			1000, 
+			25, 
+			new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 
+			100, 
+			100
+		);
 	}
 
 	public Currency getCurrency() {

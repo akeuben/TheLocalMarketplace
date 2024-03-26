@@ -1,4 +1,7 @@
-package com.thelocalmarketplace.software.payment;
+package com.thelocalmarketplace.software.UI;
+
+import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.hardware.Product;
 
 /**
  * SENG 300 Project - Group 1:
@@ -23,21 +26,24 @@ package com.thelocalmarketplace.software.payment;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - 30185321
+ * Winston Wang - ????????
  */
 
-import java.math.BigDecimal;
-
-public class CashPayment implements IPayment {
-    private BigDecimal amountPaid;
-
-
-    public CashPayment(BigDecimal amountPaid) {
-        this.amountPaid = amountPaid;
-    }
-    
-    @Override
-    public BigDecimal getAmountPaid() {
-    	return amountPaid;
-    }
+public interface UIObserver {
+	
+	/**
+	 * announces when user selects option to add their own bags
+	 */
+	void addBagSelected();
+	
+	/**
+	 * announces when user selects option to remove item from order
+	 */
+	void removeItemSelected(BarcodedProduct product);
+	
+	/**
+	 * announces when user selects option to skip bagging the current product
+	 */
+	void skipBaggingSelected(BarcodedProduct product);
+	
 }

@@ -23,7 +23,7 @@ package com.thelocalmarketplace.software.test.state;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
 
 import static org.junit.Assert.assertEquals;
@@ -57,6 +57,9 @@ public class ReadyForItemStateTest {
 	
 	@Test
 	public void testCoinSlotDisabled() {
+		SelfCheckout.uninitialize();
+		SelfCheckout.initialize(new SelfCheckoutConfiguration());
+		SelfCheckout.getInstance().startNewSession();
 		session.setState(UserSessionState.READY_FOR_ITEM);
 		// The coin slot should be disabled.
 		assertTrue(SelfCheckout.getInstance().getHardware().coinSlot.isDisabled());

@@ -23,7 +23,7 @@ package com.thelocalmarketplace.software.test;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
 
 import static org.junit.Assert.assertEquals;
@@ -52,11 +52,14 @@ import com.thelocalmarketplace.software.SelfCheckoutConfiguration.MachineRating;
 import com.thelocalmarketplace.software.payment.CashPayment;
 import com.thelocalmarketplace.software.payment.IPayment;
 import com.thelocalmarketplace.software.payment.Transaction;
+import com.thelocalmarketplace.software.session.UserSession;
 
 public class TransactionTest {
+	private UserSession session;
 	private Transaction transaction;
 	private BarcodedProduct productOne;
 	private BarcodedProduct productTwo;
+	private BarcodedProduct bulkyItem;
 	private Numeral num;
 	private Barcode bc;
 	
@@ -76,14 +79,14 @@ public class TransactionTest {
     
 	@Before
 	public void setup() {
-		SelfCheckout.uninitialize();
-		SelfCheckout.initialize(new SelfCheckoutConfiguration());
-		SelfCheckout.getInstance().startNewSession();
 		this.transaction = new Transaction();
+		this.session = SelfCheckout.getInstance().startNewSession();
+		this.transaction = session.getTransaction();
 		this.num = Numeral.eight;
 		this.bc= new Barcode(new Numeral[] {num});
 		this.productOne = new BarcodedProduct(bc, "test1", 100, 1);
 		this.productTwo = new BarcodedProduct(bc, "test2", 200, 2);
+		this.bulkyItem = new BarcodedProduct(bc,"bulky item", 50, 100);
 	}
 	
 	@Test
@@ -139,6 +142,38 @@ public class TransactionTest {
 	}
 	
 	@Test
+	public void testRemoveItemWeight() {
+		transaction.addItem(productOne);
+		transaction.addItem(productTwo);
+		session.getUIHandler().removeItemSelected(productTwo);
+		Mass productOneMass = new Mass(productOne.getExpectedWeight());
+		Assert.assertTrue(productOneMass.compareTo(transaction.getExpectedMass()) == 0);
+	}
+	
+	@Test
+	public void testRemoveItemCost() {
+		transaction.addItem(productOne);
+		transaction.addItem(productTwo);
+		session.getUIHandler().removeItemSelected(productTwo);
+		BigDecimal productOneCost = BigDecimal.valueOf(productOne.getPrice()).divide(BigDecimal.valueOf(100));
+		Assert.assertTrue(productOneCost.compareTo(transaction.getTotalCost())==0);
+	}
+	
+	@Test
+	public void testAddBulkyItemWeight() {
+		session.getUIHandler().skipBaggingSelected(bulkyItem);
+		Assert.assertTrue(transaction.getExpectedMass().compareTo(new Mass(0))==0);
+	}
+	
+	@Test
+	public void testAddBulkyItemCost() {
+		session.getTransaction().addItem(bulkyItem);
+		session.getUIHandler().skipBaggingSelected(bulkyItem);
+		Assert.assertTrue(transaction.getTotalCost().compareTo(BigDecimal.valueOf(bulkyItem.getPrice()).divide(BigDecimal.valueOf(100)))==0);
+	}
+	
+	
+	@Test
 	public void testValidPayment() {
 	    CashPayment valid = new CashPayment(BigDecimal.TEN);
 	    BigDecimal tCost = transaction.getTotalCost();
@@ -159,14 +194,12 @@ public class TransactionTest {
 
 	@Test
     public void testZeroTotalCostChange() throws Exception {
-        Transaction transaction = new Transaction(); 
         transaction.calculateChange(); // Calculate change
         // No exception should be thrown because there is no change to dispense
     }
 	
     @Test
     public void testZeroChange() {
-        Transaction transaction = new Transaction();
         transaction.addItem(productOne); // Adding a product with price 1.00
         transaction.addPayment(new PaymentStub(BigDecimal.valueOf(1.00))); // Simulating payment of 1.00
         
@@ -181,7 +214,6 @@ public class TransactionTest {
 	
     @Test
     public void testZeroChange2() {
-        Transaction transaction = new Transaction();
         transaction.addItem(productOne); // Adding a product with price 1.00
         transaction.addItem(productOne); // Adding a product with price 1.00
         transaction.addPayment(new PaymentStub(BigDecimal.valueOf(1.00))); // Simulating payment of 1.00
@@ -198,7 +230,6 @@ public class TransactionTest {
 	
     @Test
     public void testOneChange() throws Exception {
-        Transaction transaction = new Transaction();
         transaction.addItem(productOne); // Adding a product with price 1.00
         transaction.addPayment(new PaymentStub(BigDecimal.valueOf(2.00))); // Simulating payment of 2.00
         
@@ -222,7 +253,6 @@ public class TransactionTest {
 	
     @Test
     public void testTwoChange() throws Exception {
-        Transaction transaction = new Transaction();
         transaction.addItem(productOne); // Adding a product with price 1.00
         transaction.addPayment(new PaymentStub(BigDecimal.valueOf(3.00))); // Simulating payment of 3.00
         
@@ -261,7 +291,7 @@ public class TransactionTest {
     		100, 
     		100
     	));
-        Transaction transaction = new Transaction();
+        transaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();
         transaction.addItem(productOne); // Adding a product with price 1.00
         transaction.addPayment(new PaymentStub(BigDecimal.valueOf(4.00))); // Simulating payment of 4.00
         
@@ -297,7 +327,6 @@ public class TransactionTest {
 	
     @Test
     public void testChangeBill() throws Exception {
-        Transaction transaction = new Transaction();
         transaction.addItem(productOne); // Adding a product with price 1.00
         transaction.addPayment(new PaymentStub(BigDecimal.valueOf(12.00))); // Simulating payment of 12.00
         

@@ -28,14 +28,15 @@ package com.thelocalmarketplace.software.session;
 
 import com.jjjwelectronics.IDevice;
 import com.jjjwelectronics.IDeviceListener;
-import com.jjjwelectronics.scanner.Barcode;
-import com.jjjwelectronics.scanner.BarcodeScannerListener;
-import com.jjjwelectronics.scanner.IBarcodeScanner;
+import com.jjjwelectronics.card.AbstractCardReader;
+import com.jjjwelectronics.card.Card;
+import com.jjjwelectronics.card.Card.CardData;
+import com.jjjwelectronics.card.CardReaderListener;
 import com.thelocalmarketplace.software.state.UserSessionState;
 
-public class BarcodeHandler extends AbstractUserSessionHandler implements BarcodeScannerListener {
+public class CardReaderHandler extends AbstractUserSessionHandler implements CardReaderListener {
 
-	public BarcodeHandler(UserSession session) {
+	public CardReaderHandler(UserSession session) {
 		super(session);
 	}
 
@@ -52,10 +53,15 @@ public class BarcodeHandler extends AbstractUserSessionHandler implements Barcod
 	public void aDeviceHasBeenTurnedOff(IDevice<? extends IDeviceListener> device) {}
 
 	@Override
-	public void aBarcodeHasBeenScanned(IBarcodeScanner barcodeScanner, Barcode barcode) {
-		UserSessionState newState = getUserSession().getState().onScanBarcode(barcode);
+	public void aCardHasBeenSwiped() {} // will be a stub for now
+
+	@Override
+	public void theDataFromACardHasBeenRead(CardData data) {
+		UserSessionState newState = getUserSession().getState().onCardDataRead(data);
 		if(newState != null) {
-			getUserSession().setState(newState); 
+			getUserSession().setState(newState);
 		}
+
 	}
+
 }

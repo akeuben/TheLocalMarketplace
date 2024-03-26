@@ -1,4 +1,6 @@
 package com.thelocalmarketplace.software.session;
+
+import com.thelocalmarketplace.software.session.CardReaderHandler;
 import com.thelocalmarketplace.software.payment.Transaction;
 import com.thelocalmarketplace.software.state.UserSessionState;
 
@@ -25,17 +27,19 @@ import com.thelocalmarketplace.software.state.UserSessionState;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
 
 public class UserSession {
 
-    private UserSessionState state = UserSessionState.READY_FOR_ITEM;
+    private UserSessionState state = null;
     private Transaction transaction;
 
     private CoinValidatorHandler coinValidatorHandler;
     private BarcodeHandler barcodeHandler;
     private ElectronicScaleHandler electronicScaleHandler;
+    private UIHandler uiHandler;
+    private CardReaderHandler cardReaderHandler; 
     
     /**
      * Create a user session. This holds all data pertaining
@@ -43,16 +47,13 @@ public class UserSession {
      */
     public UserSession() {
     	this.transaction = new Transaction();
-		state = UserSessionState.READY_FOR_ITEM;
 		
-		// Set the initial state
-		UserSessionState newState = state.onStateSet();
-		if(newState != null) setState(newState);
-    	
     	// Initialize the event handlers
     	this.coinValidatorHandler = new CoinValidatorHandler(this);
     	this.barcodeHandler = new BarcodeHandler(this);
     	this.electronicScaleHandler = new ElectronicScaleHandler(this);
+    	this.uiHandler = new UIHandler(this);
+    	this.cardReaderHandler = new CardReaderHandler(this); 
     }
     
     /**
@@ -63,7 +64,7 @@ public class UserSession {
     	if(newState == this.state) return;
     	
     	// Send relevant events and update the state field.
-    	this.state.onStateUnset();
+    	if(this.state != null) this.state.onStateUnset();
     	this.state = newState;
     	newState = this.state.onStateSet();
     	if(newState != null) {
@@ -109,5 +110,21 @@ public class UserSession {
 	 */
 	public ElectronicScaleHandler getElectronicScaleHandler() {
 		return electronicScaleHandler;
+	}
+	
+	/**
+	 * Get the UIListener for the current session
+	 * @return The UIListener
+	 */
+	public UIHandler getUIHandler() {
+		return uiHandler;
+	}
+	
+	/*
+	 * Get the CardReaderListener for the current session
+	 * @return The CardReaderHandlerListener
+	 */
+	public CardReaderHandler getCardReaderHandler() {
+		return this.cardReaderHandler; 
 	}
 }

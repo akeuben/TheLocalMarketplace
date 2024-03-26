@@ -23,7 +23,7 @@ package com.thelocalmarketplace.software.payment;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
 
 import java.math.BigDecimal;
@@ -36,11 +36,7 @@ import com.jjjwelectronics.Mass;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
-import com.tdc.banknote.AbstractBanknoteDispenser;
-import com.tdc.banknote.Banknote;
-import com.tdc.banknote.BanknoteDispensationSlot;
-import com.tdc.banknote.IBanknoteDispenser;
-import com.tdc.coin.Coin;
+import com.jjjwelectronics.Mass.MassDifference;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.SelfCheckout;
@@ -59,7 +55,6 @@ public class Transaction {
     private final HashMap<UUID, IPayment> payments = new HashMap<>();
     
 
-
     /**
      * Adds a product into the current transaction
      * Adds weight to total expected weight
@@ -77,16 +72,54 @@ public class Transaction {
         }
     }
 
+    /**
+     * Removes weight of bulky item from transaction
+     * @param product item being added to transaction/products
+     */
+    public void skipBagging(BarcodedProduct product)
+    {
+    	if (product != null) {
+    		Mass bulkyItemMass = new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM)));
+			MassDifference massDiff = expectedMass.difference(bulkyItemMass);
+			
+			if (massDiff.compareTo(Mass.ZERO) < 0) {
+				expectedMass = Mass.ZERO;
+			} else {
+				expectedMass = massDiff.abs(); // Use the absolute value to ensure it's positive.
+			}
+        }
+        else {
+            throw new NullPointerException("product");
+        }
+    }
+    
+    /**
+     * updates transaction weight to include bag weight
+     */
+    public void addBag(Mass bagMass) {
+		expectedMass = expectedMass.sum(bagMass);
+    }
+
 
     /**
      *
      * Adds a payment to the transaction by storing in HashMap payments
-     * @param paymentMethod, type of payment method used, must be initialized so amountPaid is already defined
+     * @param payment, type of payment method used, must be initialized so amountPaid is already defined
      */
     public void addPayment(IPayment payment) {
     	UUID transactionId = UUID.randomUUID(); // Generate a unique ID for this transaction/payment
     	payments.put(transactionId, payment); // Add payment to HashMap
     	totalCost = totalCost.subtract(payment.getAmountPaid());
+    }
+
+    /**
+     * Removes an item from the transaction
+     * @param product item being removed from transaction/products
+     */
+    public void removeItem(BarcodedProduct product) {
+    	products.remove(product);
+    	totalCost = totalCost.subtract(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
+    	expectedMass = expectedMass.difference(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight()*Mass.MICROGRAMS_PER_GRAM)))).abs();
     }
     
     

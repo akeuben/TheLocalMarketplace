@@ -23,15 +23,17 @@ package com.thelocalmarketplace.software.state;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
 
 import java.math.BigDecimal;
 
 import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.card.Card.CardData;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.payment.CashPayment;
+import com.thelocalmarketplace.software.payment.CardPayment;
 import com.thelocalmarketplace.software.payment.Transaction;
 
 public class ReadyForPaymentState implements IUserSessionState<UserSessionState> {
@@ -87,7 +89,6 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 
 	@Override
 	public UserSessionState onCoinInserted(BigDecimal value) {
-		
 		//Create CoinPayment class instance
 		CashPayment payment = new CashPayment(value);
 		
@@ -106,6 +107,22 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 	    }
 	    
 	    return null;
+	}
+	
+	@Override 
+	public UserSessionState onCardDataRead(CardData data) {
+		// create a card payment instance, for now it will be debit but I might refactor those two classes into one
+		CardPayment payment = new CardPayment();
+		Transaction transaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();; 
+		payment.swipePayment(data); 
+		System.out.println("Paid amount: " + payment.getAmountPaid().doubleValue());
+		transaction.addPayment(payment);	
+		
+		
+		if(transaction.getTotalCost().compareTo(BigDecimal.ZERO) <= 0) {
+			SelfCheckout.getInstance().endCurrentSession();
+		}
+		return null; 
 	}
 
 }
