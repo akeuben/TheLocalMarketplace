@@ -39,7 +39,9 @@ import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.payment.CashPayment;
+import com.thelocalmarketplace.software.payment.IPayment;
 import com.thelocalmarketplace.software.payment.Transaction;
 
 public class TransactionTest {
@@ -48,6 +50,20 @@ public class TransactionTest {
 	private BarcodedProduct productTwo;
 	private Numeral num;
 	private Barcode bc;
+	
+    // simulate a payment by defining a payment stub
+    private static class PaymentStub implements IPayment {
+        private BigDecimal amountPaid;
+        
+        public PaymentStub(BigDecimal amountPaid) {
+            this.amountPaid = amountPaid;
+        }
+
+        @Override
+        public BigDecimal getAmountPaid() {
+            return amountPaid;
+        }
+    }
     
 	@Before
 	public void setup() {
@@ -128,4 +144,29 @@ public class TransactionTest {
         transaction.addItem(productOne);
         assertEquals(1, transaction.getProducts().length);
     }
+
+	@Test
+    public void testZeroTotalCostChange() throws Exception {
+        Transaction transaction = new Transaction(); 
+        transaction.calculateChange(); // Calculate change
+        // No exception should be thrown because there is no change to dispense
+    }
+	
+    @Test
+    public void testZeroChange() {
+        Transaction transaction = new Transaction();
+        transaction.addItem(productOne); // Adding a product with price 1.00
+        transaction.addPayment(new PaymentStub(BigDecimal.valueOf(1.00))); // Simulating payment of 1.00
+        
+        try {
+            transaction.calculateChange();
+            BigDecimal expectedChange = BigDecimal.valueOf(0.0);
+            BigDecimal actualChange = transaction.getTotalCost();
+            assertEquals(expectedChange, actualChange);
+        } catch (Exception e) {
+        }
+    }
+        
 }
+
+	
