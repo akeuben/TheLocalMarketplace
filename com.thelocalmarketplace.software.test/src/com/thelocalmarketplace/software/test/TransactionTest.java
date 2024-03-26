@@ -28,8 +28,12 @@ package com.thelocalmarketplace.software.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.util.Currency;
+import java.util.List;
+import java.util.Locale;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,8 +42,13 @@ import org.junit.Test;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
+import com.tdc.CashOverloadException;
+import com.tdc.banknote.Banknote;
+import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.software.SelfCheckout;
+import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
+import com.thelocalmarketplace.software.SelfCheckoutConfiguration.MachineRating;
 import com.thelocalmarketplace.software.payment.CashPayment;
 import com.thelocalmarketplace.software.payment.IPayment;
 import com.thelocalmarketplace.software.payment.Transaction;
@@ -67,6 +76,9 @@ public class TransactionTest {
     
 	@Before
 	public void setup() {
+		SelfCheckout.uninitialize();
+		SelfCheckout.initialize(new SelfCheckoutConfiguration());
+		SelfCheckout.getInstance().startNewSession();
 		this.transaction = new Transaction();
 		this.num = Numeral.eight;
 		this.bc= new Barcode(new Numeral[] {num});
@@ -165,6 +177,155 @@ public class TransactionTest {
             assertEquals(expectedChange, actualChange);
         } catch (Exception e) {
         }
+    }
+	
+    @Test
+    public void testZeroChange2() {
+        Transaction transaction = new Transaction();
+        transaction.addItem(productOne); // Adding a product with price 1.00
+        transaction.addItem(productOne); // Adding a product with price 1.00
+        transaction.addPayment(new PaymentStub(BigDecimal.valueOf(1.00))); // Simulating payment of 1.00
+        transaction.addPayment(new PaymentStub(BigDecimal.valueOf(1.00))); // Simulating payment of 1.00
+        
+        try {
+            transaction.calculateChange();
+            BigDecimal expectedChange = BigDecimal.valueOf(0.0);
+            BigDecimal actualChange = transaction.getTotalCost();
+            assertEquals(expectedChange, actualChange);
+        } catch (Exception e) {
+        }
+    }
+	
+    @Test
+    public void testOneChange() throws Exception {
+        Transaction transaction = new Transaction();
+        transaction.addItem(productOne); // Adding a product with price 1.00
+        transaction.addPayment(new PaymentStub(BigDecimal.valueOf(2.00))); // Simulating payment of 2.00
+        
+        try {
+			SelfCheckout.getInstance().getHardware().coinDispensers.get(BigDecimal.ONE).load(new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE));
+		} catch (CashOverloadException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        transaction.calculateChange();
+        BigDecimal expectedChange = BigDecimal.valueOf(-1.0);
+        BigDecimal actualChange = transaction.getTotalCost();
+        assertEquals(expectedChange, actualChange);
+        
+        // Check the coins that were dispensed match the coins that should have been dispensed.
+        List<Coin> collectedCoins = SelfCheckout.getInstance().getHardware().coinTray.collectCoins();
+        assertEquals(1, collectedCoins.size());
+        assertEquals(0, collectedCoins.get(0).getValue().compareTo(BigDecimal.valueOf(1.0)));
+    }
+	
+    @Test
+    public void testTwoChange() throws Exception {
+        Transaction transaction = new Transaction();
+        transaction.addItem(productOne); // Adding a product with price 1.00
+        transaction.addPayment(new PaymentStub(BigDecimal.valueOf(3.00))); // Simulating payment of 3.00
+        
+        try {
+			SelfCheckout.getInstance().getHardware().coinDispensers.get(BigDecimal.ONE).load(
+				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE),
+				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE)
+			);
+		} catch (CashOverloadException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        transaction.calculateChange();
+        BigDecimal expectedChange = BigDecimal.valueOf(-2.0);
+        BigDecimal actualChange = transaction.getTotalCost();
+        assertEquals(expectedChange, actualChange);
+        List<Coin> collectedCoins = SelfCheckout.getInstance().getHardware().coinTray.collectCoins();
+        assertEquals(2, collectedCoins.size());
+        assertEquals(0, collectedCoins.get(0).getValue().compareTo(BigDecimal.valueOf(1.0)));
+        assertEquals(0, collectedCoins.get(1).getValue().compareTo(BigDecimal.valueOf(1.0)));
+    }
+
+	
+    @Test
+    public void testOptimalChange() throws Exception {
+    	SelfCheckout.uninitialize();
+    	SelfCheckout.initialize(new SelfCheckoutConfiguration(
+    		MachineRating.BRONZE, 
+    		Currency.getInstance(Locale.CANADA), 
+    		100, 
+    		1000, 
+    		25, 
+    		new BigDecimal[] {BigDecimal.valueOf(2), BigDecimal.valueOf(1)}, 
+    		new BigDecimal[] {BigDecimal.valueOf(10)},
+    		100, 
+    		100
+    	));
+        Transaction transaction = new Transaction();
+        transaction.addItem(productOne); // Adding a product with price 1.00
+        transaction.addPayment(new PaymentStub(BigDecimal.valueOf(4.00))); // Simulating payment of 4.00
+        
+        try {
+			SelfCheckout.getInstance().getHardware().coinDispensers.get(BigDecimal.ONE).load(
+				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE),
+				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE)
+			);
+			SelfCheckout.getInstance().getHardware().coinDispensers.get(BigDecimal.valueOf(2)).load(
+				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.valueOf(2)),
+				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.valueOf(2))
+			);
+		} catch (CashOverloadException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        transaction.calculateChange();
+        BigDecimal expectedChange = BigDecimal.valueOf(-3.0);
+        BigDecimal actualChange = transaction.getTotalCost();
+        assertEquals(expectedChange, actualChange);
+        List<Coin> collectedCoins = SelfCheckout.getInstance().getHardware().coinTray.collectCoins();
+        assertEquals(2, collectedCoins.size());
+        int loonieCount = 0, toonieCount = 0;
+        for(Coin coin : collectedCoins) {
+        	if(coin.getValue().compareTo(BigDecimal.ONE) == 0) loonieCount++;
+        	if(coin.getValue().compareTo(BigDecimal.valueOf(2)) == 0) toonieCount++;
+        }
+        assertEquals(1, loonieCount);
+        assertEquals(1, toonieCount);
+    }
+
+	
+    @Test
+    public void testChangeBill() throws Exception {
+        Transaction transaction = new Transaction();
+        transaction.addItem(productOne); // Adding a product with price 1.00
+        transaction.addPayment(new PaymentStub(BigDecimal.valueOf(12.00))); // Simulating payment of 12.00
+        
+        try {
+			SelfCheckout.getInstance().getHardware().coinDispensers.get(BigDecimal.ONE).load(
+				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE),
+				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE)
+			);
+			SelfCheckout.getInstance().getHardware().banknoteDispensers.get(BigDecimal.valueOf(10)).load(
+				new Banknote(Currency.getInstance(Locale.CANADA), BigDecimal.valueOf(10)),
+				new Banknote(Currency.getInstance(Locale.CANADA), BigDecimal.valueOf(10))
+			);
+		} catch (CashOverloadException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+        transaction.calculateChange();
+        BigDecimal expectedChange = BigDecimal.valueOf(-11.0);
+        BigDecimal actualChange = transaction.getTotalCost();
+        assertEquals(expectedChange, actualChange);
+        List<Coin> collectedCoins = SelfCheckout.getInstance().getHardware().coinTray.collectCoins();
+        assertEquals(1, collectedCoins.size());
+        assertEquals(0, collectedCoins.get(0).getValue().compareTo(BigDecimal.valueOf(1)));
+        
+        List<Banknote> collectedBanknotes = SelfCheckout.getInstance().getHardware().banknoteOutput.removeDanglingBanknotes();
+        assertEquals(1, collectedBanknotes.size());
+        assertEquals(0, collectedBanknotes.get(0).getDenomination().compareTo(BigDecimal.valueOf(10)));
     }
         
 }

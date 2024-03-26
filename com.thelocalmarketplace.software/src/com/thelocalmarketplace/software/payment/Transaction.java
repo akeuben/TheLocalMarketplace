@@ -36,7 +36,10 @@ import com.jjjwelectronics.Mass;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
+import com.tdc.banknote.AbstractBanknoteDispenser;
 import com.tdc.banknote.Banknote;
+import com.tdc.banknote.BanknoteDispensationSlot;
+import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
@@ -156,9 +159,9 @@ public class Transaction {
 	                    }
 	                }
 	                if (dispense == -1) {           // unable to find anything to dispense
-	                    break;
+	                    throw new RuntimeException("No valid coins to dispense.");
 	                } else {
-	                    change.subtract(value);
+	                    change = change.subtract(value);
 	                    if (dispense == COIN) {
 	                        // Coin Dispensation
 	                        instance.getHardware().coinDispensers.get(value).emit();
@@ -174,6 +177,7 @@ public class Transaction {
                 // Rethrow the exception to be handled by the caller
                 throw e;
             }
-         }
+            SelfCheckout.getInstance().getHardware().banknoteOutput.dispense();
+        }
     }
 }

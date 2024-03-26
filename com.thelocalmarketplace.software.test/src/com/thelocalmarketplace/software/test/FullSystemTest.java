@@ -103,9 +103,9 @@ public class FullSystemTest {
 			Numeral.three
 		});
 
-		product1 = new BarcodedProduct(barcode1, "Fake Product 1", 1099, 100);
-		product2 = new BarcodedProduct(barcode2, "Fake Product 2", 2049, 200);
-		product3 = new BarcodedProduct(barcode3, "Fake Product 3", 3079, 300);
+		product1 = new BarcodedProduct(barcode1, "Fake Product 1", 1000, 100);
+		product2 = new BarcodedProduct(barcode2, "Fake Product 2", 2000, 200);
+		product3 = new BarcodedProduct(barcode3, "Fake Product 3", 3000, 300);
 
 		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode1, product1);
 		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode2, product2);
@@ -134,7 +134,7 @@ public class FullSystemTest {
 		assertEquals(session.getState(), UserSessionState.WAITING_FOR_BAGGING);
 		
 		// Check the cost and expected weight are correct
-		assertEquals(transaction.getTotalCost().compareTo(BigDecimal.valueOf(10.99)), 0);
+		assertEquals(transaction.getTotalCost().compareTo(BigDecimal.valueOf(10.00)), 0);
 		assertEquals(transaction.getExpectedMass().compareTo(new Mass(100.0)), 0);
 		
 		// Check there is 1 item in the transaction
@@ -157,7 +157,7 @@ public class FullSystemTest {
 			throw new RuntimeException();
 		}
 		
-		BigDecimal expectedCost = BigDecimal.valueOf(9.99);
+		BigDecimal expectedCost = BigDecimal.valueOf(9.00);
 		
 		assertEquals(transaction.getTotalCost().compareTo(expectedCost), 0);
 		
@@ -200,7 +200,7 @@ public class FullSystemTest {
 		assertEquals(session.getState(), UserSessionState.WAITING_FOR_BAGGING);
 		
 		// Check the cost and expected weight are correct
-		assertEquals(transaction.getTotalCost().compareTo(BigDecimal.valueOf(10.99)), 0);
+		assertEquals(transaction.getTotalCost().compareTo(BigDecimal.valueOf(10.00)), 0);
 		assertEquals(transaction.getExpectedMass().compareTo(new Mass(100.0)), 0);
 		
 		// Check there is 1 item in the transaction
