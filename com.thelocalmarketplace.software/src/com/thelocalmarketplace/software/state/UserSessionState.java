@@ -84,6 +84,12 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	public UserSessionState onCoinInserted(BigDecimal value) {
 		return state.onCoinInserted(value);
 	}
+	
+	@Override
+	public UserSessionState onBanknoteInserted(BigDecimal value) {
+		return state.onBanknoteInserted(value);
+	}
+	
 	@Override
 	public UserSessionState onCardDataRead(CardData data) {
 		return state.onCardDataRead(data);

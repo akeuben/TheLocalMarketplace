@@ -30,7 +30,6 @@ import java.math.BigDecimal;
 
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.card.Card.CardData;
-import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.payment.CashPayment;
 import com.thelocalmarketplace.software.payment.CardPayment;
@@ -55,14 +54,6 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 		// is in the correct state
 		SelfCheckout.getInstance().getHardware().coinSlot.enable();
 		return null; 
-	}
-
-	@Override
-	public void onStateUnset() {}
-
-	@Override
-	public UserSessionState onScanBarcode(Barcode barcode) {
-		return null;
 	}
 	 
 	@Override
@@ -98,6 +89,33 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 	    
 	    //Checking when the balance goes down to zero 
 	    if (transaction.getTotalCost().compareTo(BigDecimal.ZERO) <= 0) {
+			try {
+				transaction.calculateChange();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	        SelfCheckout.getInstance().endCurrentSession();
+	    }
+	    
+	    return null;
+	}
+
+	@Override
+	public UserSessionState onBanknoteInserted(BigDecimal value) {
+		//Create CoinPayment class instance
+		CashPayment payment = new CashPayment(value);
+		
+		//Adding payment onto the current transaction 
+		Transaction transaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();
+	    transaction.addPayment(payment);
+	    
+	    //Checking when the balance goes down to zero 
+	    if (transaction.getTotalCost().compareTo(BigDecimal.ZERO) <= 0) {
+			try {
+				transaction.calculateChange();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 	        SelfCheckout.getInstance().endCurrentSession();
 	    }
 	    

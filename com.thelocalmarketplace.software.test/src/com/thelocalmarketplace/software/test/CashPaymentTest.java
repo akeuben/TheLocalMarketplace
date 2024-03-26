@@ -47,4 +47,10 @@ public class CashPaymentTest {
         BigDecimal amount = BigDecimal.ONE;
         assertEquals(amount, payment.getAmountPaid());
     }
+    @Test
+    public void testPayment() {
+    	CashPayment newPayment = new CashPayment(BigDecimal.ONE);
+    	BigDecimal newAmount = BigDecimal.ONE;
+    	assertEquals(newPayment.getAmountPaid(), newAmount);
+    }
 }

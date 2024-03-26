@@ -26,13 +26,8 @@ package com.thelocalmarketplace.software.state;
  * Winston Wang - 30185321
  */
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 import com.jjjwelectronics.Mass;
-import com.jjjwelectronics.OverloadedDevice;
-import com.jjjwelectronics.card.Card.CardData;
-import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.software.Globals;
 import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.payment.Transaction;
@@ -47,14 +42,6 @@ public class WaitingForBaggingState implements IUserSessionState<UserSessionStat
 		
 		return null;
 	}
-
-	@Override
-	public void onStateUnset() throws RuntimeException{}
-	
-	@Override
-	public UserSessionState onScanBarcode(Barcode barcode) {
-		return null; // State does not change if user scans an additional item
-	}
 	
 	@Override
 	public UserSessionState onWeightChanged(Mass mass) {
@@ -67,15 +54,5 @@ public class WaitingForBaggingState implements IUserSessionState<UserSessionStat
 		}
 			
 		return null; // If item is not the correct weight, weight for correct item to be placed/removed from bagging area
-	}
-	
-	@Override
-	public UserSessionState onCoinInserted(BigDecimal value) {
-		return null; // State does not change if user inserts coin
-	}
-	
-	@Override 
-	public UserSessionState onCardDataRead(CardData data) {
-		return null; 
 	}
 }

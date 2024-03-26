@@ -33,8 +33,10 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import com.jjjwelectronics.Mass;
+import com.tdc.CashOverloadException;
+import com.tdc.DisabledException;
+import com.tdc.NoCashAvailableException;
 import com.jjjwelectronics.Mass.MassDifference;
-import com.jjjwelectronics.OverloadedDevice;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.SelfCheckout;
@@ -162,4 +164,53 @@ public class Transaction {
 		payments = this.payments.values().toArray(payments);
 		return payments;
 	}
+
+    public void calculateChange() throws Exception  {
+        if (totalCost.compareTo(BigDecimal.ZERO) < 0) {
+            SelfCheckout instance = SelfCheckout.getInstance();
+            BigDecimal change = totalCost.negate();
+            BigDecimal[] banknoteDenominations =instance.getConfiguration().banknoteDenominations;
+            BigDecimal[] coinDenominations = instance.getConfiguration().coinDenominations;
+            
+            final int BANKNOTE = 0;
+            final int COIN = 1;
+            
+            try {
+	            while (change.compareTo(BigDecimal.ZERO) > 0) {
+	                int dispense = -1;
+	                BigDecimal value = BigDecimal.valueOf(-1);
+	                for (BigDecimal banknote : banknoteDenominations) {
+	                    if (change.compareTo(banknote) >= 0 && banknote.compareTo(value) > 0 && instance.getHardware().banknoteDispensers.get(banknote).size() > 0) {
+	                        value = banknote;
+	                        dispense = BANKNOTE;
+	                    }
+	                }
+	                for (BigDecimal coin : coinDenominations) {
+	                    if (change.compareTo(coin) >= 0 && coin.compareTo(value) > 0 && instance.getHardware().coinDispensers.get(coin).size() > 0) {
+	                        value = coin;
+	                        dispense = COIN;
+	                    }
+	                }
+	                if (dispense == -1) {           // unable to find anything to dispense
+	                    throw new RuntimeException("No valid coins to dispense.");
+	                } else {
+	                    change = change.subtract(value);
+	                    if (dispense == COIN) {
+	                        // Coin Dispensation
+	                        instance.getHardware().coinDispensers.get(value).emit();
+	                    } else {
+	                        // Banknote Dispensation
+	                        instance.getHardware().banknoteDispensers.get(value).emit();
+	                    }
+	                }
+	            }
+            }catch (DisabledException | CashOverloadException | NoCashAvailableException e) {
+            	// Print error message
+                System.err.println("Exception occurred while calculating change: " + e.getMessage());
+                // Rethrow the exception to be handled by the caller
+                throw e;
+            }
+            SelfCheckout.getInstance().getHardware().banknoteOutput.dispense();
+        }
+    }
 }
