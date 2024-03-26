@@ -23,7 +23,7 @@ package com.thelocalmarketplace.software.test;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
 
 import static org.junit.Assert.assertEquals;
@@ -46,5 +46,11 @@ public class CashPaymentTest {
         CashPayment payment = new CashPayment(BigDecimal.ONE);
         BigDecimal amount = BigDecimal.ONE;
         assertEquals(amount, payment.getAmountPaid());
+    }
+    @Test
+    public void testPayment() {
+    	CashPayment newPayment = new CashPayment(BigDecimal.ONE);
+    	BigDecimal newAmount = BigDecimal.ONE;
+    	assertEquals(newPayment.getAmountPaid(), newAmount);
     }
 }

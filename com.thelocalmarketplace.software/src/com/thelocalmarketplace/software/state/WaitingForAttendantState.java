@@ -1,4 +1,6 @@
-package com.thelocalmarketplace.software.payment;
+package com.thelocalmarketplace.software.state;
+
+import java.math.BigDecimal;
 
 /**
  * SENG 300 Project - Group 1:
@@ -23,21 +25,14 @@ package com.thelocalmarketplace.software.payment;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - 30185321
+ * Winston Wang - ????????
  */
 
-import java.math.BigDecimal;
+public class WaitingForAttendantState implements IUserSessionState<UserSessionState> {
 
-public class CashPayment implements IPayment {
-    private BigDecimal amountPaid;
-
-
-    public CashPayment(BigDecimal amountPaid) {
-        this.amountPaid = amountPaid;
-    }
-    
     @Override
-    public BigDecimal getAmountPaid() {
-    	return amountPaid;
+    public UserSessionState onStateSet() {
+    	//for now attendant state will automatically override back to ready for item
+        return UserSessionState.READY_FOR_ITEM;
     }
 }

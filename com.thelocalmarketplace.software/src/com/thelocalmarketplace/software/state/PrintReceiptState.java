@@ -122,10 +122,9 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
         }
 
         hardwarePrinter.cutPaper();
-        hardwarePrinter.removeReceipt();
 
         //After receipt printing the use case states the station should return to a ready state
-        SelfCheckout.getInstance().getCurrentSession().setState(UserSessionState.READY_FOR_ITEM);
+        SelfCheckout.getInstance().endCurrentSession();
         return null;
     }
 

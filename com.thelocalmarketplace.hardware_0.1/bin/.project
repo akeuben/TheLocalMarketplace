@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>TheLocalMarketplace</name>
+	<name>com.thelocalmarketplace.hardware_0.1</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -16,7 +16,7 @@
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1711067212315</id>
+			<id>1710116030025</id>
 			<name></name>
 			<type>30</type>
 			<matcher>

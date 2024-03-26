@@ -1,10 +1,5 @@
 package com.thelocalmarketplace.software;
 
-import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
-import com.thelocalmarketplace.hardware.SelfCheckoutStationBronze;
-import com.thelocalmarketplace.hardware.SelfCheckoutStationGold;
-import com.thelocalmarketplace.hardware.SelfCheckoutStationSilver;
-
 /**
  * SENG 300 Project - Group 1:
  * 
@@ -28,10 +23,16 @@ import com.thelocalmarketplace.hardware.SelfCheckoutStationSilver;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
 
+import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
+import com.thelocalmarketplace.hardware.SelfCheckoutStationBronze;
+import com.thelocalmarketplace.hardware.SelfCheckoutStationGold;
+import com.thelocalmarketplace.hardware.SelfCheckoutStationSilver;
+
 import com.thelocalmarketplace.software.session.UserSession;
+import com.thelocalmarketplace.software.state.UserSessionState;
 
 import powerutility.PowerGrid;
 
@@ -40,6 +41,7 @@ public class SelfCheckout {
 	private static SelfCheckout instance;
 	
 	private UserSession currentSession;
+	private SelfCheckoutConfiguration configuration;
 	
 	private AbstractSelfCheckoutStation hardware;
 
@@ -96,8 +98,8 @@ public class SelfCheckout {
 		AbstractSelfCheckoutStation.configureCoinDispenserCapacity(configuration.coinDispenserCapacity);
 		AbstractSelfCheckoutStation.configureCoinStorageUnitCapacity(configuration.coinStorageUnitCapacity);
 		AbstractSelfCheckoutStation.configureCoinTrayCapacity(configuration.coinTrayCapacity);
-		
 		instance = new SelfCheckout(configuration);
+		instance.configuration = configuration;
 		
 		return instance;
 	}
@@ -111,6 +113,10 @@ public class SelfCheckout {
 		instance.endCurrentSession();
 		
 		instance = null;
+	}
+
+	public SelfCheckoutConfiguration getConfiguration() {
+		return configuration;
 	}
 	
 	/**
@@ -131,6 +137,8 @@ public class SelfCheckout {
 			throw new RuntimeException("There is already an active user session.");
 		}
 		currentSession = new UserSession();
+    	
+		currentSession.setState(UserSessionState.READY_FOR_ITEM);
 		
 		// Remove old listeners
 		hardware.mainScanner.deregisterAll();
@@ -141,8 +149,10 @@ public class SelfCheckout {
 		// Register listeners
 		hardware.mainScanner.register(currentSession.getBarcodeHandler());
 		hardware.baggingArea.register(currentSession.getElectronicScaleHandler());
+		hardware.cardReader.register(currentSession.getCardReaderHandler());
 		hardware.coinValidator.attach(currentSession.getCoinValidatorHandler());
 		hardware.printer.register(currentSession.getReceiptPrinterHandler());
+		hardware.banknoteValidator.attach(currentSession.getBanknoteValidatorHandler());
 		
 		return currentSession;
 	}

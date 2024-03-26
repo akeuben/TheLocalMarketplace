@@ -29,10 +29,10 @@ import java.util.List;
 
 public class PrintReceiptStateTest {
 	private UserSession session;
-     private IReceiptPrinter hardwarePrinter;
-     private SelfCheckout selfCheckout;
-     private UserSession userSession;
-     private Transaction transaction;
+	private IReceiptPrinter hardwarePrinter;
+	private SelfCheckout selfCheckout;
+	private UserSession userSession;
+	private Transaction transaction;
     private PrintReceiptState state;
     private Barcode tempBarcode;
     private Barcode tempBarcode1;
@@ -43,19 +43,15 @@ public class PrintReceiptStateTest {
 
     @Before
     public void setUp() {
-   
-    		SelfCheckout.uninitialize();
-    		SelfCheckout.initialize(new SelfCheckoutConfiguration());
-    		session = SelfCheckout.getInstance().startNewSession();
-    		state = new PrintReceiptState();
-
+		SelfCheckout.uninitialize();
+		SelfCheckout.initialize(new SelfCheckoutConfiguration());
+		session = SelfCheckout.getInstance().startNewSession();
+		state = new PrintReceiptState();
     }
 
     @Test
-  public void testOnStateSet() {
-    	
-    	    state.onStateSet();
-
+    public void testOnStateSet() {
+	    state.onStateSet();
     }
     
     @Test

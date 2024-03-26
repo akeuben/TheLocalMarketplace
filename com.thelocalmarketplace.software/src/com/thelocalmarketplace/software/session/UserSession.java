@@ -1,7 +1,4 @@
 package com.thelocalmarketplace.software.session;
-import com.jjjwelectronics.printer.ReceiptPrinterListener;
-import com.thelocalmarketplace.software.payment.Transaction;
-import com.thelocalmarketplace.software.state.UserSessionState;
 
 /**
  * SENG 300 Project - Group 1:
@@ -26,35 +23,40 @@ import com.thelocalmarketplace.software.state.UserSessionState;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
+
+import com.thelocalmarketplace.software.payment.Transaction;
+import com.thelocalmarketplace.software.state.UserSessionState;
 
 public class UserSession {
 
-    private UserSessionState state;
+    private UserSessionState state = null;
     private Transaction transaction;
 
     private CoinValidatorHandler coinValidatorHandler;
+    private BanknoteValidatorHandler banknoteValidatorHandler;
     private BarcodeHandler barcodeHandler;
     private ElectronicScaleHandler electronicScaleHandler;
     private ReceiptPrinterHandler receiptPrinterHandler;
+    private UIHandler uiHandler;
+    private CardReaderHandler cardReaderHandler;
+    
     /**
      * Create a user session. This holds all data pertaining
      * to the user during a transaction at a self checkout machine.
      */
     public UserSession() {
     	this.transaction = new Transaction();
-		state = UserSessionState.READY_FOR_ITEM;
 		
-		// Set the initial state
-		UserSessionState newState = state.onStateSet();
-		if(newState != null) setState(newState);
-    	
     	// Initialize the event handlers
     	this.coinValidatorHandler = new CoinValidatorHandler(this);
+    	this.banknoteValidatorHandler = new BanknoteValidatorHandler(this);
     	this.barcodeHandler = new BarcodeHandler(this);
     	this.electronicScaleHandler = new ElectronicScaleHandler(this);
 		this.receiptPrinterHandler = new ReceiptPrinterHandler(this);
+    	this.uiHandler = new UIHandler(this);
+    	this.cardReaderHandler = new CardReaderHandler(this);
     }
     
     /**
@@ -63,14 +65,14 @@ public class UserSession {
      */
     public void setState(UserSessionState newState) {
 		if(newState == this.state) return;
-
-		// Send relevant events and update the state field.
-		this.state.onStateUnset();
-		this.state = newState;
-		newState = this.state.onStateSet();
-		if(newState != null) {
-			setState(newState);
-		}
+    	
+    	// Send relevant events and update the state field.
+    	if(this.state != null) this.state.onStateUnset();
+    	this.state = newState;
+    	newState = this.state.onStateSet();
+    	if(newState != null) {
+    		setState(newState);
+    	}
     }
     
     /**
@@ -98,6 +100,14 @@ public class UserSession {
     }
     
     /**
+     * Get the BanknoteValidatorObserver for the current session
+     * @return The Banknote ValidatorObserver
+     */
+    public BanknoteValidatorHandler getBanknoteValidatorHandler() {
+    	return this.banknoteValidatorHandler;
+    }
+    
+    /**
      * Get the BarcodeScannerListener for the current session
      * @return The BarcodeScannerListener
      */
@@ -118,4 +128,20 @@ public class UserSession {
 	 * @return Current ReceiptPrinterHandler
 	 */
 	public ReceiptPrinterHandler getReceiptPrinterHandler() { return receiptPrinterHandler; }
+	
+	/**
+	 * Get the UIListener for the current session
+	 * @return The UIListener
+	 */
+	public UIHandler getUIHandler() {
+		return uiHandler;
+	}
+	
+	/*
+	 * Get the CardReaderListener for the current session
+	 * @return The CardReaderHandlerListener
+	 */
+	public CardReaderHandler getCardReaderHandler() {
+		return this.cardReaderHandler; 
+	}
 }

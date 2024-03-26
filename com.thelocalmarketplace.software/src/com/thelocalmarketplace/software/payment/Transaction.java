@@ -23,7 +23,7 @@ package com.thelocalmarketplace.software.payment;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
 
 import java.math.BigDecimal;
@@ -33,8 +33,13 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import com.jjjwelectronics.Mass;
+import com.tdc.CashOverloadException;
+import com.tdc.DisabledException;
+import com.tdc.NoCashAvailableException;
+import com.jjjwelectronics.Mass.MassDifference;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
+import com.thelocalmarketplace.software.SelfCheckout;
 
 public class Transaction {
 
@@ -49,7 +54,6 @@ public class Transaction {
 
     private final HashMap<UUID, IPayment> payments = new HashMap<>();
     
-
 
     /**
      * Adds a product into the current transaction
@@ -68,6 +72,34 @@ public class Transaction {
         }
     }
 
+    /**
+     * Removes weight of bulky item from transaction
+     * @param product item being added to transaction/products
+     */
+    public void skipBagging(BarcodedProduct product)
+    {
+    	if (product != null) {
+    		Mass bulkyItemMass = new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM)));
+			MassDifference massDiff = expectedMass.difference(bulkyItemMass);
+			
+			if (massDiff.compareTo(Mass.ZERO) < 0) {
+				expectedMass = Mass.ZERO;
+			} else {
+				expectedMass = massDiff.abs(); // Use the absolute value to ensure it's positive.
+			}
+        }
+        else {
+            throw new NullPointerException("product");
+        }
+    }
+    
+    /**
+     * updates transaction weight to include bag weight
+     */
+    public void addBag(Mass bagMass) {
+		expectedMass = expectedMass.sum(bagMass);
+    }
+
 
     /**
      *
@@ -78,6 +110,16 @@ public class Transaction {
     	UUID transactionId = UUID.randomUUID(); // Generate a unique ID for this transaction/payment
     	payments.put(transactionId, payment); // Add payment to HashMap
     	totalCost = totalCost.subtract(payment.getAmountPaid());
+    }
+
+    /**
+     * Removes an item from the transaction
+     * @param product item being removed from transaction/products
+     */
+    public void removeItem(BarcodedProduct product) {
+    	products.remove(product);
+    	totalCost = totalCost.subtract(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
+    	expectedMass = expectedMass.difference(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight()*Mass.MICROGRAMS_PER_GRAM)))).abs();
     }
     
     
@@ -126,4 +168,53 @@ public class Transaction {
 		payments = this.payments.values().toArray(payments);
 		return payments;
 	}
+
+    public void calculateChange() throws Exception  {
+        if (totalCost.compareTo(BigDecimal.ZERO) < 0) {
+            SelfCheckout instance = SelfCheckout.getInstance();
+            BigDecimal change = totalCost.negate();
+            BigDecimal[] banknoteDenominations =instance.getConfiguration().banknoteDenominations;
+            BigDecimal[] coinDenominations = instance.getConfiguration().coinDenominations;
+            
+            final int BANKNOTE = 0;
+            final int COIN = 1;
+            
+            try {
+	            while (change.compareTo(BigDecimal.ZERO) > 0) {
+	                int dispense = -1;
+	                BigDecimal value = BigDecimal.valueOf(-1);
+	                for (BigDecimal banknote : banknoteDenominations) {
+	                    if (change.compareTo(banknote) >= 0 && banknote.compareTo(value) > 0 && instance.getHardware().banknoteDispensers.get(banknote).size() > 0) {
+	                        value = banknote;
+	                        dispense = BANKNOTE;
+	                    }
+	                }
+	                for (BigDecimal coin : coinDenominations) {
+	                    if (change.compareTo(coin) >= 0 && coin.compareTo(value) > 0 && instance.getHardware().coinDispensers.get(coin).size() > 0) {
+	                        value = coin;
+	                        dispense = COIN;
+	                    }
+	                }
+	                if (dispense == -1) {           // unable to find anything to dispense
+	                    throw new RuntimeException("No valid coins to dispense.");
+	                } else {
+	                    change = change.subtract(value);
+	                    if (dispense == COIN) {
+	                        // Coin Dispensation
+	                        instance.getHardware().coinDispensers.get(value).emit();
+	                    } else {
+	                        // Banknote Dispensation
+	                        instance.getHardware().banknoteDispensers.get(value).emit();
+	                    }
+	                }
+	            }
+            }catch (DisabledException | CashOverloadException | NoCashAvailableException e) {
+            	// Print error message
+                System.err.println("Exception occurred while calculating change: " + e.getMessage());
+                // Rethrow the exception to be handled by the caller
+                throw e;
+            }
+            SelfCheckout.getInstance().getHardware().banknoteOutput.dispense();
+        }
+    }
 }

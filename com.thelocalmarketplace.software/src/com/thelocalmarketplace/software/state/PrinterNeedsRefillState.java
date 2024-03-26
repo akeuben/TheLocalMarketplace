@@ -44,21 +44,6 @@ public class PrinterNeedsRefillState implements IUserSessionState<UserSessionSta
     }
 
     @Override
-    public UserSessionState onScanBarcode(Barcode barcode) {
-        return null;
-    }
-
-    @Override
-    public UserSessionState onWeightChanged(Mass mass) {
-        return null;
-    }
-
-    @Override
-    public UserSessionState onCoinInserted(BigDecimal value) {
-        return null;
-    }
-
-    @Override
     public UserSessionState onPrinterRefilled() {
         SelfCheckout.getInstance().getCurrentSession().setState(UserSessionState.READY_FOR_PAYMENT);
         return null;
