@@ -32,11 +32,9 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.jjjwelectronics.Item;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
-import com.jjjwelectronics.scanner.BarcodedItem;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.SelfCheckout;
@@ -118,8 +116,6 @@ public class ReadyForItemStateTest {
 		session.setState(UserSessionState.READY_FOR_ITEM);
 		
 		Barcode barcode = new Barcode(new Numeral[] {Numeral.seven});
-		
-		BarcodedProduct product = new BarcodedProduct(barcode, "test product", 1000, 100);
 		
 		// The state should not change
 		UserSessionState newState = UserSessionState.READY_FOR_ITEM.onScanBarcode(barcode);

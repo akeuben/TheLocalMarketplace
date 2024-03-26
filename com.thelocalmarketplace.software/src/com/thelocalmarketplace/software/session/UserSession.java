@@ -1,9 +1,5 @@
 package com.thelocalmarketplace.software.session;
 
-import com.thelocalmarketplace.software.session.CardReaderHandler;
-import com.thelocalmarketplace.software.payment.Transaction;
-import com.thelocalmarketplace.software.state.UserSessionState;
-
 /**
  * SENG 300 Project - Group 1:
  * 
@@ -30,6 +26,9 @@ import com.thelocalmarketplace.software.state.UserSessionState;
  * Winston Wang - 30185321
  */
 
+import com.thelocalmarketplace.software.payment.Transaction;
+import com.thelocalmarketplace.software.state.UserSessionState;
+
 public class UserSession {
 
     private UserSessionState state = null;
@@ -39,8 +38,9 @@ public class UserSession {
     private BanknoteValidatorHandler banknoteValidatorHandler;
     private BarcodeHandler barcodeHandler;
     private ElectronicScaleHandler electronicScaleHandler;
+    private ReceiptPrinterHandler receiptPrinterHandler;
     private UIHandler uiHandler;
-    private CardReaderHandler cardReaderHandler; 
+    private CardReaderHandler cardReaderHandler;
     
     /**
      * Create a user session. This holds all data pertaining
@@ -54,8 +54,9 @@ public class UserSession {
     	this.banknoteValidatorHandler = new BanknoteValidatorHandler(this);
     	this.barcodeHandler = new BarcodeHandler(this);
     	this.electronicScaleHandler = new ElectronicScaleHandler(this);
+		this.receiptPrinterHandler = new ReceiptPrinterHandler(this);
     	this.uiHandler = new UIHandler(this);
-    	this.cardReaderHandler = new CardReaderHandler(this); 
+    	this.cardReaderHandler = new CardReaderHandler(this);
     }
     
     /**
@@ -63,7 +64,7 @@ public class UserSession {
      * @param newState The new state to set
      */
     public void setState(UserSessionState newState) {
-    	if(newState == this.state) return;
+		if(newState == this.state) return;
     	
     	// Send relevant events and update the state field.
     	if(this.state != null) this.state.onStateUnset();
@@ -121,6 +122,12 @@ public class UserSession {
 	public ElectronicScaleHandler getElectronicScaleHandler() {
 		return electronicScaleHandler;
 	}
+
+	/**
+	 * Get the ReceiptPrinterHandler for the current session
+	 * @return Current ReceiptPrinterHandler
+	 */
+	public ReceiptPrinterHandler getReceiptPrinterHandler() { return receiptPrinterHandler; }
 	
 	/**
 	 * Get the UIListener for the current session

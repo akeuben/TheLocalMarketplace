@@ -28,6 +28,7 @@ package com.thelocalmarketplace.software.test;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
 import java.math.BigDecimal;
@@ -53,6 +54,52 @@ public class SelfCheckoutTest {
 		SelfCheckout.initialize(new SelfCheckoutConfiguration());
 		assertThrows(RuntimeException.class, () -> SelfCheckout.initialize(new SelfCheckoutConfiguration()));
 		SelfCheckout.uninitialize();
+	}
+	
+	@Test
+	public void testSessionWithBronzeMachine() {
+		SelfCheckout.initialize(new SelfCheckoutConfiguration(
+			MachineRating.BRONZE, 
+			Currency.getInstance(Locale.CANADA), 
+			100, 
+			1000, 
+			25, 
+			new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 
+			100, 
+			100
+		));
+		assertNotNull(SelfCheckout.getInstance());
+		SelfCheckout.uninitialize();
+	}
+	
+	@Test
+	public void testSessionWithSilverMachine() {
+		SelfCheckout.initialize(new SelfCheckoutConfiguration(
+			MachineRating.SILVER, 
+			Currency.getInstance(Locale.CANADA), 
+			100, 
+			1000, 
+			25, 
+			new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 
+			100, 
+			100
+		));
+		assertNotNull(SelfCheckout.getInstance());
+	}
+	
+	@Test
+	public void testSessionWithGoldMachine() {
+		SelfCheckout.initialize(new SelfCheckoutConfiguration(
+			MachineRating.GOLD, 
+			Currency.getInstance(Locale.CANADA), 
+			100, 
+			1000, 
+			25, 
+			new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 
+			100, 
+			100
+		));
+		assertNotNull(SelfCheckout.getInstance());
 	}
 	
 	@Test

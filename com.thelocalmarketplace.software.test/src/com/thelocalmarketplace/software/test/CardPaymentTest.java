@@ -1,5 +1,20 @@
 package com.thelocalmarketplace.software.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.Calendar;
+import java.util.Currency;
+import java.util.HashMap;
+import java.util.Locale;
+
+import org.junit.Before;
+
 /**
  * SENG 300 Project - Group 1:
  * 
@@ -31,7 +46,6 @@ import org.junit.Test;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.card.Card;
-import com.jjjwelectronics.card.CardReaderGold;
 import com.jjjwelectronics.card.Card.CardData;
 import com.jjjwelectronics.scale.IElectronicScale;
 import com.jjjwelectronics.scanner.Barcode;
@@ -41,7 +55,6 @@ import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.SelfCheckout;
-
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration.MachineRating;
 import com.thelocalmarketplace.software.payment.BankDataBase;
@@ -50,23 +63,7 @@ import com.thelocalmarketplace.software.payment.Transaction;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.state.UserSessionState;
 
-import powerutility.NoPowerException;
-import powerutility.PowerGrid;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
-
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.Currency;
-import java.util.HashMap;
-import java.util.Locale;
-
-import org.junit.Before; 
+import powerutility.NoPowerException; 
 
 
 /**
@@ -174,8 +171,7 @@ public class CardPaymentTest {
 	@Test
     public void testSwipePaymentOnFake() {
         SelfCheckout sc = SelfCheckout.getInstance();
-        UserSession session = sc.startNewSession();
-        Transaction transaction = session.getTransaction();
+        sc.startNewSession();
         IBarcodeScanner scanner = sc.getHardware().mainScanner; 
 		IElectronicScale baggingArea = sc.getHardware().baggingArea; 
 		// scan the product then add it to the baggingArea
@@ -196,14 +192,12 @@ public class CardPaymentTest {
 
         // Assert payment fail
         assertFalse("Payment should fail", result);
-        
     }
 	
 	
 	/**
 	 * Test to see ensure that database will not run twice
 	 */
-	
 	@Test (expected = RuntimeException.class)
 	public void testDoubleInitialize() {
 		HashMap<String, CardIssuer> map = new HashMap<>(); 
@@ -214,7 +208,6 @@ public class CardPaymentTest {
 	/**
 	 * Tests to see if payment will fail if cardReader attempts to swipe a null card
 	 */
-	
 	@Test
 	public void swipeNull() {
 		SelfCheckout sc = SelfCheckout.getInstance(); 
@@ -224,12 +217,11 @@ public class CardPaymentTest {
 	/**
 	 * Tests to see if payment will fail if cardData is null
 	 */
-	
 	@Test (expected = NullPointerException.class)
 	public void cardDataNull() {
 		 SelfCheckout sc = SelfCheckout.getInstance();
 	        UserSession session = sc.startNewSession();
-	        Transaction transaction = session.getTransaction();
+	        session.getTransaction();
 	        IBarcodeScanner scanner = sc.getHardware().mainScanner; 
 			IElectronicScale baggingArea = sc.getHardware().baggingArea; 
 			// scan the product then add it to the baggingArea
@@ -245,30 +237,22 @@ public class CardPaymentTest {
 	/**
 	 * Tests for noPowerException
 	 */
-	
 	@Test (expected = NoPowerException.class)
 	public void noPowerException() {
-		 SelfCheckout sc = SelfCheckout.getInstance();
-	        UserSession session = sc.startNewSession();
-	        sc.getHardware().cardReader.turnOff();
-	        Transaction transaction = session.getTransaction();
-	        IBarcodeScanner scanner = sc.getHardware().mainScanner; 
-			IElectronicScale baggingArea = sc.getHardware().baggingArea; 
-			// scan the product then add it to the baggingArea
-			scanner.scan(new BarcodedItem(barcode, new Mass(100)));
-			baggingArea.addAnItem(new BarcodedItem(barcode, new Mass(100)));
+		SelfCheckout sc = SelfCheckout.getInstance();
+        UserSession session = sc.startNewSession();
+        sc.getHardware().cardReader.turnOff();
+        session.getTransaction();
+        IBarcodeScanner scanner = sc.getHardware().mainScanner; 
+		IElectronicScale baggingArea = sc.getHardware().baggingArea; 
+		// scan the product then add it to the baggingArea
+		scanner.scan(new BarcodedItem(barcode, new Mass(100)));
+		baggingArea.addAnItem(new BarcodedItem(barcode, new Mass(100)));
 
-			try {
-				sc.getHardware().cardReader.swipe(debit);
-				
-			} catch (IOException e) {
-				
-				e.printStackTrace();
-			}
+		try {
+			sc.getHardware().cardReader.swipe(debit);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
-	
-	
-	
-	
-	
 }

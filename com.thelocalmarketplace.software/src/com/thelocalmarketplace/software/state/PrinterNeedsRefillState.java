@@ -28,8 +28,7 @@ package com.thelocalmarketplace.software.state;
 
 import com.thelocalmarketplace.software.SelfCheckout;
 
-public class WaitingForAttendantState implements IUserSessionState<UserSessionState> {
-
+public class PrinterNeedsRefillState implements IUserSessionState<UserSessionState> {
     @Override
     public UserSessionState onStateSet() {
 		// Disable the coin slot to prevent the user from inserting a coin while the software
@@ -37,7 +36,18 @@ public class WaitingForAttendantState implements IUserSessionState<UserSessionSt
 		SelfCheckout.getInstance().getHardware().coinSlot.disable();
 		SelfCheckout.getInstance().getHardware().banknoteInput.disable();
 		
-    	//for now attendant state will automatically override back to ready for item
-        return UserSessionState.READY_FOR_ITEM;
+        SelfCheckout.getInstance().attendantStationFlagged = true;
+        return null;
+    }
+
+    @Override
+    public void onStateUnset() {
+        SelfCheckout.getInstance().attendantStationFlagged = false;
+    }
+
+    @Override
+    public UserSessionState onPrinterRefilled() {
+        SelfCheckout.getInstance().getCurrentSession().setState(UserSessionState.READY_FOR_PAYMENT);
+        return null;
     }
 }

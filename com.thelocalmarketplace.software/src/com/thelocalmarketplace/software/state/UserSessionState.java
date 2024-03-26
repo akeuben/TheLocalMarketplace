@@ -49,6 +49,16 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	 */
 	READY_FOR_PAYMENT(new ReadyForPaymentState()),
 	/**
+	 * This state is used when the system has received full payment and
+	 * can end the customers session
+	 */
+	PRINT_RECEIPT(new PrintReceiptState()),
+	/**
+	 * This state is used when the printer cannot fully print a customer receipt
+	 * and needs to notify the attendant station
+	 */
+	PRINTER_NEEDS_REFILL(new PrinterNeedsRefillState()),
+	/**
 	 * This state is used when the system
 	 * is waiting for attendant to approve
 	 */
@@ -84,6 +94,11 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	public UserSessionState onCoinInserted(BigDecimal value) {
 		return state.onCoinInserted(value);
 	}
+
+	@Override
+	public UserSessionState onPrinterRefilled() {
+		return null;
+	}
 	
 	@Override
 	public UserSessionState onBanknoteInserted(BigDecimal value) {
@@ -94,5 +109,4 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	public UserSessionState onCardDataRead(CardData data) {
 		return state.onCardDataRead(data);
 	}
-	
 }

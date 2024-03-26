@@ -73,7 +73,12 @@ public interface IUserSessionState<T> {
 	 * @return The state to transition to after this function returns, or null to stay on the same state.
 	 */
 	default T onCoinInserted(BigDecimal value) {return null;};
-	
+
+	/**
+	 * Called when the printer is refilled with ink.
+	 * @return
+	 */
+	default T onPrinterRefilled() {return null;};
 	/**
 	 * Called when a {@link Banknote} is inserted into the input slot.
 	 * @param value The value of the banknote that was inserted.

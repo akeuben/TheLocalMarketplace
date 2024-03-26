@@ -1,10 +1,5 @@
 package com.thelocalmarketplace.software.session;
 
-import com.thelocalmarketplace.hardware.BarcodedProduct;
-import com.thelocalmarketplace.hardware.Product;
-import com.thelocalmarketplace.software.UI.UIObserver;
-import com.thelocalmarketplace.software.state.UserSessionState;
-
 /**
  * SENG 300 Project - Group 1:
  * 
@@ -30,6 +25,10 @@ import com.thelocalmarketplace.software.state.UserSessionState;
  * Stephanie Sevilla - 30176781
  * Winston Wang - ????????
  */
+
+import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.software.UI.UIObserver;
+import com.thelocalmarketplace.software.state.UserSessionState;
 
 public class UIHandler extends AbstractUserSessionHandler implements UIObserver {
 

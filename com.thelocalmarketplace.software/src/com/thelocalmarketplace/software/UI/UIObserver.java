@@ -1,8 +1,5 @@
 package com.thelocalmarketplace.software.UI;
 
-import com.thelocalmarketplace.hardware.BarcodedProduct;
-import com.thelocalmarketplace.hardware.Product;
-
 /**
  * SENG 300 Project - Group 1:
  * 
@@ -26,8 +23,10 @@ import com.thelocalmarketplace.hardware.Product;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
+
+import com.thelocalmarketplace.hardware.BarcodedProduct;
 
 public interface UIObserver {
 	

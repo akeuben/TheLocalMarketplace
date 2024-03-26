@@ -158,6 +158,10 @@ public class Transaction {
 		return products;
 	}
 
+    public ArrayList<BarcodedProduct> getBarcodedProducts(){
+        return products;
+    }
+
 
 	public IPayment[] getPayments() {
 		IPayment[] payments = new IPayment[0];
