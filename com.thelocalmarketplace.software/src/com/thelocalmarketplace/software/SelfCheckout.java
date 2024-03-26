@@ -148,6 +148,7 @@ public class SelfCheckout {
 		hardware.baggingArea.register(currentSession.getElectronicScaleHandler());
 		hardware.cardReader.register(currentSession.getCardReaderHandler());
 		hardware.coinValidator.attach(currentSession.getCoinValidatorHandler());
+		hardware.banknoteValidator.attach(currentSession.getBanknoteValidatorHandler());
 		
 		return currentSession;
 	}

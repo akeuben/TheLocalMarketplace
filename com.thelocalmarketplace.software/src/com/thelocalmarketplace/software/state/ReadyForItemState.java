@@ -26,11 +26,8 @@ package com.thelocalmarketplace.software.state;
  * Winston Wang - 30185321
  */
 
-import java.math.BigDecimal;
-
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.OverloadedDevice;
-import com.jjjwelectronics.card.Card.CardData;
 import com.jjjwelectronics.scale.AbstractElectronicScale;
 import com.jjjwelectronics.scale.IElectronicScale;
 import com.jjjwelectronics.scanner.Barcode;
@@ -67,9 +64,6 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 	}
 
 	@Override
-	public void onStateUnset() throws RuntimeException {}
-
-	@Override
 	public UserSessionState onScanBarcode(Barcode barcode) {
 		BarcodedProduct barcodeProduct = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
 		// want to check to see if the product exists within the database
@@ -104,15 +98,4 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 		// allow the customer to continue. Stay on the same state.
 		return null;
 	}
-
-	@Override
-	public UserSessionState onCoinInserted(BigDecimal value) {
-		return null;
-	}
-	
-	// do nothing and stay in same state 
-	public UserSessionState onCardDataRead(CardData data) {
-		return null; 
-	}
-
 }

@@ -36,6 +36,7 @@ public class UserSession {
     private Transaction transaction;
 
     private CoinValidatorHandler coinValidatorHandler;
+    private BanknoteValidatorHandler banknoteValidatorHandler;
     private BarcodeHandler barcodeHandler;
     private ElectronicScaleHandler electronicScaleHandler;
     private UIHandler uiHandler;
@@ -50,6 +51,7 @@ public class UserSession {
 		
     	// Initialize the event handlers
     	this.coinValidatorHandler = new CoinValidatorHandler(this);
+    	this.banknoteValidatorHandler = new BanknoteValidatorHandler(this);
     	this.barcodeHandler = new BarcodeHandler(this);
     	this.electronicScaleHandler = new ElectronicScaleHandler(this);
     	this.uiHandler = new UIHandler(this);
@@ -94,6 +96,14 @@ public class UserSession {
      */
     public CoinValidatorHandler getCoinValidatorHandler() {
     	return this.coinValidatorHandler;
+    }
+    
+    /**
+     * Get the BanknoteValidatorObserver for the current session
+     * @return The Banknote ValidatorObserver
+     */
+    public BanknoteValidatorHandler getBanknoteValidatorHandler() {
+    	return this.banknoteValidatorHandler;
     }
     
     /**

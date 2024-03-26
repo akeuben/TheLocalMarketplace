@@ -79,7 +79,8 @@ public class TransactionTest {
     
 	@Before
 	public void setup() {
-		this.transaction = new Transaction();
+		SelfCheckout.uninitialize();
+		SelfCheckout.initialize(new SelfCheckoutConfiguration());
 		this.session = SelfCheckout.getInstance().startNewSession();
 		this.transaction = session.getTransaction();
 		this.num = Numeral.eight;
@@ -291,7 +292,8 @@ public class TransactionTest {
     		100, 
     		100
     	));
-        transaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();
+    	session = SelfCheckout.getInstance().startNewSession();
+        transaction = session.getTransaction();
         transaction.addItem(productOne); // Adding a product with price 1.00
         transaction.addPayment(new PaymentStub(BigDecimal.valueOf(4.00))); // Simulating payment of 4.00
         

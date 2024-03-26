@@ -32,6 +32,7 @@ import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.card.Card.CardData;
 import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.IBarcodeScanner;
+import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 
 public interface IUserSessionState<T> {
@@ -49,7 +50,7 @@ public interface IUserSessionState<T> {
 	 * cleaning up resources used, or resetting any changed 
 	 * values.
 	 */
-	void onStateUnset();
+	default void onStateUnset() {};
 	
 	/**
 	 * Called when a {@link Barcode} is scanned by any {@link IBarcodeScanner}
@@ -57,26 +58,33 @@ public interface IUserSessionState<T> {
 	 * @param barcode The {@link Barcode} that was scanned
 	 * @return The state to transition to after this function returns, or null to stay on the same state.
 	 */
-	T onScanBarcode(Barcode barcode);
+	default T onScanBarcode(Barcode barcode) {return null;};
 	
 	/**
 	 * Called when the {@link Mass} of the bagging area is changed.
 	 * @param mass The new total mass on the bagging area scale.
 	 * @return The state to transition to after this function returns, or null to stay on the same state.
 	 */
-	T onWeightChanged(Mass mass);
+	default T onWeightChanged(Mass mass) {return null;};
 	
 	/**
 	 * Called when a {@link Coin} is inserted into the coin slot.
 	 * @param value The value of the coin that was inserted.
 	 * @return The state to transition to after this function returns, or null to stay on the same state.
 	 */
-	T onCoinInserted(BigDecimal value);
+	default T onCoinInserted(BigDecimal value) {return null;};
+	
+	/**
+	 * Called when a {@link Banknote} is inserted into the input slot.
+	 * @param value The value of the banknote that was inserted.
+	 * @return The state to transition to after this function returns, or null to stay on the same state.
+	 */
+	default T onBanknoteInserted(BigDecimal value) {return null;}
 	
 	/**
 	 * Called when a {@link Card} has it's data read by the card reader through tap, swipe or insert.
 	 * @param data The Card data of the card that was just read.
 	 * @return The state that should be transition to after the function executes, null if state is same. 
 	 */
-	T onCardDataRead(CardData data);
+	default T onCardDataRead(CardData data) {return null;};
 }
