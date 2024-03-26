@@ -75,7 +75,7 @@ public class WaitingforBaggingState implements IUserSessionState<UserSessionStat
 	}
 
 	@Override
-	public boolean checkStateGate() {
-		return true;
+	public UserSessionState onPrinterRefilled() {
+		return null;
 	}
 }
