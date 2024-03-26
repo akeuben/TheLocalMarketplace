@@ -1,6 +1,10 @@
 package com.thelocalmarketplace.software.test;
+import com.thelocalmarketplace.software.SelfCheckout;
+import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.session.ReceiptPrinterHandler;
 import static org.junit.Assert.*;
+
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -30,6 +34,13 @@ import org.junit.Test;
  */
 
 public class ReceiptHandlerTest {
+	
+	@Before
+	public void setUp() {
+		SelfCheckout.uninitialize();
+		SelfCheckout.initialize(new SelfCheckoutConfiguration());
+		SelfCheckout.getInstance().startNewSession();
+	}
 
     @Test
     public void testRefillFlagsSetWhenNeitherFlagSet() {
