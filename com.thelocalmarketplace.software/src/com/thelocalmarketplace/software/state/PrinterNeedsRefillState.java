@@ -34,6 +34,11 @@ import java.math.BigDecimal;
 public class PrinterNeedsRefillState implements IUserSessionState<UserSessionState> {
     @Override
     public UserSessionState onStateSet() {
+		// Disable the coin slot to prevent the user from inserting a coin while the software
+		// is not in the correct state
+		SelfCheckout.getInstance().getHardware().coinSlot.disable();
+		SelfCheckout.getInstance().getHardware().banknoteInput.disable();
+		
         SelfCheckout.getInstance().attendantStationFlagged = true;
         return null;
     }

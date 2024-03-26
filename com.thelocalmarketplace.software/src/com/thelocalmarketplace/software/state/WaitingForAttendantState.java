@@ -2,6 +2,8 @@ package com.thelocalmarketplace.software.state;
 
 import java.math.BigDecimal;
 
+import com.thelocalmarketplace.software.SelfCheckout;
+
 /**
  * SENG 300 Project - Group 1:
  * 
@@ -32,6 +34,11 @@ public class WaitingForAttendantState implements IUserSessionState<UserSessionSt
 
     @Override
     public UserSessionState onStateSet() {
+		// Disable the coin slot to prevent the user from inserting a coin while the software
+		// is not in the correct state
+		SelfCheckout.getInstance().getHardware().coinSlot.disable();
+		SelfCheckout.getInstance().getHardware().banknoteInput.disable();
+		
     	//for now attendant state will automatically override back to ready for item
         return UserSessionState.READY_FOR_ITEM;
     }
