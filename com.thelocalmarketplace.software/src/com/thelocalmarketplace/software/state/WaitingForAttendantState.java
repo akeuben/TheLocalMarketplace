@@ -1,9 +1,5 @@
 package com.thelocalmarketplace.software.state;
 
-import java.math.BigDecimal;
-
-import com.thelocalmarketplace.software.SelfCheckout;
-
 /**
  * SENG 300 Project - Group 1:
  * 
@@ -27,8 +23,10 @@ import com.thelocalmarketplace.software.SelfCheckout;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
+
+import com.thelocalmarketplace.software.SelfCheckout;
 
 public class WaitingForAttendantState implements IUserSessionState<UserSessionState> {
 

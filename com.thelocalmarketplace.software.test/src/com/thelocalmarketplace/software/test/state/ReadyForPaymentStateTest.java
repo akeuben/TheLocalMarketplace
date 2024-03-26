@@ -29,21 +29,16 @@ package com.thelocalmarketplace.software.test.state;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import com.jjjwelectronics.Item;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
-import com.jjjwelectronics.scanner.BarcodedItem;
-import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
-import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.payment.CashPayment;

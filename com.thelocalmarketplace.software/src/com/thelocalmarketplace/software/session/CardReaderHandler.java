@@ -28,8 +28,6 @@ package com.thelocalmarketplace.software.session;
 
 import com.jjjwelectronics.IDevice;
 import com.jjjwelectronics.IDeviceListener;
-import com.jjjwelectronics.card.AbstractCardReader;
-import com.jjjwelectronics.card.Card;
 import com.jjjwelectronics.card.Card.CardData;
 import com.jjjwelectronics.card.CardReaderListener;
 import com.thelocalmarketplace.software.state.UserSessionState;

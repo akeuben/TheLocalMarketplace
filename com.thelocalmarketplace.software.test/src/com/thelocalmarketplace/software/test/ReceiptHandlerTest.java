@@ -1,11 +1,4 @@
 package com.thelocalmarketplace.software.test;
-import com.thelocalmarketplace.software.SelfCheckout;
-import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
-import com.thelocalmarketplace.software.session.ReceiptPrinterHandler;
-import static org.junit.Assert.*;
-
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * SENG 300 Project - Group 1:
@@ -30,8 +23,16 @@ import org.junit.Test;
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
+
+import com.thelocalmarketplace.software.SelfCheckout;
+import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
+import com.thelocalmarketplace.software.session.ReceiptPrinterHandler;
+import static org.junit.Assert.*;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class ReceiptHandlerTest {
 	

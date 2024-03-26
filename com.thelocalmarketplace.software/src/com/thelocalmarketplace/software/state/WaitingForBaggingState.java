@@ -26,7 +26,6 @@ package com.thelocalmarketplace.software.state;
  * Winston Wang - 30185321
  */
 
-
 import com.jjjwelectronics.Mass;
 import com.thelocalmarketplace.software.Globals;
 import com.thelocalmarketplace.software.SelfCheckout;

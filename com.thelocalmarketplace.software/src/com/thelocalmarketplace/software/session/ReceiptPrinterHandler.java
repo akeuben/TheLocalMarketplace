@@ -1,6 +1,8 @@
+package com.thelocalmarketplace.software.session;
+
 /**
  * SENG 300 Project - Group 1:
- *
+ * 
  * Avery Keuben - 30170731
  * Moiz Siddiqui - 30150291
  * Ammaar Melethil - 30141956
@@ -21,17 +23,13 @@
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
-package com.thelocalmarketplace.software.session;
 
 import com.jjjwelectronics.IDevice;
 import com.jjjwelectronics.IDeviceListener;
 import com.jjjwelectronics.printer.ReceiptPrinterListener;
-import com.jjjwelectronics.scale.ElectronicScaleListener;
 import com.thelocalmarketplace.software.SelfCheckout;
-
-import java.util.ArrayList;
 
 public class ReceiptPrinterHandler extends AbstractUserSessionHandler implements ReceiptPrinterListener {
 

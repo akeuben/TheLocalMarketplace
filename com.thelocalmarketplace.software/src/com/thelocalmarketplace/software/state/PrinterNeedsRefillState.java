@@ -1,6 +1,8 @@
+package com.thelocalmarketplace.software.state;
+
 /**
  * SENG 300 Project - Group 1:
- *
+ * 
  * Avery Keuben - 30170731
  * Moiz Siddiqui - 30150291
  * Ammaar Melethil - 30141956
@@ -21,15 +23,10 @@
  * Ivan Agalakov - 30172107
  * Samuel Turner - 10064857
  * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
+ * Winston Wang - 30185321
  */
-package com.thelocalmarketplace.software.state;
 
-import com.jjjwelectronics.Mass;
-import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.software.SelfCheckout;
-
-import java.math.BigDecimal;
 
 public class PrinterNeedsRefillState implements IUserSessionState<UserSessionState> {
     @Override

@@ -1,8 +1,5 @@
 package com.thelocalmarketplace.software.test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-
 /**
  * SENG 300 Project - Group 1:
  * 
@@ -28,6 +25,10 @@ import static org.junit.Assert.assertNull;
  * Stephanie Sevilla - 30176781
  * Winston Wang - 30185321
  */
+
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import java.math.BigDecimal;
 import java.util.Currency;

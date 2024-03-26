@@ -42,18 +42,18 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 		//Get current balance by creating a transaction instance
 		Transaction transaction = SelfCheckout.getInstance().getCurrentSession().getTransaction(); 
 		
-		//Check if balance is 0 and that there is an item to end session 
-		if(transaction.getTotalCost().compareTo(BigDecimal.ZERO) <= 0) {
+		if (transaction.getProducts().length == 0) {
+			//If item is at a 0, set state to ready for item
+	    	return UserSessionState.READY_FOR_ITEM;
+		} else if(transaction.getTotalCost().compareTo(BigDecimal.ZERO) <= 0) {
+			//Check if balance is 0 and that there is an item to end session 
 			try {
 				transaction.calculateChange();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 	        return UserSessionState.PRINT_RECEIPT;
-		} else if (transaction.getProducts().length == 0) {
-			//If item is at a 0, set state to ready for item
-	    	return UserSessionState.READY_FOR_ITEM;
-	    }
+		}
 		
 		// Enable the coin slot to allow the user to insert a coin while the software
 		// is in the correct state
@@ -134,7 +134,7 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 		Transaction transaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();; 
 		payment.swipePayment(data); 
 		System.out.println("Paid amount: " + payment.getAmountPaid().doubleValue());
-		transaction.addPayment(payment);	
+		transaction.addPayment(payment);
 		
 		
 		if(transaction.getTotalCost().compareTo(BigDecimal.ZERO) <= 0) {
