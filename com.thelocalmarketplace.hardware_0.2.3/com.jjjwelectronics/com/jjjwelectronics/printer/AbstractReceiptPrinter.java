@@ -30,7 +30,6 @@ abstract class AbstractReceiptPrinter extends AbstractDevice<ReceiptPrinterListe
 	 * lines.
 	 */
 	public static final int MAXIMUM_PAPER = 1 << 10;
-
 	protected int charactersOfInkRemaining = 0;
 	protected int linesOfPaperRemaining = 0;
 	private StringBuilder sb = new StringBuilder();
