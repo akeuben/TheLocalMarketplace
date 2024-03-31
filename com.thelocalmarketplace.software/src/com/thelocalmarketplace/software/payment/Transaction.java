@@ -184,13 +184,13 @@ public class Transaction {
 	                int dispense = -1;
 	                BigDecimal value = BigDecimal.valueOf(-1);
 	                for (BigDecimal banknote : banknoteDenominations) {
-	                    if (change.compareTo(banknote) >= 0 && banknote.compareTo(value) > 0 && instance.getHardware().banknoteDispensers.get(banknote).size() > 0) {
+	                    if (change.compareTo(banknote) >= 0 && banknote.compareTo(value) > 0 && instance.getHardware().getBanknoteDispensers().get(banknote).size() > 0) {
 	                        value = banknote;
 	                        dispense = BANKNOTE;
 	                    }
 	                }
 	                for (BigDecimal coin : coinDenominations) {
-	                    if (change.compareTo(coin) >= 0 && coin.compareTo(value) > 0 && instance.getHardware().coinDispensers.get(coin).size() > 0) {
+	                    if (change.compareTo(coin) >= 0 && coin.compareTo(value) > 0 && instance.getHardware().getCoinDispensers().get(coin).size() > 0) {
 	                        value = coin;
 	                        dispense = COIN;
 	                    }
@@ -201,10 +201,10 @@ public class Transaction {
 	                    change = change.subtract(value);
 	                    if (dispense == COIN) {
 	                        // Coin Dispensation
-	                        instance.getHardware().coinDispensers.get(value).emit();
+	                        instance.getHardware().getCoinDispensers().get(value).emit();
 	                    } else {
 	                        // Banknote Dispensation
-	                        instance.getHardware().banknoteDispensers.get(value).emit();
+	                        instance.getHardware().getBanknoteDispensers().get(value).emit();
 	                    }
 	                }
 	            }
@@ -214,7 +214,7 @@ public class Transaction {
                 // Rethrow the exception to be handled by the caller
                 throw e;
             }
-            SelfCheckout.getInstance().getHardware().banknoteOutput.dispense();
+            SelfCheckout.getInstance().getHardware().getBanknoteOutput().dispense();
         }
     }
 }

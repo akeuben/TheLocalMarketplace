@@ -52,10 +52,10 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
     public UserSessionState onStateSet() {
 		// Disable the coin slot to prevent the user from inserting a coin while the software
 		// is not in the correct state
-		SelfCheckout.getInstance().getHardware().coinSlot.disable();
-		SelfCheckout.getInstance().getHardware().banknoteInput.disable();
+		SelfCheckout.getInstance().getHardware().getCoinSlot().disable();
+		SelfCheckout.getInstance().getHardware().getBanknoteInput().disable();
 		
-        hardwarePrinter = SelfCheckout.getInstance().getHardware().printer;
+        hardwarePrinter = SelfCheckout.getInstance().getHardware().getPrinter();
         finalTransactionRecord = SelfCheckout.getInstance().getCurrentSession().getTransaction();//prob add a null check just incase
         itemizedTransaction = new ArrayList<String>();
         String workingString = "";

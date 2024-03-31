@@ -118,4 +118,22 @@ public class CardPayment implements CardReaderListener, IPayment{
 	protected void setAmountPaid(BigDecimal amountPaid) {
 		this.amountPaid = amountPaid; 
 	}
+
+	@Override
+	public void aCardHasBeenInserted() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void theCardHasBeenRemoved() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void aCardHasBeenTapped() {
+		// TODO Auto-generated method stub
+		
+	}
 }

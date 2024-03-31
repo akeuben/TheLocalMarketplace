@@ -141,18 +141,18 @@ public class SelfCheckout {
 		currentSession.setState(UserSessionState.READY_FOR_ITEM);
 		
 		// Remove old listeners
-		hardware.mainScanner.deregisterAll();
-		hardware.baggingArea.deregisterAll();
-		hardware.coinValidator.detachAll();
-		hardware.printer.deregisterAll();
+		hardware.getMainScanner().deregisterAll();
+		hardware.getBaggingArea().deregisterAll();
+		hardware.getCoinValidator().detachAll();
+		hardware.getPrinter().deregisterAll();
 		
 		// Register listeners
-		hardware.mainScanner.register(currentSession.getBarcodeHandler());
-		hardware.baggingArea.register(currentSession.getElectronicScaleHandler());
-		hardware.cardReader.register(currentSession.getCardReaderHandler());
-		hardware.coinValidator.attach(currentSession.getCoinValidatorHandler());
-		hardware.printer.register(currentSession.getReceiptPrinterHandler());
-		hardware.banknoteValidator.attach(currentSession.getBanknoteValidatorHandler());
+		hardware.getMainScanner().register(currentSession.getBarcodeHandler());
+		hardware.getBaggingArea().register(currentSession.getElectronicScaleHandler());
+		hardware.getCardReader().register(currentSession.getCardReaderHandler());
+		hardware.getCoinValidator().attach(currentSession.getCoinValidatorHandler());
+		hardware.getPrinter().register(currentSession.getReceiptPrinterHandler());
+		hardware.getBanknoteValidator().attach(currentSession.getBanknoteValidatorHandler());
 		
 		return currentSession;
 	}

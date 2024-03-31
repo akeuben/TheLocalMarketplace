@@ -91,15 +91,15 @@ public class CardPaymentTest {
 		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode, product); 
 		
 		bank = new CardIssuer("bank", 10);
-		debit = new Card("visa", "1234", "name", "503");
+		debit = new Card("visa", "1234", "name", "503", "1234", false, false);
 		Calendar expiry = Calendar.getInstance();
 		expiry.set(2026, 1, 1);
 		bank.addCardData(debit.number, debit.cardholder, expiry, debit.cvv, 100);
 		
-		credit = new Card("visa", "4321", "name", "405");
+		credit = new Card("visa", "4321", "name", "405", "1234", false, false);
 		bank.addCardData(credit.number, credit.cardholder, expiry, credit.cvv, 200);
 		 
-		fake = new Card("card", "1111", "notName", "101");
+		fake = new Card("card", "1111", "notName", "101", "1234", false, false);
 		
 		HashMap<String, CardIssuer> map = new HashMap<>(); 
 		map.put("visa", bank); 
@@ -116,8 +116,8 @@ public class CardPaymentTest {
 		UserSession session = sc.startNewSession(); 
 		Transaction transaction = session.getTransaction(); 
 		
-		IBarcodeScanner scanner = sc.getHardware().mainScanner; 
-		IElectronicScale baggingArea = sc.getHardware().baggingArea; 
+		IBarcodeScanner scanner = sc.getHardware().getMainScanner(); 
+		IElectronicScale baggingArea = sc.getHardware().getBaggingArea(); 
 		// scan the product then add it to the baggingArea
 		scanner.scan(new BarcodedItem(barcode, new Mass(100)));
 		baggingArea.addAnItem(new BarcodedItem(barcode, new Mass(100)));
@@ -125,7 +125,7 @@ public class CardPaymentTest {
 		System.out.println("Transaction before: " + transaction.getTotalCost().doubleValue());
 		session.setState(UserSessionState.READY_FOR_PAYMENT); 
 		try {
-			sc.getHardware().cardReader.swipe(debit);
+			sc.getHardware().getCardReader().swipe(debit);
 			
 		} catch (IOException e) {
 			
@@ -143,8 +143,8 @@ public class CardPaymentTest {
         SelfCheckout sc = SelfCheckout.getInstance();
         UserSession session = sc.startNewSession();
         Transaction transaction = session.getTransaction();
-        IBarcodeScanner scanner = sc.getHardware().mainScanner; 
-		IElectronicScale baggingArea = sc.getHardware().baggingArea; 
+		IBarcodeScanner scanner = sc.getHardware().getMainScanner(); 
+		IElectronicScale baggingArea = sc.getHardware().getBaggingArea(); 
 		// scan the product then add it to the baggingArea
 		scanner.scan(new BarcodedItem(barcode, new Mass(100)));
 		baggingArea.addAnItem(new BarcodedItem(barcode, new Mass(100)));
@@ -172,8 +172,8 @@ public class CardPaymentTest {
     public void testSwipePaymentOnFake() {
         SelfCheckout sc = SelfCheckout.getInstance();
         sc.startNewSession();
-        IBarcodeScanner scanner = sc.getHardware().mainScanner; 
-		IElectronicScale baggingArea = sc.getHardware().baggingArea; 
+		IBarcodeScanner scanner = sc.getHardware().getMainScanner(); 
+		IElectronicScale baggingArea = sc.getHardware().getBaggingArea(); 
 		// scan the product then add it to the baggingArea
 		scanner.scan(new BarcodedItem(barcode, new Mass(100)));
 		baggingArea.addAnItem(new BarcodedItem(barcode, new Mass(100)));
@@ -211,7 +211,7 @@ public class CardPaymentTest {
 	@Test
 	public void swipeNull() {
 		SelfCheckout sc = SelfCheckout.getInstance(); 
-		assertThrows(NullPointerException.class, () -> sc.getHardware().cardReader.swipe(null));
+		assertThrows(NullPointerException.class, () -> sc.getHardware().getCardReader().swipe(null));
 	}
 	
 	/**
@@ -222,8 +222,8 @@ public class CardPaymentTest {
 		 SelfCheckout sc = SelfCheckout.getInstance();
 	        UserSession session = sc.startNewSession();
 	        session.getTransaction();
-	        IBarcodeScanner scanner = sc.getHardware().mainScanner; 
-			IElectronicScale baggingArea = sc.getHardware().baggingArea; 
+	        IBarcodeScanner scanner = sc.getHardware().getMainScanner(); 
+			IElectronicScale baggingArea = sc.getHardware().getBaggingArea(); 
 			// scan the product then add it to the baggingArea
 			scanner.scan(new BarcodedItem(barcode, new Mass(100)));
 			baggingArea.addAnItem(new BarcodedItem(barcode, new Mass(100)));
@@ -241,16 +241,16 @@ public class CardPaymentTest {
 	public void noPowerException() {
 		SelfCheckout sc = SelfCheckout.getInstance();
         UserSession session = sc.startNewSession();
-        sc.getHardware().cardReader.turnOff();
+        sc.getHardware().getCardReader().turnOff();
         session.getTransaction();
-        IBarcodeScanner scanner = sc.getHardware().mainScanner; 
-		IElectronicScale baggingArea = sc.getHardware().baggingArea; 
+		IBarcodeScanner scanner = sc.getHardware().getMainScanner(); 
+		IElectronicScale baggingArea = sc.getHardware().getBaggingArea(); 
 		// scan the product then add it to the baggingArea
 		scanner.scan(new BarcodedItem(barcode, new Mass(100)));
 		baggingArea.addAnItem(new BarcodedItem(barcode, new Mass(100)));
 
 		try {
-			sc.getHardware().cardReader.swipe(debit);
+			sc.getHardware().getCardReader().swipe(debit);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
