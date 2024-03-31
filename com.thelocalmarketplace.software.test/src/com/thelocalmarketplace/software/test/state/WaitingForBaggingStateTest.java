@@ -57,7 +57,7 @@ public class WaitingForBaggingStateTest {
 	public void testCoinSlotDisabled() {
 		session.setState(UserSessionState.WAITING_FOR_BAGGING);
 		// The coin slot should be disabled.
-		assertTrue(SelfCheckout.getInstance().getHardware().coinSlot.isDisabled());
+		assertTrue(SelfCheckout.getInstance().getHardware().getCoinSlot().isDisabled());
 	}
 	
 	@Test
@@ -70,7 +70,7 @@ public class WaitingForBaggingStateTest {
 	
 	@Test
 	public void testOnStateSetOverloadWeight() {
-		SelfCheckout.getInstance().getHardware().baggingArea.addAnItem(new BarcodedItem(new Barcode(new Numeral[] {Numeral.five}), new Mass(9999999999999999999999999999999999999999999.0)));
+		SelfCheckout.getInstance().getHardware().getBaggingArea().addAnItem(new BarcodedItem(new Barcode(new Numeral[] {Numeral.five}), new Mass(9999999999999999999999999999999999999999999.0)));
 		session.setState(UserSessionState.WAITING_FOR_BAGGING);
 		
 		// The coin slot should be disabled.
@@ -79,7 +79,7 @@ public class WaitingForBaggingStateTest {
 	
 	@Test
 	public void testOnStateSetTooMuchWeight() {
-		SelfCheckout.getInstance().getHardware().baggingArea.addAnItem(new BarcodedItem(new Barcode(new Numeral[] {Numeral.five}), new Mass(9999.0)));
+		SelfCheckout.getInstance().getHardware().getBaggingArea().addAnItem(new BarcodedItem(new Barcode(new Numeral[] {Numeral.five}), new Mass(9999.0)));
 		session.setState(UserSessionState.WAITING_FOR_BAGGING);
 		
 		// The coin slot should be disabled.

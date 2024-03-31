@@ -57,8 +57,8 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 		
 		// Enable the coin slot to allow the user to insert a coin while the software
 		// is in the correct state
-		SelfCheckout.getInstance().getHardware().coinSlot.enable();
-		SelfCheckout.getInstance().getHardware().banknoteInput.enable();
+		SelfCheckout.getInstance().getHardware().getCoinSlot().enable();
+		SelfCheckout.getInstance().getHardware().getBanknoteInput().enable();
 		return null; 
 	}
 	 
@@ -72,7 +72,7 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 		Mass absoluteDifference = expectedMass.difference(mass).abs();
 		
 		// The maximum difference between masses.
-		Mass maximumDifference = SelfCheckout.getInstance().getHardware().baggingArea.getSensitivityLimit();
+		Mass maximumDifference = SelfCheckout.getInstance().getHardware().getBaggingArea().getSensitivityLimit();
 		
 		// Check if we are within the margin of error. If so, do nothing
 		if(absoluteDifference.compareTo(maximumDifference) == 1) {

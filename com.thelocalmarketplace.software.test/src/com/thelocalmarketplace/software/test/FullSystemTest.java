@@ -185,9 +185,9 @@ public class FullSystemTest {
 		UserSession session = sc.startNewSession();
 		Transaction transaction = session.getTransaction();
 
-		IBarcodeScanner scanner = SelfCheckout.getInstance().getHardware().mainScanner;
-		IElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().baggingArea;
-		CoinSlot coinSlot = SelfCheckout.getInstance().getHardware().coinSlot;
+		IBarcodeScanner scanner = sc.getHardware().getMainScanner(); 
+		IElectronicScale baggingArea = sc.getHardware().getBaggingArea(); 
+		CoinSlot coinSlot = SelfCheckout.getInstance().getHardware().getCoinSlot();
 
 		assertEquals(session.getState(), UserSessionState.READY_FOR_ITEM);
 		
@@ -215,7 +215,7 @@ public class FullSystemTest {
 		assertEquals(session.getState(), UserSessionState.READY_FOR_PAYMENT);
 		
 		CoinValidatorObserverStub stub = new CoinValidatorObserverStub();
-		SelfCheckout.getInstance().getHardware().coinValidator.attach(stub);
+		SelfCheckout.getInstance().getHardware().getCoinValidator().attach(stub);
 		
 		// Pay 1 dollar
 		try {
@@ -301,12 +301,12 @@ public class FullSystemTest {
 		UserSession session = sc.startNewSession();
 		Transaction transaction = session.getTransaction();
 
-		IBarcodeScanner scanner = SelfCheckout.getInstance().getHardware().mainScanner;
-		IElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().baggingArea;
-		BanknoteInsertionSlot banknoteInput = SelfCheckout.getInstance().getHardware().banknoteInput;
+		IBarcodeScanner scanner = sc.getHardware().getMainScanner(); 
+		IElectronicScale baggingArea = sc.getHardware().getBaggingArea(); 
+		BanknoteInsertionSlot banknoteInput = SelfCheckout.getInstance().getHardware().getBanknoteInput();
 		
 		try {
-			sc.getHardware().coinDispensers.get(BigDecimal.ONE).load(
+			sc.getHardware().getCoinDispensers().get(BigDecimal.ONE).load(
 				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE),
 				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE)
 			);
@@ -341,7 +341,7 @@ public class FullSystemTest {
 		assertEquals(session.getState(), UserSessionState.READY_FOR_PAYMENT);
 		
 		BanknoteValidatorObserverStub stub = new BanknoteValidatorObserverStub();
-		SelfCheckout.getInstance().getHardware().banknoteValidator.attach(stub);
+		SelfCheckout.getInstance().getHardware().getBanknoteValidator().attach(stub);
 		
 		// Pay 1 dollar
 		try {
@@ -352,7 +352,7 @@ public class FullSystemTest {
 			throw new RuntimeException();
 		}
 
-        List<Coin> collectedCoins = SelfCheckout.getInstance().getHardware().coinTray.collectCoins();
+        List<Coin> collectedCoins = SelfCheckout.getInstance().getHardware().getCoinTray().collectCoins();
         assertEquals(1, collectedCoins.size());
         assertEquals(0, collectedCoins.get(0).getValue().compareTo(BigDecimal.valueOf(1)));
 	}
@@ -363,8 +363,8 @@ public class FullSystemTest {
 		UserSession session = sc.startNewSession();
 		Transaction transaction = session.getTransaction();
 
-		IBarcodeScanner scanner = SelfCheckout.getInstance().getHardware().mainScanner;
-		IElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().baggingArea;
+		IBarcodeScanner scanner = SelfCheckout.getInstance().getHardware().getMainScanner();
+		IElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().getBaggingArea();
 		
 		BarcodedItem item1 = new BarcodedItem(barcode1, new Mass(100.0));
 
@@ -413,7 +413,7 @@ public class FullSystemTest {
 		SelfCheckout sc = SelfCheckout.getInstance();
 		UserSession session = sc.startNewSession();
 
-		IElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().baggingArea;
+		IElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().getBaggingArea();
 		
 		BarcodedItem item1 = new BarcodedItem(barcode1, new Mass(100.0));
 
@@ -437,7 +437,7 @@ public class FullSystemTest {
 		SelfCheckout sc  = SelfCheckout.getInstance(); 
 		UserSession session = sc.startNewSession();
 		
-		IBarcodeScanner scanner = sc.getHardware().mainScanner; 
+		IBarcodeScanner scanner = sc.getHardware().getMainScanner(); 
 		Numeral[] dummyCode = {Numeral.one, Numeral.two};
 		BarcodedItem newItem = new BarcodedItem(new Barcode(dummyCode), new Mass(10.0));
 		scanner.scan(newItem); 

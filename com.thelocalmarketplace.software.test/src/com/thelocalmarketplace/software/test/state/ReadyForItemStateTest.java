@@ -60,7 +60,7 @@ public class ReadyForItemStateTest {
 		SelfCheckout.getInstance().startNewSession();
 		session.setState(UserSessionState.READY_FOR_ITEM);
 		// The coin slot should be disabled.
-		assertTrue(SelfCheckout.getInstance().getHardware().coinSlot.isDisabled());
+		assertTrue(SelfCheckout.getInstance().getHardware().getCoinSlot().isDisabled());
 	}
 	
 	@Test

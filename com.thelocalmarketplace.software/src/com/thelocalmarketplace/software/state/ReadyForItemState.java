@@ -43,12 +43,11 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 	public UserSessionState onStateSet() {
 		// Disable the coin slot to prevent the user from inserting a coin while the software
 		// is not in the correct state
-		SelfCheckout.getInstance().getHardware().coinSlot.disable();
-		SelfCheckout.getInstance().getHardware().banknoteInput.disable();
-
+		SelfCheckout.getInstance().getHardware().getCoinSlot().disable();
+		SelfCheckout.getInstance().getHardware().getBanknoteInput().disable();
 		Transaction currentTransaction = SelfCheckout.getInstance().getCurrentSession().getTransaction(); // Get current transaction
 		Mass expectedMass = currentTransaction.getExpectedMass(); // Get expected mass
-		IElectronicScale scale = SelfCheckout.getInstance().getHardware().baggingArea;
+		IElectronicScale scale = SelfCheckout.getInstance().getHardware().getBaggingArea();
 		if(!(scale instanceof AbstractElectronicScale)) return null;
 		
 		Mass absoluteDifference;
@@ -88,7 +87,7 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 		Mass absoluteDifference = expectedMass.difference(mass).abs();
 		
 		// The maximum difference between masses.
-		Mass maximumDifference = SelfCheckout.getInstance().getHardware().baggingArea.getSensitivityLimit();
+		Mass maximumDifference = SelfCheckout.getInstance().getHardware().getBaggingArea().getSensitivityLimit();
 		
 		// Check if we are within the margin of error. If so, do nothing
 		if(absoluteDifference.compareTo(maximumDifference) == 1) {

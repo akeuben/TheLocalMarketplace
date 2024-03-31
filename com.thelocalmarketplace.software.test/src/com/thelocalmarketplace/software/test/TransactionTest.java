@@ -234,7 +234,7 @@ public class TransactionTest {
         transaction.addPayment(new PaymentStub(BigDecimal.valueOf(2.00))); // Simulating payment of 2.00
         
         try {
-			SelfCheckout.getInstance().getHardware().coinDispensers.get(BigDecimal.ONE).load(new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE));
+			SelfCheckout.getInstance().getHardware().getCoinDispensers().get(BigDecimal.ONE).load(new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE));
 		} catch (CashOverloadException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -246,7 +246,7 @@ public class TransactionTest {
         assertEquals(expectedChange, actualChange);
         
         // Check the coins that were dispensed match the coins that should have been dispensed.
-        List<Coin> collectedCoins = SelfCheckout.getInstance().getHardware().coinTray.collectCoins();
+        List<Coin> collectedCoins = SelfCheckout.getInstance().getHardware().getCoinTray().collectCoins();
         assertEquals(1, collectedCoins.size());
         assertEquals(0, collectedCoins.get(0).getValue().compareTo(BigDecimal.valueOf(1.0)));
     }
@@ -257,7 +257,7 @@ public class TransactionTest {
         transaction.addPayment(new PaymentStub(BigDecimal.valueOf(3.00))); // Simulating payment of 3.00
         
         try {
-			SelfCheckout.getInstance().getHardware().coinDispensers.get(BigDecimal.ONE).load(
+			SelfCheckout.getInstance().getHardware().getCoinDispensers().get(BigDecimal.ONE).load(
 				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE),
 				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE)
 			);
@@ -270,7 +270,7 @@ public class TransactionTest {
         BigDecimal expectedChange = BigDecimal.valueOf(-2.0);
         BigDecimal actualChange = transaction.getTotalCost();
         assertEquals(expectedChange, actualChange);
-        List<Coin> collectedCoins = SelfCheckout.getInstance().getHardware().coinTray.collectCoins();
+        List<Coin> collectedCoins = SelfCheckout.getInstance().getHardware().getCoinTray().collectCoins();
         assertEquals(2, collectedCoins.size());
         assertEquals(0, collectedCoins.get(0).getValue().compareTo(BigDecimal.valueOf(1.0)));
         assertEquals(0, collectedCoins.get(1).getValue().compareTo(BigDecimal.valueOf(1.0)));
@@ -297,11 +297,11 @@ public class TransactionTest {
         transaction.addPayment(new PaymentStub(BigDecimal.valueOf(4.00))); // Simulating payment of 4.00
         
         try {
-			SelfCheckout.getInstance().getHardware().coinDispensers.get(BigDecimal.ONE).load(
+			SelfCheckout.getInstance().getHardware().getCoinDispensers().get(BigDecimal.ONE).load(
 				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE),
 				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE)
 			);
-			SelfCheckout.getInstance().getHardware().coinDispensers.get(BigDecimal.valueOf(2)).load(
+			SelfCheckout.getInstance().getHardware().getCoinDispensers().get(BigDecimal.valueOf(2)).load(
 				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.valueOf(2)),
 				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.valueOf(2))
 			);
@@ -314,7 +314,7 @@ public class TransactionTest {
         BigDecimal expectedChange = BigDecimal.valueOf(-3.0);
         BigDecimal actualChange = transaction.getTotalCost();
         assertEquals(expectedChange, actualChange);
-        List<Coin> collectedCoins = SelfCheckout.getInstance().getHardware().coinTray.collectCoins();
+        List<Coin> collectedCoins = SelfCheckout.getInstance().getHardware().getCoinTray().collectCoins();
         assertEquals(2, collectedCoins.size());
         int loonieCount = 0, toonieCount = 0;
         for(Coin coin : collectedCoins) {
@@ -332,11 +332,11 @@ public class TransactionTest {
         transaction.addPayment(new PaymentStub(BigDecimal.valueOf(12.00))); // Simulating payment of 12.00
         
         try {
-			SelfCheckout.getInstance().getHardware().coinDispensers.get(BigDecimal.ONE).load(
+			SelfCheckout.getInstance().getHardware().getCoinDispensers().get(BigDecimal.ONE).load(
 				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE),
 				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE)
 			);
-			SelfCheckout.getInstance().getHardware().banknoteDispensers.get(BigDecimal.valueOf(10)).load(
+			SelfCheckout.getInstance().getHardware().getBanknoteDispensers().get(BigDecimal.valueOf(10)).load(
 				new Banknote(Currency.getInstance(Locale.CANADA), BigDecimal.valueOf(10)),
 				new Banknote(Currency.getInstance(Locale.CANADA), BigDecimal.valueOf(10))
 			);
@@ -349,11 +349,11 @@ public class TransactionTest {
         BigDecimal expectedChange = BigDecimal.valueOf(-11.0);
         BigDecimal actualChange = transaction.getTotalCost();
         assertEquals(expectedChange, actualChange);
-        List<Coin> collectedCoins = SelfCheckout.getInstance().getHardware().coinTray.collectCoins();
+        List<Coin> collectedCoins = SelfCheckout.getInstance().getHardware().getCoinTray().collectCoins();
         assertEquals(1, collectedCoins.size());
         assertEquals(0, collectedCoins.get(0).getValue().compareTo(BigDecimal.valueOf(1)));
         
-        List<Banknote> collectedBanknotes = SelfCheckout.getInstance().getHardware().banknoteOutput.removeDanglingBanknotes();
+        List<Banknote> collectedBanknotes = SelfCheckout.getInstance().getHardware().getBanknoteOutput().removeDanglingBanknotes();
         assertEquals(1, collectedBanknotes.size());
         assertEquals(0, collectedBanknotes.get(0).getDenomination().compareTo(BigDecimal.valueOf(10)));
     }

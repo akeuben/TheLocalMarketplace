@@ -70,7 +70,7 @@ public class ReadyForPaymentStateTest {
 	public void testCoinSlotEnabled() {
 		session.setState(UserSessionState.READY_FOR_PAYMENT);
 		// The coin slot should be enabled.
-		assertFalse(SelfCheckout.getInstance().getHardware().coinSlot.isDisabled());
+		assertFalse(SelfCheckout.getInstance().getHardware().getCoinSlot().isDisabled());
 	}
 	
 	@Test
