@@ -26,7 +26,10 @@ package com.thelocalmarketplace.software.session;
  * Winston Wang - ????????
  */
 
+import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.scanner.BarcodedItem;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.UI.UIObserver;
 import com.thelocalmarketplace.software.state.UserSessionState;
 
@@ -49,16 +52,12 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 
 	@Override
 	public void removeItemSelected(BarcodedProduct product) {
+		BarcodedItem item = new BarcodedItem(product.getBarcode(), new Mass(product.getExpectedWeight()));
+		super.getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
 		super.getUserSession().getTransaction().removeItem(product);
 		super.getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
-		// Waits for user to remove item from bagging area
-		//TODO Not sure how this should be implemented. Is there a way to get the current mass of the scale???
-		//if (super.getUserSession().getTransaction().getExpectedMass() != super.getUserSession().getTransaction().getExpectedMass() + product.getExpectedWeight()) {
-			// Changes state back to READY_FOR_ITEM when item is removed
-			//super.getUserSession().setState(UserSessionState.READY_FOR_ITEM);
-		//}
-
-
+		//removeAnItem handles mass changes
+		SelfCheckout.getInstance().getHardware().getBaggingArea().removeAnItem(item);
 	}
 
 	@Override
