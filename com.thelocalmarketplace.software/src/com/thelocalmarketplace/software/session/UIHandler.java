@@ -26,9 +26,13 @@ package com.thelocalmarketplace.software.session;
  * Winston Wang - ????????
  */
 
+import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.bag.ReusableBag;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.software.UI.UIObserver;
 import com.thelocalmarketplace.software.state.UserSessionState;
+
+import java.math.BigInteger;
 
 public class UIHandler extends AbstractUserSessionHandler implements UIObserver {
 
@@ -37,13 +41,13 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 	}
 
 	@Override
-	public void addBagSelected() {
+	public void addBagSelected(ReusableBag bag) {
 		//sets state to add bag state
 		getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
-		//new state changed back to waiting for item after add bag completed
-		UserSessionState newState = getUserSession().getState().onStateSet();
-		if (newState!=null) {
-			getUserSession().setState(newState);
+		//Checks bag weight
+		if (bag.getMass().compareTo(new Mass(BigInteger.valueOf(5_000_000))) > 0) {
+			// Change state to waiting for attendant
+			getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
 		}
 	}
 
