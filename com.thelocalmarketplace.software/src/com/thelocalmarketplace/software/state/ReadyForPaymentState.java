@@ -132,9 +132,10 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 		// create a card payment instance, for now it will be debit but I might refactor those two classes into one
 		CardPayment payment = new CardPayment();
 		Transaction transaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();; 
-		payment.swipePayment(data); 
-		System.out.println("Paid amount: " + payment.getAmountPaid().doubleValue());
-		transaction.addPayment(payment);
+		if(data != null) {
+			payment.makePayment(data); 
+			transaction.addPayment(payment);
+		}
 		
 		
 		if(transaction.getTotalCost().compareTo(BigDecimal.ZERO) <= 0) {

@@ -63,21 +63,12 @@ public class CardReaderHandler extends AbstractUserSessionHandler implements Car
 	}
 
 	@Override
-	public void aCardHasBeenInserted() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void aCardHasBeenInserted() {}
 
 	@Override
-	public void theCardHasBeenRemoved() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void theCardHasBeenRemoved() {}
 
 	@Override
-	public void aCardHasBeenTapped() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void aCardHasBeenTapped() {}
 
 }

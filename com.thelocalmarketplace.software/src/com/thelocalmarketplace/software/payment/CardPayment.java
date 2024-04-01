@@ -49,7 +49,7 @@ public class CardPayment implements CardReaderListener, IPayment{
 	 * Will attempt to post a transaction using a debit card via swiping
 	 * @return result of transaction, true if successful, false if not
 	 */
-	public boolean swipePayment(CardData data) {
+	public boolean makePayment(CardData data) {
 		this.amountDue = SelfCheckout.getInstance().getCurrentSession().getTransaction().getTotalCost();
 		// check to see if the bank that corresponds to the card's type exists 
 		if(BankDataBase.getInstance().getDataBase().containsKey(data.getType().toLowerCase())) {
@@ -63,8 +63,11 @@ public class CardPayment implements CardReaderListener, IPayment{
 					boolean posted = bank.postTransaction(data.getNumber(), blockNum, this.amountDue.doubleValue());
 						// Whether transaction is valid or not release the hold
 						bank.releaseHold(data.getNumber(), blockNum);
-						// transaction was successful so update the amount that was paid
-						setAmountPaid(this.amountDue);
+						// case where the transaction is successful so need to account for that
+						if(posted) {
+							setAmountPaid(this.amountDue);
+						}
+						
 					// once that is all done then return the result of the transaction being posted
 					return posted;
 

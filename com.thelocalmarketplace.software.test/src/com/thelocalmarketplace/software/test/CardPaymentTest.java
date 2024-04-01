@@ -159,7 +159,7 @@ public class CardPaymentTest {
 
         // Initialize CardPayment and attempt payment
         CardPayment payment = new CardPayment();
-        boolean result = payment.swipePayment(cardData);
+        boolean result = payment.makePayment(cardData);
 
         // Assert payment success
         assertTrue("Payment should succeed", result);
@@ -188,7 +188,7 @@ public class CardPaymentTest {
 
         // Initialize CardPayment and attempt payment
         CardPayment payment = new CardPayment();
-        boolean result = payment.swipePayment(cardData);
+        boolean result = payment.makePayment(cardData);
 
         // Assert payment fail
         assertFalse("Payment should fail", result);
@@ -231,7 +231,7 @@ public class CardPaymentTest {
 	        // Prepare card data (simulate swiping the card)
 	        CardData cardData = null;
 	        CardPayment payment = new CardPayment();
-	        payment.swipePayment(cardData);
+	        payment.makePayment(cardData);
 	}
 	
 	/**
