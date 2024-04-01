@@ -38,6 +38,7 @@ import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.jjjwelectronics.Mass.MassDifference;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.SelfCheckout;
 
@@ -66,6 +67,18 @@ public class Transaction {
             products.add(product);
             totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
             expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM))));
+        }
+        else {
+            throw new NullPointerException("product");
+        }
+    }
+
+    public void addItem(PLUCodedProduct product) {
+        if (product != null) {
+            products.add(product);
+            totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
+            // TODO determine how to handle expected weight for PLU coded products
+            expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM)));
         }
         else {
             throw new NullPointerException("product");
