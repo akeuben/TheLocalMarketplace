@@ -1,5 +1,7 @@
 package com.thelocalmarketplace.software.session;
 
+import java.util.Locale;
+
 /**
  * SENG 300 Project - Group 1:
  * 
@@ -27,6 +29,7 @@ package com.thelocalmarketplace.software.session;
  */
 
 import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.UI.UIObserver;
 import com.thelocalmarketplace.software.state.UserSessionState;
 
@@ -68,6 +71,14 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 		// TODO: Once state changes back to normal, will add the bulky item to the transaction (currently working with no attendant feedback)
 		super.getUserSession().getTransaction().skipBagging(product);
 		super.getUserSession().setState(UserSessionState.READY_FOR_ITEM);
+	}
+
+	/**
+	 * takes user selected language and sets it as the language for the self checkout
+	 */
+	@Override
+	public void selectLanguage(Locale newLanguage) {
+		SelfCheckout.getInstance().getConfiguration().language = newLanguage;
 	}
 
 }

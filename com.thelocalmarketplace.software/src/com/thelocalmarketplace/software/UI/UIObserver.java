@@ -1,5 +1,7 @@
 package com.thelocalmarketplace.software.UI;
 
+import java.util.Locale;
+
 /**
  * SENG 300 Project - Group 1:
  * 
@@ -44,5 +46,12 @@ public interface UIObserver {
 	 * announces when user selects option to skip bagging the current product
 	 */
 	void skipBaggingSelected(BarcodedProduct product);
+	
+	
+	/**
+	 * announces when user selects a new language
+	 * @param newLanguage
+	 */
+	void selectLanguage(Locale newLanguage);
 	
 }
