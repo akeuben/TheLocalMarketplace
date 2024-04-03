@@ -37,13 +37,13 @@ public class EnableStation {
      * 		The station to be enabled.
      */
     public EnableStation(AbstractSelfCheckoutStation station) {
-        this.station = station
+        this.station = station;
     }
 
     /**
      * Turns on/enables the station.
      */
     public void enable() {
-        station.turnOn()
+        station.turnOn();
     }
 }
