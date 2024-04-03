@@ -37,6 +37,9 @@ public class EnableStation {
      * 		The station to be enabled.
      */
     public EnableStation(AbstractSelfCheckoutStation station) {
+    	if (station == null) {
+    		throw new NullPointerException();
+    	}
         this.station = station;
     }
 
