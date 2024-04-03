@@ -48,7 +48,7 @@ public class PayWithBanknote implements BanknoteValidatorObserver {
         waitingForValidation = false;
         updateTransactionTotal(denomination);
         try {
-            dispenseChange();
+//            dispenseChange();
         } catch (ChangeDispenseException e) {
             e.printStackTrace();
             // Log error or handle it appropriately
@@ -67,12 +67,12 @@ public class PayWithBanknote implements BanknoteValidatorObserver {
         amountDue = amountDue.subtract(banknoteValue);
     }
 
-    private void dispenseChange() {
-        if (amountDue.compareTo(BigDecimal.ZERO) >= 0) {
-            return; // No change required
-        }
-        BigDecimal changeAmount = amountDue.negate();
-    }
+//    private void dispenseChange() {
+//        if (amountDue.compareTo(BigDecimal.ZERO) >= 0) {
+//            return; // No change required
+//        }
+//        BigDecimal changeAmount = amountDue.negate();
+//    }
 }
 
 
