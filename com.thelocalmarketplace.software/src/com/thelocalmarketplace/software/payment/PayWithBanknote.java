@@ -15,32 +15,6 @@ public class PayWithBanknote implements BanknoteValidatorObserver {
     private Currency currency;
     private boolean waitingForValidation;
 
-//    public PayWithBanknote(BanknoteInsertionSlot insertionSlot, BanknoteValidator validator,
-//                           BanknoteStorageUnit storageUnit, BanknoteDispenser dispenser,
-//                           BigDecimal amountDue, Currency currency) {
-//        this.insertionSlot = insertionSlot;
-//        this.validator = validator;
-//        this.storageUnit = storageUnit;
-//        this.dispenser = dispenser;
-//        this.amountDue = amountDue;
-//        this.currency = currency;
-//        this.waitingForValidation = false;
-//        validator.attach(this);
-//    }
-//
-//    public void payWithBanknote(Banknote banknote) throws InvalidCurrencyException {
-//        if (!banknote.getCurrency().equals(currency)) {
-//            throw new InvalidCurrencyException("Invalid currency.");
-//        }
-//        try {
-//            insertionSlot.receive(banknote);
-//            validator.receive(banknote);
-//            waitingForValidation = true;
-//        } catch (DisabledException | CashOverloadException e) {
-//            e.printStackTrace();
-//            // Handle exceptions appropriately
-//        }
-//    }
 
     @Override
     public void goodBanknote(BanknoteValidator validator, Currency currency, BigDecimal denomination) {
