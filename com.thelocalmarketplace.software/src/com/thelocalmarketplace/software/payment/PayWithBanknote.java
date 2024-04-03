@@ -4,6 +4,7 @@ import com.tdc.*;
 import com.tdc.banknote.*;
 import java.math.BigDecimal;
 import java.util.Currency;
+import com.thelocalmarketplace.hardware.*;
 
 public class PayWithBanknote implements BanknoteValidatorObserver {
     private BanknoteInsertionSlot insertionSlot;
@@ -14,32 +15,32 @@ public class PayWithBanknote implements BanknoteValidatorObserver {
     private Currency currency;
     private boolean waitingForValidation;
 
-    public PayWithBanknote(BanknoteInsertionSlot insertionSlot, BanknoteValidator validator,
-                           BanknoteStorageUnit storageUnit, BanknoteDispenser dispenser,
-                           BigDecimal amountDue, Currency currency) {
-        this.insertionSlot = insertionSlot;
-        this.validator = validator;
-        this.storageUnit = storageUnit;
-        this.dispenser = dispenser;
-        this.amountDue = amountDue;
-        this.currency = currency;
-        this.waitingForValidation = false;
-        validator.attach(this);
-    }
-
-    public void payWithBanknote(Banknote banknote) throws InvalidCurrencyException {
-        if (!banknote.getCurrency().equals(currency)) {
-            throw new InvalidCurrencyException("Invalid currency.");
-        }
-        try {
-            insertionSlot.receive(banknote);
-            validator.receive(banknote);
-            waitingForValidation = true;
-        } catch (DisabledException | CashOverloadException e) {
-            e.printStackTrace();
-            // Handle exceptions appropriately
-        }
-    }
+//    public PayWithBanknote(BanknoteInsertionSlot insertionSlot, BanknoteValidator validator,
+//                           BanknoteStorageUnit storageUnit, BanknoteDispenser dispenser,
+//                           BigDecimal amountDue, Currency currency) {
+//        this.insertionSlot = insertionSlot;
+//        this.validator = validator;
+//        this.storageUnit = storageUnit;
+//        this.dispenser = dispenser;
+//        this.amountDue = amountDue;
+//        this.currency = currency;
+//        this.waitingForValidation = false;
+//        validator.attach(this);
+//    }
+//
+//    public void payWithBanknote(Banknote banknote) throws InvalidCurrencyException {
+//        if (!banknote.getCurrency().equals(currency)) {
+//            throw new InvalidCurrencyException("Invalid currency.");
+//        }
+//        try {
+//            insertionSlot.receive(banknote);
+//            validator.receive(banknote);
+//            waitingForValidation = true;
+//        } catch (DisabledException | CashOverloadException e) {
+//            e.printStackTrace();
+//            // Handle exceptions appropriately
+//        }
+//    }
 
     @Override
     public void goodBanknote(BanknoteValidator validator, Currency currency, BigDecimal denomination) {
@@ -51,6 +52,7 @@ public class PayWithBanknote implements BanknoteValidatorObserver {
         } catch (ChangeDispenseException e) {
             e.printStackTrace();
             // Log error or handle it appropriately
+            
         }
     }
 
@@ -65,37 +67,14 @@ public class PayWithBanknote implements BanknoteValidatorObserver {
         amountDue = amountDue.subtract(banknoteValue);
     }
 
-    private void dispenseChange() throws ChangeDispenseException {
+    private void dispenseChange() {
         if (amountDue.compareTo(BigDecimal.ZERO) >= 0) {
             return; // No change required
         }
         BigDecimal changeAmount = amountDue.negate();
-        try {
-            while (changeAmount.compareTo(BigDecimal.ZERO) > 0) {
-                Banknote banknoteToDispense = selectBanknoteForChange(changeAmount);
-                if (banknoteToDispense != null) {
-                    dispenser.emit(banknoteToDispense);
-                    changeAmount = changeAmount.subtract(banknoteToDispense.getDenomination());
-                } else {
-                    throw new InsufficientChangeException("Unable to dispense the required change.");
-                }
-            }
-        } catch (InsufficientChangeException e) {
-            throw new ChangeDispenseException("Error dispensing change: " + e.getMessage(), e);
-        }
     }
+}
 
-    private Banknote selectBanknoteForChange(BigDecimal changeAmount) {
-        BigDecimal[] denominations = new BigDecimal[]{new BigDecimal("50"), new BigDecimal("20"),
-                                                      new BigDecimal("10"), new BigDecimal("5"),
-                                                      new BigDecimal("1")};
-        for (BigDecimal denomination : denominations) {
-            if (changeAmount.compareTo(denomination) >= 0) {
-                return new Banknote(currency, denomination);
-            }
-        }
-        return null; // No suitable denomination found
-    }
 
     @Override
     public void enabled(IComponent<? extends IComponentObserver> component) {
