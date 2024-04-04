@@ -66,6 +66,8 @@ public class SelfCheckout {
 		PowerGrid.engageUninterruptiblePowerSource();
 		hardware.plugIn(PowerGrid.instance());
 		hardware.turnOn();
+		hardware.getCoinSlot().disable();
+		hardware.getBanknoteInput().disable();
 	}
 	
 	/**

@@ -92,4 +92,20 @@ public class SelfCheckoutConfiguration {
 	public static enum MachineRating {
 		GOLD, SILVER, BRONZE
 	}
+
+	public BigDecimal[] getBanknoteDenominations() {
+		return banknoteDenominations;
+	}
+
+	public int getBanknoteStorageCapacity() {
+		return banknoteStorageCapacity;
+	}
+
+	public int getReusableBagDispenserCapacity() {
+		return reusableBagDispenserCapacity;
+	}
+
+	public MachineRating getRating() {
+		return rating;
+	}
 }

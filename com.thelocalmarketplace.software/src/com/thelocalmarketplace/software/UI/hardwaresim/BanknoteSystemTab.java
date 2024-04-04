@@ -1,0 +1,232 @@
+package com.thelocalmarketplace.software.UI.hardwaresim;
+
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.math.BigDecimal;
+import java.util.Currency;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+
+import com.tdc.CashOverloadException;
+import com.tdc.DisabledException;
+import com.tdc.NoCashAvailableException;
+import com.tdc.banknote.Banknote;
+import com.tdc.banknote.BanknoteDispensationSlot;
+import com.tdc.banknote.IBanknoteDispenser;
+import com.thelocalmarketplace.software.SelfCheckout;
+import com.thelocalmarketplace.software.UI.components.ErrorPopup;
+
+import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
+import ca.ucalgary.seng300.simulation.SimulationException;
+
+public class BanknoteSystemTab extends JPanel {
+private static final long serialVersionUID = -7616750139837556826L;
+	
+	private DefaultListModel<Banknote> collectedBanknoteModel;
+	private Map<BigDecimal, JLabel> dispenserLabels;
+	
+	private JLabel countLabel;
+	private JLabel isDangling;
+
+	public BanknoteSystemTab() {
+		setLayout(new GridLayout(0, 2));
+		setBorder(new EmptyBorder(10, 10, 10, 10));
+		
+		dispenserLabels = new HashMap<BigDecimal, JLabel>();
+		
+		JPanel masterBanknoteInputPanel = new JPanel();
+		masterBanknoteInputPanel.setLayout(new GridLayout(0, 1));
+		JPanel banknoteInputPanel = new JPanel();
+		banknoteInputPanel.setLayout(new FlowLayout());
+		
+		JPanel banknoteDispenserPanel = new JPanel();
+		banknoteDispenserPanel.setLayout(new GridLayout(0, 4));
+		
+		JScrollPane banknoteInputScrollPane = new JScrollPane(banknoteInputPanel);
+		banknoteInputScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		banknoteInputScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		banknoteInputScrollPane.setBorder(new TitledBorder("Banknote Input"));
+		
+		JScrollPane banknoteDispenserScrollPane = new JScrollPane(banknoteDispenserPanel);
+		banknoteDispenserScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		banknoteDispenserScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		banknoteDispenserScrollPane.setBorder(new TitledBorder("Banknote Dispensers"));
+		
+		for(BigDecimal denomination : SelfCheckout.getInstance().getConfiguration().getBanknoteDenominations()) {
+			JButton btn = new JButton("$" + denomination.toPlainString());
+			btn.addActionListener((e) -> this.insertBanknote(denomination));
+			banknoteInputPanel.add(btn);
+			
+			JLabel label = new JLabel("$" + denomination.toPlainString());
+			JLabel amount = new JLabel("0");
+			JButton reloadBtn = new JButton("reload");
+			reloadBtn.addActionListener((e) -> this.reloadDispenser(denomination));
+			JButton emitBtn = new JButton("emit");
+			emitBtn.addActionListener((e) -> this.emitDispenser(denomination));
+			banknoteDispenserPanel.add(label);
+			banknoteDispenserPanel.add(amount);
+			banknoteDispenserPanel.add(reloadBtn);
+			banknoteDispenserPanel.add(emitBtn);
+			dispenserLabels.put(denomination, amount);
+		}
+		updateBanknoteDispensers();
+		
+		masterBanknoteInputPanel.add(banknoteInputScrollPane);
+		
+		JButton removeDanglingButton = new JButton("Remove Dangling");
+		removeDanglingButton.addActionListener(this::removeDanglingFromInput);
+		isDangling = new JLabel("false");
+		
+		JPanel inputDangling = new JPanel();
+		
+		inputDangling.add(new JLabel("Has Dangling banknote: "));
+		inputDangling.add(isDangling);
+		inputDangling.add(removeDanglingButton);
+		
+		masterBanknoteInputPanel.add(inputDangling);
+		
+		add(masterBanknoteInputPanel);
+		
+		JPanel banknoteOutputPanel = new JPanel();
+		banknoteOutputPanel.setBorder(new TitledBorder("Banknote Output"));
+		banknoteOutputPanel.setLayout(new GridLayout(1, 2));
+		collectedBanknoteModel = new DefaultListModel<Banknote>();
+		JList<Banknote> collectedBanknoteList = new JList<>(collectedBanknoteModel);
+		JScrollPane collectedBanknoteScrollPane = new JScrollPane(collectedBanknoteList);
+		JPanel outputControlPanel = new JPanel();
+		outputControlPanel.setLayout(new GridLayout(0, 1));
+		JButton releaseButton = new JButton("Release Banknotes");
+		JButton collectButton = new JButton("Collect Banknotes");
+		releaseButton.addActionListener(this::releaseBanknoteOutput);
+		collectButton.addActionListener(this::updateBanknoteOutput);
+		
+		outputControlPanel.add(releaseButton);
+		outputControlPanel.add(collectButton);
+		
+		banknoteOutputPanel.add(collectedBanknoteScrollPane);
+		banknoteOutputPanel.add(outputControlPanel);
+		
+		add(banknoteOutputPanel);
+		
+		add(banknoteDispenserScrollPane);
+		
+		JPanel banknoteStoragePanel = new JPanel();
+		banknoteStoragePanel.setLayout(new GridLayout(0, 2));
+		banknoteStoragePanel.setBorder(new TitledBorder("Banknote Storage"));
+		banknoteStoragePanel.add(new JLabel("Banknote Count: "));
+		countLabel = new JLabel("");
+		updateStorageCount();
+		banknoteStoragePanel.add(countLabel);
+		banknoteStoragePanel.add(new JLabel("Banknote Capacity: "));
+		JLabel capcityLabel = new JLabel("" + SelfCheckout.getInstance().getConfiguration().banknoteStorageCapacity);
+		banknoteStoragePanel.add(capcityLabel);
+		JButton emptyButton = new JButton("Empty Storage");
+		emptyButton.addActionListener((e) -> emptyStorageUnit());
+		banknoteStoragePanel.add(emptyButton);
+		
+		add(banknoteStoragePanel);
+	}
+	
+	public void insertBanknote(BigDecimal denomination) {
+		Currency currency = SelfCheckout.getInstance().getConfiguration().getCurrency();
+		Banknote banknote = new Banknote(currency, denomination);
+		try {
+			SelfCheckout.getInstance().getHardware().getBanknoteInput().receive(banknote);
+		} catch (DisabledException | RuntimeException e) {
+			ErrorPopup.showError("Failed to insert banknote", "The banknote input is disabled.");
+		} catch(CashOverloadException e) {
+			ErrorPopup.showError("Failed to insert banknote", "The banknote input is overloaded.");
+		}
+		updateStorageCount();
+		updateInputDanglingStatus();
+	}
+	
+	public void removeDanglingFromInput(ActionEvent e) {
+		try {
+			SelfCheckout.getInstance().getHardware().getBanknoteInput().removeDanglingBanknote();
+		} catch(NullPointerSimulationException e1) {
+			ErrorPopup.showError("Failed to collect dangling banknotes", "There are no banknotes dangling to collect!");
+		}
+		updateInputDanglingStatus();
+	}
+	
+	public void updateInputDanglingStatus() {
+		boolean dangling = SelfCheckout.getInstance().getHardware().getBanknoteInput().hasDanglingBanknotes();
+		isDangling.setText("" + dangling);
+	}
+	
+	public void updateBanknoteOutput(ActionEvent e) {
+		BanknoteDispensationSlot slot = SelfCheckout.getInstance().getHardware().getBanknoteOutput();
+		try {
+			List<Banknote> collected = slot.removeDanglingBanknotes();
+			collectedBanknoteModel.clear();
+			collectedBanknoteModel.addAll(collected);
+		} catch(NullPointerSimulationException e1) {
+			ErrorPopup.showError("Failed to collect dangling banknotes", "There are no banknotes dangling to collect!");
+		}
+	}
+	
+	public void releaseBanknoteOutput(ActionEvent e) {
+		BanknoteDispensationSlot slot = SelfCheckout.getInstance().getHardware().getBanknoteOutput();
+		slot.dispense();
+	}
+	
+	public void reloadDispenser(BigDecimal denomination) {
+		Currency currency = SelfCheckout.getInstance().getConfiguration().getCurrency();
+		IBanknoteDispenser dispenser = SelfCheckout.getInstance().getHardware().getBanknoteDispensers().get(denomination);
+		while(dispenser.size() < dispenser.getCapacity()) {
+			try {
+				dispenser.load(new Banknote(currency, denomination));
+			} catch (SimulationException | CashOverloadException e) {
+				// This should never happen
+				e.printStackTrace();
+			}
+		}
+		updateBanknoteDispensers();
+	}
+	
+	public void emitDispenser(BigDecimal denomination) {
+		IBanknoteDispenser dispenser = SelfCheckout.getInstance().getHardware().getBanknoteDispensers().get(denomination);
+		
+		try {
+			dispenser.emit();
+		} catch (DisabledException e) {
+			ErrorPopup.showError("Failed to Dispsense Banknote", "The banknote dispenser is disabled.");
+		} catch (CashOverloadException e) {
+			ErrorPopup.showError("Failed to Dispsense Banknote", "The banknote dispenser is overloaded.");
+		} catch (NoCashAvailableException e) {
+			ErrorPopup.showError("Failed to Dispsense Banknote", "The banknote dispenser is empty!");
+		}
+		updateBanknoteDispensers();
+	}
+	
+	public void updateBanknoteDispensers() {
+		for(BigDecimal denomination : dispenserLabels.keySet()) {
+			IBanknoteDispenser dispenser = SelfCheckout.getInstance().getHardware().getBanknoteDispensers().get(denomination);
+			int count = dispenser.size();
+			dispenserLabels.get(denomination).setText(count + "");
+		}
+	}
+	
+	public void updateStorageCount() {
+		int count = SelfCheckout.getInstance().getHardware().getBanknoteStorage().getBanknoteCount();
+		countLabel.setText("" + count);
+	}
+	
+	public void emptyStorageUnit() {
+		SelfCheckout.getInstance().getHardware().getBanknoteStorage().unload();
+		updateStorageCount();
+	}
+}
