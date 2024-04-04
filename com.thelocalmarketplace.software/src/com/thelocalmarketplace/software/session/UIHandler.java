@@ -52,12 +52,7 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 
 	@Override
 	public void removeItemSelected(BarcodedProduct product) {
-		BarcodedItem item = new BarcodedItem(product.getBarcode(), new Mass(product.getExpectedWeight()));
-		super.getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
-		super.getUserSession().getTransaction().removeItem(product);
 		super.getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
-		//removeAnItem handles mass changes
-		SelfCheckout.getInstance().getHardware().getBaggingArea().removeAnItem(item);
 	}
 
 	@Override
