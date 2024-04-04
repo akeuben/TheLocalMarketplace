@@ -176,4 +176,11 @@ public class SelfCheckout {
 	public AbstractSelfCheckoutStation getHardware() {
 		return hardware;
 	}
+
+	/**
+	 * Turns on/enables the station.
+	 */
+	public void enableStation() {
+		hardware.turnOn();
+	}
 }
