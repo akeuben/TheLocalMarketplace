@@ -46,21 +46,18 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 
 	@Override
 	public void addBagSelected(ReusableBag bag) {
-		//sets state to add bag state
-		getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
-		//adds bag to transaction and checks weight
-		SelfCheckout.getInstance().getHardware().getBaggingArea().addAnItem(bag);
-		getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
+		// Sets state for attendant to verify conflict.
+		if (bag.getMass().compareTo(new Mass(BigInteger.valueOf(5_000_000))) > 1) {
+			bagTooHeavy();
+		}
 	}
 
 	@Override
 	public void removeItemSelected(BarcodedProduct product) {
-		BarcodedItem item = new BarcodedItem(product.getBarcode(), new Mass(product.getExpectedWeight()));
-		super.getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
-		super.getUserSession().getTransaction().removeItem(product);
 		super.getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
-		//removeAnItem handles mass changes
-		SelfCheckout.getInstance().getHardware().getBaggingArea().removeAnItem(item);
+		BarcodedItem item = new BarcodedItem(product.getBarcode(), new Mass(product.getExpectedWeight()));
+		super.getUserSession().getTransaction().removeItem(product);
+		//Program will wait until bagging is corrected and state is changed back to ready.
 	}
 
 	@Override
@@ -70,5 +67,9 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 		// TODO: Once state changes back to normal, will add the bulky item to the transaction (currently working with no attendant feedback)
 		super.getUserSession().getTransaction().skipBagging(product);
 		super.getUserSession().setState(UserSessionState.READY_FOR_ITEM);
+	}
+
+	public void bagTooHeavy() {
+		getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
 	}
 }
