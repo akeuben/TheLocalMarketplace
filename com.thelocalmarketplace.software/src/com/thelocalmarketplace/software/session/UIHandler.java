@@ -45,11 +45,10 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 	}
 
 	@Override
-	public void addBagSelected(Item bag) {
-		// Sets state for attendant to verify conflict.
-		if (bag.getMass().compareTo(new Mass(BigInteger.valueOf(5_000_000))) > 1) {
-			getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
-		}
+	public void addBagSelected() {
+		super.getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
+		//Program will wait until bagging is corrected and state is changed back to ready.
+
 	}
 
 	@Override

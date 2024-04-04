@@ -34,7 +34,7 @@ public interface UIObserver {
 	/**
 	 * announces when user selects option to add their own bags
 	 */
-	void addBagSelected(Item bag);
+	void addBagSelected();
 	
 	/**
 	 * announces when user selects option to remove item from order
