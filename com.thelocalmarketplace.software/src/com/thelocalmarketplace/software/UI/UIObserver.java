@@ -26,7 +26,7 @@ package com.thelocalmarketplace.software.UI;
  * Winston Wang - 30185321
  */
 
-import com.jjjwelectronics.bag.ReusableBag;
+import com.jjjwelectronics.Item;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 
 public interface UIObserver {
@@ -34,7 +34,7 @@ public interface UIObserver {
 	/**
 	 * announces when user selects option to add their own bags
 	 */
-	void addBagSelected(ReusableBag bag);
+	void addBagSelected(Item bag);
 	
 	/**
 	 * announces when user selects option to remove item from order
