@@ -46,6 +46,9 @@ public class SelfCheckout {
 	private AbstractSelfCheckoutStation hardware;
 
 	public boolean attendantStationFlagged; //placeholder for any case where the attendant station may be flagged
+
+	private boolean isStationEnabled;
+	private boolean disableStationQueued;
 	
 	private SelfCheckout(SelfCheckoutConfiguration configuration) {
 		currentSession = null;
@@ -100,6 +103,7 @@ public class SelfCheckout {
 		AbstractSelfCheckoutStation.configureCoinTrayCapacity(configuration.coinTrayCapacity);
 		instance = new SelfCheckout(configuration);
 		instance.configuration = configuration;
+		instance.enableStation();
 		
 		return instance;
 	}
@@ -136,6 +140,11 @@ public class SelfCheckout {
 		if(currentSession != null) {
 			throw new RuntimeException("There is already an active user session.");
 		}
+
+		if(!instance.isStationEnabled) {
+			throw new RuntimeException("A session cannot be started if the station is disabled.");
+		}
+
 		currentSession = new UserSession();
     	
 		currentSession.setState(UserSessionState.READY_FOR_ITEM);
@@ -166,6 +175,12 @@ public class SelfCheckout {
 		if(currentSession == null) return false;
 		
 		currentSession = null;
+
+		if(disableStationQueued) {
+			isStationEnabled = false;
+			disableStationQueued = false;
+		}
+
 		return true;
 	}
 
@@ -175,5 +190,37 @@ public class SelfCheckout {
 	 */
 	public AbstractSelfCheckoutStation getHardware() {
 		return hardware;
+	}
+
+	/**
+	 * Gets the value of isStationEnabled.
+	 * @return true if the station is currently enabled, false if it is currently disabled.
+	 */
+	public boolean getStationEnabledState() {
+		return isStationEnabled;
+	}
+
+	/**
+	 * Enables the self checkout station.
+	 * @return false if the station was already enabled; true if the station was changed from disabled to enabled.
+	 */
+	public boolean enableStation() {
+		boolean returnBool = !isStationEnabled;
+		isStationEnabled = true;
+		return returnBool;
+	}
+
+	/**
+	 * Attempts to disable the self checkout station.
+	 * @return true if the station was successfully disabled, false if it could not be disabled.
+	 */
+	public boolean disableStation() {
+		if(currentSession == null) {
+			isStationEnabled = false;
+			return true;
+		} else {
+			disableStationQueued = true;
+			return false;
+		}
 	}
 }
