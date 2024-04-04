@@ -35,7 +35,7 @@ public class CardTab extends JPanel {
 	JCheckBox hasChipField; 
 
 	public CardTab() {
-		setLayout(new GridLayout(0, 1));
+		setLayout(new GridLayout(0, 1, 20, 20));
 		setBorder(new EmptyBorder(10, 10, 10, 10));
 		
 		JPanel cardInputPanel = new JPanel();

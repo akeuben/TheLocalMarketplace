@@ -4,6 +4,9 @@ import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Locale;
 
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
 import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration.MachineRating;
@@ -34,6 +37,13 @@ public class Simulation {
 			100, 
 			100
 		));
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+				| UnsupportedLookAndFeelException e) {
+			// this should never happen!
+			e.printStackTrace();
+		}
 		UIHardwareSimulation.startHardwareSimulationUI();
 	}
 }

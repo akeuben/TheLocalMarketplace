@@ -1,0 +1,107 @@
+package com.thelocalmarketplace.software.UI.hardwaresim.components;
+
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.border.TitledBorder;
+
+import com.jjjwelectronics.Item;
+import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.OverloadedDevice;
+import com.jjjwelectronics.scale.AbstractElectronicScale;
+import com.jjjwelectronics.scale.IElectronicScale;
+import com.thelocalmarketplace.software.UI.components.ErrorPopup;
+
+public class ScaleComponent extends JPanel {
+
+	private static final long serialVersionUID = 2409413101383782924L;
+
+	private static class WeightedItem extends Item {
+
+		protected WeightedItem(Mass mass) {
+			super(mass);
+		}
+		
+		@Override
+		public String toString() {
+			return getMass().inGrams().toPlainString() + "g";
+		}
+		
+	}
+	
+	JLabel currentWeightLabel;
+	JTextField input;
+	DefaultListModel<WeightedItem> currentItemsOnScale = new DefaultListModel<WeightedItem>();
+	JList<WeightedItem> itemList;
+	
+	private IElectronicScale scale;
+
+	public ScaleComponent(IElectronicScale scale, String name) {
+		this.scale = scale;
+		
+		setBorder(new TitledBorder(name));
+		setLayout(new GridLayout(0, 2, 20, 20));
+		
+		add(new JLabel("Current Weight:"));
+		currentWeightLabel = new JLabel("0g");
+		add(currentWeightLabel);
+		
+		itemList = new JList<WeightedItem>(currentItemsOnScale);
+		
+		add(itemList);
+		
+		JButton removeBtn = new JButton("Remove Selected");
+		removeBtn.addActionListener(this::removeSelected);
+		add(removeBtn);
+		
+		input = new JTextField(20);
+		add(input);
+		JButton addWeightBtn = new JButton("Add");
+		addWeightBtn.addActionListener(this::addWeight);
+		
+		add(addWeightBtn);
+		
+		updateCurrentWeight();
+	}
+	
+	private void addWeight(ActionEvent e) {
+		
+		float weightInGrams;
+		try {
+			weightInGrams = Float.parseFloat(input.getText());
+		} catch(NumberFormatException e1) {
+			ErrorPopup.showError("Invalid Weight", "The weight " + input.getText() + " is not a valid weight.");
+			return;
+		}
+		WeightedItem item = new WeightedItem(new Mass(weightInGrams)) {};
+		scale.addAnItem(item);
+		currentItemsOnScale.add(currentItemsOnScale.getSize(), item);
+		updateCurrentWeight();
+	}
+	
+	private void updateCurrentWeight() {
+		AbstractElectronicScale scale = (AbstractElectronicScale) this.scale;
+		try {
+			currentWeightLabel.setText(scale.getCurrentMassOnTheScale().inGrams().toPlainString() + "g");
+		} catch (OverloadedDevice e) {
+			currentWeightLabel.setText("overloaded!");
+			e.printStackTrace();
+		}
+	}
+	
+	private void removeSelected(ActionEvent e) {
+		if(itemList.getSelectedIndex() == -1) {
+			ErrorPopup.showError("Failed to remove item", "No item is currently selected");
+			return;
+		}
+		WeightedItem item = currentItemsOnScale.remove(itemList.getSelectedIndex());
+		scale.removeAnItem(item);
+		updateCurrentWeight();
+	}
+}

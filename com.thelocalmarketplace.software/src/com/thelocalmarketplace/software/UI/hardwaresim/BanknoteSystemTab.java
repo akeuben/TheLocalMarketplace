@@ -41,7 +41,7 @@ private static final long serialVersionUID = -7616750139837556826L;
 	private JLabel isDangling;
 
 	public BanknoteSystemTab() {
-		setLayout(new GridLayout(0, 2));
+		setLayout(new GridLayout(0, 2, 20, 20));
 		setBorder(new EmptyBorder(10, 10, 10, 10));
 		
 		dispenserLabels = new HashMap<BigDecimal, JLabel>();

@@ -14,6 +14,7 @@ public class UIHardwareSimulation extends JFrame {
 		tabbedPane.addTab("Banknote System", new BanknoteSystemTab());
 		tabbedPane.addTab("Scanners", new ScannerTab());
 		tabbedPane.addTab("Card", new CardTab());
+		tabbedPane.addTab("Scales", new ScaleTab());
 		add(tabbedPane);
 		pack();
 		setVisible(true);

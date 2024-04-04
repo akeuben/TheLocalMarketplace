@@ -39,7 +39,7 @@ public class CoinSystemTab extends JPanel {
 	private JLabel countLabel;
 
 	public CoinSystemTab() {
-		setLayout(new GridLayout(0, 2));
+		setLayout(new GridLayout(0, 2, 220, 20));
 		setBorder(new EmptyBorder(10, 10, 10, 10));
 		
 		dispenserLabels = new HashMap<BigDecimal, JLabel>();
