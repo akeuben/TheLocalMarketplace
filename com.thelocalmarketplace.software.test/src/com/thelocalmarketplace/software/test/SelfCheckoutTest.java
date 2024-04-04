@@ -169,4 +169,39 @@ public class SelfCheckoutTest {
 		assertThrows(RuntimeException.class, () -> SelfCheckout.getInstance());
 	}
 	
+	@Test
+	public void testSelfCheckoutEnabledFromDisable() {
+		SelfCheckout.initialize(new SelfCheckoutConfiguration());
+		SelfCheckout.getInstance().disableStation();
+		assertEquals(true, SelfCheckout.getInstance().enableStation());
+	}
+	
+	@Test
+	public void testSelfCheckoutEnabledFromEnabled() {
+		SelfCheckout.initialize(new SelfCheckoutConfiguration());
+		assertEquals(false, SelfCheckout.getInstance().enableStation());
+	}
+	
+	@Test
+	public void testSelfCheckoutEnabledOnInitialize() {
+		SelfCheckout.initialize(new SelfCheckoutConfiguration());
+		assertEquals(true, SelfCheckout.getInstance().getStationEnabledState());
+	}
+	
+	@Test
+	public void testSelfCheckoutResponse() {
+		SelfCheckout.initialize(new SelfCheckoutConfiguration());
+		SelfCheckout.getInstance().enableStation();
+		assertEquals(true, SelfCheckout.getInstance().getStationEnabledState());
+		SelfCheckout.getInstance().disableStation();
+		assertEquals(false, SelfCheckout.getInstance().getStationEnabledState());
+	}
+	
+	@Test
+	public void testDisableDuringSession() {
+		SelfCheckout.initialize(new SelfCheckoutConfiguration());
+		SelfCheckout.getInstance().startNewSession();
+		assertEquals(false, SelfCheckout.getInstance().disableStation());
+	}
+	
 }
