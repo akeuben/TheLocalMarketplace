@@ -62,15 +62,14 @@ public class Transaction {
      * @param product item being added to transaction/products
      */
     public void addItem(BarcodedProduct product) {
-        if (product != null) {
-            products.add(product);
-            totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
-            expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM))));
-        }
-        else {
-            throw new NullPointerException("product");
-        }
-    }
+		if (product != null) {
+			products.add(product);
+			totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
+		} else {
+				throw new NullPointerException("product");
+		}
+	}
+
 
     /**
      * Removes weight of bulky item from transaction
@@ -96,8 +95,8 @@ public class Transaction {
     /**
      * updates transaction weight to include bag weight
      */
-    public void addBag(Mass bagMass) {
-		expectedMass = expectedMass.sum(bagMass);
+    public void addOwnBag() {
+		expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf(5_000_000)));
     }
 
 

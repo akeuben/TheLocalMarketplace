@@ -46,9 +46,9 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 
 	@Override
 	public void addBagSelected() {
-		super.getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
+		super.getUserSession().getTransaction().addOwnBag();
+		super.getUserSession().setState(UserSessionState.ADDING_BAGS_STATE);
 		//Program will wait until bagging is corrected and state is changed back to ready.
-
 	}
 
 	@Override
@@ -61,10 +61,13 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 
 	@Override
 	public void skipBaggingSelected(BarcodedProduct product) {
-		// TODO: Wait for attendant to change state of transaction back to normal, then add item.
 		super.getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
-		// TODO: Once state changes back to normal, will add the bulky item to the transaction (currently working with no attendant feedback)
 		super.getUserSession().getTransaction().skipBagging(product);
 		super.getUserSession().setState(UserSessionState.READY_FOR_ITEM);
+	}
+
+	@Override
+	public void doneAddingBagsSelected() {
+		super.getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
 	}
 }
