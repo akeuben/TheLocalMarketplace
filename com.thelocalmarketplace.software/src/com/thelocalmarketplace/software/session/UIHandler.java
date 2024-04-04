@@ -53,6 +53,7 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 	@Override
 	public void removeItemSelected(BarcodedProduct product) {
 		super.getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
+		super.getUserSession().getTransaction().removeItem(product);
 	}
 
 	@Override
