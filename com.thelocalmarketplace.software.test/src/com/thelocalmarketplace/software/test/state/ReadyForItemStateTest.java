@@ -37,10 +37,14 @@ import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
-import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
+import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.state.UserSessionState;
+import com.thelocalmarketplace.software.test.stubs.TestableAttendantStation;
+import com.thelocalmarketplace.software.test.stubs.TestableSelfCheckoutStationGold;
+
+import powerutility.PowerGrid;
 
 public class ReadyForItemStateTest {
 	
@@ -48,19 +52,20 @@ public class ReadyForItemStateTest {
 	
 	@Before
 	public void setup() {
-		SelfCheckout.uninitialize();
-		SelfCheckout.initialize(new SelfCheckoutConfiguration());
-		session = SelfCheckout.getInstance().startNewSession();
+		PowerGrid.engageUninterruptiblePowerSource();
+		Software.uninitialize();
+		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		session = Software.getInstance().startNewSession(0);
 	}
 	
 	@Test
 	public void testCoinSlotDisabled() {
-		SelfCheckout.uninitialize();
-		SelfCheckout.initialize(new SelfCheckoutConfiguration());
-		SelfCheckout.getInstance().startNewSession();
+		Software.uninitialize();
+		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		Software.getInstance().startNewSession(0);
 		session.setState(UserSessionState.READY_FOR_ITEM);
 		// The coin slot should be disabled.
-		assertTrue(SelfCheckout.getInstance().getHardware().getCoinSlot().isDisabled());
+		assertTrue(Software.getInstance().getHardware(0).getCoinSlot().isDisabled());
 	}
 	
 	@Test
@@ -69,7 +74,7 @@ public class ReadyForItemStateTest {
 		session.setState(UserSessionState.READY_FOR_ITEM);
 		
 		// The state should not change
-		UserSessionState newState = UserSessionState.READY_FOR_ITEM.onCoinInserted(null);
+		UserSessionState newState = UserSessionState.READY_FOR_ITEM.onCoinInserted(session, null);
 		
 		assertEquals(newState, null);
 	}
@@ -79,7 +84,7 @@ public class ReadyForItemStateTest {
 		session.setState(UserSessionState.READY_FOR_ITEM);
 		
 		// The state should not change
-		UserSessionState newState = UserSessionState.READY_FOR_ITEM.onWeightChanged(new Mass(50.0));
+		UserSessionState newState = UserSessionState.READY_FOR_ITEM.onWeightChanged(session, new Mass(50.0));
 
 		assertEquals(newState, UserSessionState.WAITING_FOR_BAGGING);
 	}
@@ -89,7 +94,7 @@ public class ReadyForItemStateTest {
 		session.setState(UserSessionState.READY_FOR_ITEM);
 		
 		// The state should not change
-		UserSessionState newState = UserSessionState.READY_FOR_ITEM.onWeightChanged(new Mass(0.001));
+		UserSessionState newState = UserSessionState.READY_FOR_ITEM.onWeightChanged(session, new Mass(0.001));
 
 		assertEquals(newState, null);
 	}
@@ -104,7 +109,7 @@ public class ReadyForItemStateTest {
 		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode, product);
 		
 		// The state should not change
-		UserSessionState newState = UserSessionState.READY_FOR_ITEM.onScanBarcode(barcode);
+		UserSessionState newState = UserSessionState.READY_FOR_ITEM.onScanBarcode(session, barcode);
 
 		assertEquals(session.getTransaction().getProducts()[0], product);
 		
@@ -118,7 +123,7 @@ public class ReadyForItemStateTest {
 		Barcode barcode = new Barcode(new Numeral[] {Numeral.seven});
 		
 		// The state should not change
-		UserSessionState newState = UserSessionState.READY_FOR_ITEM.onScanBarcode(barcode);
+		UserSessionState newState = UserSessionState.READY_FOR_ITEM.onScanBarcode(session, barcode);
 
 		assertEquals(session.getTransaction().getProducts().length, 0);
 		

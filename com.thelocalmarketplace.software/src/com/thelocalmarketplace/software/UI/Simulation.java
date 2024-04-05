@@ -16,7 +16,7 @@ import com.thelocalmarketplace.software.UI.hardwaresim.UIHardwareSimulation;
 
 public class Simulation {
 	public static void main(String[] args) {
-		SelfCheckout.initialize(new SelfCheckoutConfiguration(
+	/*	SelfCheckout.initialize(new SelfCheckoutConfiguration(
 			MachineRating.BRONZE, 
 			Currency.getInstance(Locale.CANADA), 
 			100, 
@@ -39,6 +39,7 @@ public class Simulation {
 			100, 
 			100
 		));
+		*/
 		UIHardwareSimulation.startHardwareSimulationUI();
 		SelfCheckoutComponent test = new SelfCheckoutComponent();
 		JFrame frame = new JFrame();

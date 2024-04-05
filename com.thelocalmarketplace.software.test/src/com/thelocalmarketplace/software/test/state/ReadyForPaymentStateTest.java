@@ -37,13 +37,19 @@ import org.junit.Test;
 
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
+import com.jjjwelectronics.OverloadedDevice;
+import com.jjjwelectronics.printer.IReceiptPrinter;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
-import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
+import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.payment.CashPayment;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.state.UserSessionState;
+import com.thelocalmarketplace.software.test.stubs.TestableAttendantStation;
+import com.thelocalmarketplace.software.test.stubs.TestableSelfCheckoutStationGold;
+
+import powerutility.PowerGrid;
 
 public class ReadyForPaymentStateTest {
 	
@@ -51,17 +57,26 @@ public class ReadyForPaymentStateTest {
 	
 	@Before
 	public void setup() {
-		SelfCheckout.uninitialize();
-		SelfCheckout.initialize(new SelfCheckoutConfiguration());
-		session = SelfCheckout.getInstance().startNewSession();
+		PowerGrid.engageUninterruptiblePowerSource();
+		Software.uninitialize();
+		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		session = Software.getInstance().startNewSession(0);
 		session.getTransaction().addItem(new BarcodedProduct(new Barcode(new Numeral[] {Numeral.five}), "test product", 100, 100));
+
+		IReceiptPrinter printer = Software.getInstance().getHardware(0).getPrinter();
+		try {
+			printer.addInk(1<<5);
+			printer.addPaper(1<<5);
+		} catch (OverloadedDevice e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Test
 	public void testEmptyTransaction() {
-		SelfCheckout.uninitialize();
-		SelfCheckout.initialize(new SelfCheckoutConfiguration());
-		session = SelfCheckout.getInstance().startNewSession();
+		Software.uninitialize();
+		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		session = Software.getInstance().startNewSession(0);
 		session.setState(UserSessionState.READY_FOR_PAYMENT);
 		assertEquals(session.getState(), UserSessionState.READY_FOR_ITEM);
 	}
@@ -70,7 +85,7 @@ public class ReadyForPaymentStateTest {
 	public void testCoinSlotEnabled() {
 		session.setState(UserSessionState.READY_FOR_PAYMENT);
 		// The coin slot should be enabled.
-		assertFalse(SelfCheckout.getInstance().getHardware().getCoinSlot().isDisabled());
+		assertFalse(Software.getInstance().getHardware(0).getCoinSlot().isDisabled());
 	}
 	
 	@Test
@@ -78,7 +93,7 @@ public class ReadyForPaymentStateTest {
 		session.getTransaction().addPayment(new CashPayment(BigDecimal.valueOf(1)));
 		session.setState(UserSessionState.READY_FOR_PAYMENT);
 		// The session should have ended.
-		assertNull(SelfCheckout.getInstance().getCurrentSession());
+		assertNull(Software.getInstance().getCurrentSession(0));
 	}
 	
 	@Test
@@ -86,7 +101,7 @@ public class ReadyForPaymentStateTest {
 		session.setState(UserSessionState.READY_FOR_PAYMENT);
 		
 		// The state should not change
-		UserSessionState newState = UserSessionState.READY_FOR_PAYMENT.onScanBarcode(null);
+		UserSessionState newState = UserSessionState.READY_FOR_PAYMENT.onScanBarcode(session, null);
 		
 		assertEquals(newState, null);
 	}
@@ -96,7 +111,7 @@ public class ReadyForPaymentStateTest {
 		session.setState(UserSessionState.READY_FOR_PAYMENT);
 		
 		// The state should not change
-		UserSessionState newState = UserSessionState.READY_FOR_PAYMENT.onWeightChanged(new Mass(150.00));
+		UserSessionState newState = UserSessionState.READY_FOR_PAYMENT.onWeightChanged(session, new Mass(150.00));
 
 		assertEquals(newState, UserSessionState.WAITING_FOR_BAGGING);
 	}
@@ -106,7 +121,7 @@ public class ReadyForPaymentStateTest {
 		session.setState(UserSessionState.READY_FOR_PAYMENT);
 		
 		// The state should not change
-		UserSessionState newState = UserSessionState.READY_FOR_PAYMENT.onWeightChanged(new Mass(100.01));
+		UserSessionState newState = UserSessionState.READY_FOR_PAYMENT.onWeightChanged(session, new Mass(100.01));
 		
 		assertEquals(newState, null);
 	}
@@ -115,10 +130,10 @@ public class ReadyForPaymentStateTest {
 	public void testInsertingCoins() {
 		session.getTransaction().addItem(new BarcodedProduct(new Barcode(new Numeral[] {Numeral.five}), "test product", 100, 100));
 		session.setState(UserSessionState.READY_FOR_PAYMENT);
-		UserSessionState newState = UserSessionState.READY_FOR_PAYMENT.onCoinInserted(new BigDecimal(1));
+		UserSessionState newState = UserSessionState.READY_FOR_PAYMENT.onCoinInserted(session, new BigDecimal(1));
 		assertEquals(newState, null);
 		assertEquals(session.getTransaction().getTotalCost(), BigDecimal.valueOf(1));
-		UserSessionState.READY_FOR_PAYMENT.onCoinInserted(new BigDecimal(1));
-		assertNull(SelfCheckout.getInstance().getCurrentSession());
+		UserSessionState.READY_FOR_PAYMENT.onCoinInserted(session, new BigDecimal(1));
+		assertNull(Software.getInstance().getCurrentSession(0));
 	}
 }
