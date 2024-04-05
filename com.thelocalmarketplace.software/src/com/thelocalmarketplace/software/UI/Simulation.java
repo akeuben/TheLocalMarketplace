@@ -2,6 +2,7 @@ package com.thelocalmarketplace.software.UI;
 
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.HashMap;
 import java.util.Locale;
 
 import javax.swing.UIManager;
@@ -9,9 +10,11 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import com.thelocalmarketplace.hardware.AttendantStation;
 import com.thelocalmarketplace.hardware.SelfCheckoutStationGold;
+import com.thelocalmarketplace.hardware.external.CardIssuer;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.UI.hardwaresim.UIHardwareSimulation;
+import com.thelocalmarketplace.software.payment.BankDataBase;
 
 public class Simulation {
 	public static void main(String[] args) {
@@ -38,7 +41,7 @@ public class Simulation {
 			}, 
 			100, 
 			100
-		), 2);
+		), 1);
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
@@ -46,6 +49,7 @@ public class Simulation {
 			// this should never happen!
 			e.printStackTrace();
 		}
-		UIHardwareSimulation.startHardwareSimulationUI(2);
+		BankDataBase.initialize(new HashMap<String, CardIssuer>());
+		UIHardwareSimulation.startHardwareSimulationUI(1);
 	}
 }

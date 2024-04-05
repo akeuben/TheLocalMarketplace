@@ -5,6 +5,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
 
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
@@ -32,7 +33,7 @@ public abstract class AbstractProductDatabaseTab<T extends Product> extends Abst
 		productList.setCellRenderer(this);
 
 		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(0, 1, 20, 20));
+		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		panel.setBorder(new TitledBorder("Create new Entry"));
 		JPanel entries = new JPanel();
 		entries.setLayout(new GridLayout(0, 2, 20, 20));
