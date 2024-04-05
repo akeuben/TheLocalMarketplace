@@ -53,7 +53,7 @@ public class CoinValidatorHandler extends AbstractUserSessionHandler implements 
 
 	@Override
 	public void validCoinDetected(CoinValidator validator, BigDecimal value) {
-		UserSessionState newState = getUserSession().getState().onCoinInserted(value);
+		UserSessionState newState = getUserSession().getState().onCoinInserted(getUserSession(), value);
 		if(newState != null) {
 			getUserSession().setState(newState); 
 		}

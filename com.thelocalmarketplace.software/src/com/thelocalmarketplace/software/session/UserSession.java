@@ -1,5 +1,8 @@
 package com.thelocalmarketplace.software.session;
 
+import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
+import com.thelocalmarketplace.software.Software;
+
 /**
  * SENG 300 Project - Group 1:
  * 
@@ -41,13 +44,14 @@ public class UserSession {
     private ReceiptPrinterHandler receiptPrinterHandler;
     private UIHandler uiHandler;
     private CardReaderHandler cardReaderHandler;
+    private int machineID;
     
     /**
      * Create a user session. This holds all data pertaining
      * to the user during a transaction at a self checkout machine.
      */
-    public UserSession() {
-    	this.transaction = new Transaction();
+    public UserSession(int machineID) {
+    	this.transaction = new Transaction(this);
 		
     	// Initialize the event handlers
     	this.coinValidatorHandler = new CoinValidatorHandler(this);
@@ -57,6 +61,7 @@ public class UserSession {
 		this.receiptPrinterHandler = new ReceiptPrinterHandler(this);
     	this.uiHandler = new UIHandler(this);
     	this.cardReaderHandler = new CardReaderHandler(this);
+    	this.machineID = machineID;
     }
     
     /**
@@ -67,9 +72,9 @@ public class UserSession {
 		if(newState == this.state) return;
     	
     	// Send relevant events and update the state field.
-    	if(this.state != null) this.state.onStateUnset();
+    	if(this.state != null) this.state.onStateUnset(this);
     	this.state = newState;
-    	newState = this.state.onStateSet();
+    	newState = this.state.onStateSet(this);
     	if(newState != null) {
     		setState(newState);
     	}
@@ -143,5 +148,21 @@ public class UserSession {
 	 */
 	public CardReaderHandler getCardReaderHandler() {
 		return this.cardReaderHandler; 
+	}
+	
+	/**
+	 * Gets the machine ID for the self checkout station of the current session
+	 * @return
+	 */
+	public int getMachineID() {
+		return this.machineID;
+	}
+	
+	/**
+	 * Gets the hardware for the self checkout station.
+	 * @return
+	 */
+	public AbstractSelfCheckoutStation getHardware() {
+		return Software.getInstance().getHardware(machineID);
 	}
 }

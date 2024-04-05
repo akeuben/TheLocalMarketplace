@@ -53,7 +53,7 @@ public class ElectronicScaleHandler extends AbstractUserSessionHandler implement
 
 	@Override
 	public void theMassOnTheScaleHasChanged(IElectronicScale scale, Mass mass) {
-		UserSessionState newState = getUserSession().getState().onWeightChanged(mass);
+		UserSessionState newState = getUserSession().getState().onWeightChanged(getUserSession(), mass);
 		if(newState != null) {
 			getUserSession().setState(newState); 
 		}
