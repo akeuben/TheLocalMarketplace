@@ -23,10 +23,10 @@ public class SelfCheckoutComponent extends JPanel{
 	private JPanel transactionViewer;
 	private JList<String> transactionList; 
 	private DefaultListModel<String> transactionListModel; 
-	private WrappedJComponent<JButton> alertButton; 
-	private WrappedJComponent<JLabel> statusField;
-	private WrappedJComponent<JButton> overrideButton;  
-	private WrappedJComponent<JButton> assistButton; 
+	private JPanel alertButton; 
+	private JPanel statusField;
+	private JPanel overrideButton;  
+	private JPanel assistButton; 
 	
 	// attendant's view of a self checkout machine
 	public SelfCheckoutComponent() {
@@ -35,12 +35,14 @@ public class SelfCheckoutComponent extends JPanel{
 		setBackground(Color.GRAY);
 		
 		// add the alert button
-		alertButton = new WrappedJComponent<JButton>(JButton.class, "Alert");
-		
+		alertButton = new JPanel();
+		JButton button = new JButton("Alert");
+		alertButton.setLayout(new GridLayout(1,1));
 		alertButton.setBackground(Color.GRAY);
-		alertButton.getComponent().setSize(75, 50);
-		alertButton.getComponent().addActionListener(new AlertButtonListener());
-		alertButton.setPreferredSize(alertButton.getComponent().getSize());
+		button.setSize(75, 50);
+		button.addActionListener(new AlertButtonListener());
+		alertButton.add(button); 
+		alertButton.setPreferredSize(button.getSize());
 		GridBagConstraints c = new GridBagConstraints();
 		c.gridx = 0; 
 		c.gridy = 0;
@@ -49,11 +51,14 @@ public class SelfCheckoutComponent extends JPanel{
 		add(alertButton, c);
 		
 		// add the status field
-		statusField = new WrappedJComponent<JLabel>(JLabel.class, "Status: Ready For Payment");
-		statusField.getComponent().setSize(300, 90);
+		statusField = new JPanel();
+		statusField.setLayout(new GridLayout(1,1));
+		JLabel label = new JLabel("Status: Ready For Payment");
+		label.setSize(300, 90);
 		statusField.setBackground(Color.GRAY);
-		statusField.getComponent().setFont(new Font("regular", Font.BOLD, 22));
-		statusField.setPreferredSize(statusField.getComponent().getSize());
+		label.setFont(new Font("regular", Font.BOLD, 22));
+		statusField.add(label);
+		statusField.setPreferredSize(label.getSize());
 		c = new GridBagConstraints(); 
 		c.gridx = 1; 
 		c.gridy = 0; 
@@ -63,10 +68,13 @@ public class SelfCheckoutComponent extends JPanel{
 		add(statusField, c);
 		
 		// add the override button 
-		overrideButton = new WrappedJComponent<JButton>(JButton.class, "Override");
-		overrideButton.getComponent().setSize(75,50);
-		overrideButton.setPreferredSize(overrideButton.getComponent().getSize());
+		overrideButton = new JPanel();
+		overrideButton.setLayout(new GridLayout(1,1));
+		button = new JButton("Override");
+		button.setSize(75,50);
+		overrideButton.setPreferredSize(button.getSize());
 		overrideButton.setBackground(Color.GRAY);
+		overrideButton.add(button); 
 		c = new GridBagConstraints();
 		c.gridx = 2; 
 		c.gridy = 0; 
@@ -93,10 +101,14 @@ public class SelfCheckoutComponent extends JPanel{
 		add(transactionViewer, c);
 		
 		// add the assist button
-		assistButton = new WrappedJComponent<JButton>(JButton.class, "Assist");
-		assistButton.getComponent().setSize(75, 50);
-		assistButton.setPreferredSize(assistButton.getComponent().getSize());
+		assistButton = new JPanel();
+		assistButton.setLayout(new GridLayout(1,1));
+		
+		button = new JButton("Assist");
+		button.setSize(75, 50);
+		assistButton.setPreferredSize(button.getSize());
 		assistButton.setBackground(Color.GRAY);
+		assistButton.add(button);
 		
 		c = new GridBagConstraints();
 		c.gridy = 2; 
@@ -105,9 +117,6 @@ public class SelfCheckoutComponent extends JPanel{
 		c.weighty = 0.1; 
 		c.anchor = GridBagConstraints.SOUTHWEST; 
 		add(assistButton, c);
-		setVisible(true);
-		
+		setVisible(true);	
 	}
-	
-
 }

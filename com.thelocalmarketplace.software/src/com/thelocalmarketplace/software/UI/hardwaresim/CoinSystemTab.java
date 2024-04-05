@@ -16,7 +16,6 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import com.tdc.CashOverloadException;
@@ -25,12 +24,12 @@ import com.tdc.NoCashAvailableException;
 import com.tdc.coin.Coin;
 import com.tdc.coin.ICoinDispenser;
 import com.thelocalmarketplace.hardware.CoinTray;
+import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.UI.components.ErrorPopup;
 
 import ca.ucalgary.seng300.simulation.SimulationException;
 
-public class CoinSystemTab extends JPanel {
-	/*
+public class CoinSystemTab extends AbstractHardwareSimTab {
 	private static final long serialVersionUID = -7616750139837556826L;
 	
 	private DefaultListModel<Coin> collectedCoinModel;
@@ -38,9 +37,8 @@ public class CoinSystemTab extends JPanel {
 	
 	private JLabel countLabel;
 
-	public CoinSystemTab() {
-		setLayout(new GridLayout(0, 2));
-		setBorder(new EmptyBorder(10, 10, 10, 10));
+	public CoinSystemTab(int machineId) {
+		super(machineId, 2);
 		
 		dispenserLabels = new HashMap<BigDecimal, JLabel>();
 		
@@ -60,7 +58,7 @@ public class CoinSystemTab extends JPanel {
 		coinDispenserScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		coinDispenserScrollPane.setBorder(new TitledBorder("Coin Dispensers"));
 		
-		for(BigDecimal denomination : SelfCheckout.getInstance().getConfiguration().getCoinDenominations()) {
+		for(BigDecimal denomination : Software.getInstance().getConfiguration().coinDenominations) {
 			JButton btn = new JButton("$" + denomination.toPlainString());
 			btn.addActionListener((e) -> this.insertCoin(denomination));
 			coinSlotPanel.add(btn);
@@ -105,7 +103,7 @@ public class CoinSystemTab extends JPanel {
 		updateStorageCount();
 		coinStoragePanel.add(countLabel);
 		coinStoragePanel.add(new JLabel("Coin Capacity: "));
-		JLabel capcityLabel = new JLabel("" + SelfCheckout.getInstance().getConfiguration().coinStorageUnitCapacity);
+		JLabel capcityLabel = new JLabel("" + Software.getInstance().getConfiguration().coinStorageUnitCapacity);
 		coinStoragePanel.add(capcityLabel);
 		JButton emptyButton = new JButton("Empty Storage");
 		emptyButton.addActionListener((e) -> emptyStorageUnit());
@@ -115,27 +113,29 @@ public class CoinSystemTab extends JPanel {
 	}
 	
 	public void insertCoin(BigDecimal denomination) {
-		Currency currency = SelfCheckout.getInstance().getConfiguration().getCurrency();
+		Currency currency = Software.getInstance().getConfiguration().currency;
 		Coin coin = new Coin(currency, denomination);
 		try {
-			SelfCheckout.getInstance().getHardware().getCoinSlot().receive(coin);
+			getHardware().getCoinSlot().receive(coin);
 		} catch (DisabledException | RuntimeException e) {
 			ErrorPopup.showError("Failed to insert coin", "The coin slot is disabled.");
 		} catch(CashOverloadException e) {
 			ErrorPopup.showError("Failed to insert coin", "The coin slot is overloaded.");
 		}
+		updateStorageCount();
+		updateCoinDispensers();
 	}
 	
 	public void updateCoinTray(ActionEvent e) {
-		CoinTray tray = SelfCheckout.getInstance().getHardware().getCoinTray();
+		CoinTray tray = getHardware().getCoinTray();
 		List<Coin> collected = tray.collectCoins();
 		collectedCoinModel.clear();
 		collectedCoinModel.addAll(collected);
 	}
 	
 	public void reloadDispenser(BigDecimal denomination) {
-		Currency currency = SelfCheckout.getInstance().getConfiguration().getCurrency();
-		ICoinDispenser dispenser = SelfCheckout.getInstance().getHardware().getCoinDispensers().get(denomination);
+		Currency currency = Software.getInstance().getConfiguration().currency;
+		ICoinDispenser dispenser = getHardware().getCoinDispensers().get(denomination);
 		while(dispenser.hasSpace()) {
 			try {
 				dispenser.load(new Coin(currency, denomination));
@@ -148,7 +148,7 @@ public class CoinSystemTab extends JPanel {
 	}
 	
 	public void emitDispenser(BigDecimal denomination) {
-		ICoinDispenser dispenser = SelfCheckout.getInstance().getHardware().getCoinDispensers().get(denomination);
+		ICoinDispenser dispenser = getHardware().getCoinDispensers().get(denomination);
 		
 		try {
 			dispenser.emit();
@@ -164,20 +164,19 @@ public class CoinSystemTab extends JPanel {
 	
 	public void updateCoinDispensers() {
 		for(BigDecimal denomination : dispenserLabels.keySet()) {
-			ICoinDispenser dispenser = SelfCheckout.getInstance().getHardware().getCoinDispensers().get(denomination);
+			ICoinDispenser dispenser = getHardware().getCoinDispensers().get(denomination);
 			int count = dispenser.size();
 			dispenserLabels.get(denomination).setText(count + "");
 		}
 	}
 	
 	public void updateStorageCount() {
-		int count = SelfCheckout.getInstance().getHardware().getCoinStorage().getCoinCount();
+		int count = getHardware().getCoinStorage().getCoinCount();
 		countLabel.setText("" + count);
 	}
 	
 	public void emptyStorageUnit() {
-		SelfCheckout.getInstance().getHardware().getCoinStorage().unload();
+		getHardware().getCoinStorage().unload();
 		updateStorageCount();
 	}
-	*/
 }

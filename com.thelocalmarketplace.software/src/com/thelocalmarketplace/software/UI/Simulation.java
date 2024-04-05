@@ -6,16 +6,21 @@ import java.util.Currency;
 import java.util.Locale;
 
 import javax.swing.JFrame;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
+import com.thelocalmarketplace.hardware.AttendantStation;
+import com.thelocalmarketplace.hardware.SelfCheckoutStationGold;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
-import com.thelocalmarketplace.software.UI.Attendant.AttendantUI;
+import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.UI.Attendant.SelfCheckoutComponent;
 import com.thelocalmarketplace.software.UI.hardwaresim.UIHardwareSimulation;
 
 public class Simulation {
 	public static void main(String[] args) {
-	/*	SelfCheckout.initialize(new SelfCheckoutConfiguration(
-			MachineRating.BRONZE, 
+		Software.initialize(new SelfCheckoutConfiguration(
+			SelfCheckoutStationGold.class,
+			AttendantStation.class,
 			Currency.getInstance(Locale.CANADA), 
 			100, 
 			1000, 
@@ -36,17 +41,20 @@ public class Simulation {
 			}, 
 			100, 
 			100
-		));
-		*/
-		UIHardwareSimulation.startHardwareSimulationUI();
-		SelfCheckoutComponent test = new SelfCheckoutComponent();
-		JFrame frame = new JFrame();
-		frame.setSize(475,600);
-		frame.setLayout(new GridLayout(1,1));
-		frame.getContentPane().add(test);
-		frame.setVisible(true);
-		
-		
+		), 2);
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+				| UnsupportedLookAndFeelException e) {
+			// this should never happen!
+			e.printStackTrace();
+		}
+		UIHardwareSimulation.startHardwareSimulationUI(2);
+		JFrame test = new JFrame();
+		test.setSize(475, 600);
+		test.setLayout(new GridLayout(1,1));
+		test.add(new SelfCheckoutComponent());
+		test.setVisible(true);
 		
 	}
 }
