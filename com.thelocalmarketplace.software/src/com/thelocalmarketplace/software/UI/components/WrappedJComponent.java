@@ -4,13 +4,15 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
 
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 
 public class WrappedJComponent<T extends Component> extends JPanel {
 	private static final long serialVersionUID = 7945193115284784435L;
 	private T component;
 
-	public WrappedJComponent(Class<T> clazz, Object ...args) {
+	public WrappedJComponent(Class<? extends T> clazz, Object ...args) {
 		Class<?>[] argTypes = new Class<?>[args.length];
 		for(int i = 0; i < args.length; i++) {
 			argTypes[i] = args[i].getClass();
@@ -23,7 +25,7 @@ public class WrappedJComponent<T extends Component> extends JPanel {
 		}
 		add(component);
 	}
-	
+
 	public T getComponent() {
 		return component;
 	}
