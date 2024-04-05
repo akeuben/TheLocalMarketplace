@@ -59,6 +59,8 @@ public class Software {
 		disableStationQueued = new boolean[stationCount];
 		try {
 			attendantStation = configuration.attendantType.getConstructor().newInstance();
+			attendantStation.plugIn(PowerGrid.instance());
+			attendantStation.turnOn();
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
 			System.out.println("Failed to create the attendant station. The given class does not have a constructor with no formal parameters.");

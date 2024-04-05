@@ -8,6 +8,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
@@ -17,6 +19,7 @@ import com.jjjwelectronics.OverloadedDevice;
 import com.jjjwelectronics.scale.AbstractElectronicScale;
 import com.jjjwelectronics.scale.IElectronicScale;
 import com.thelocalmarketplace.software.UI.components.ErrorPopup;
+import com.thelocalmarketplace.software.UI.components.WrappedJComponent;
 
 public class ScaleComponent extends JPanel {
 
@@ -36,7 +39,7 @@ public class ScaleComponent extends JPanel {
 	}
 	
 	JLabel currentWeightLabel;
-	JTextField input;
+	WrappedJComponent<JTextField> input;
 	DefaultListModel<WeightedItem> currentItemsOnScale = new DefaultListModel<WeightedItem>();
 	JList<WeightedItem> itemList;
 	
@@ -54,16 +57,18 @@ public class ScaleComponent extends JPanel {
 		
 		itemList = new JList<WeightedItem>(currentItemsOnScale);
 		
-		add(itemList);
+		JScrollPane itemListScrollPane = new JScrollPane(itemList);
 		
-		JButton removeBtn = new JButton("Remove Selected");
-		removeBtn.addActionListener(this::removeSelected);
+		add(itemListScrollPane);
+		
+		WrappedJComponent<JButton> removeBtn = WrappedJComponent.create(JButton.class, String.class, "Remove Selected");
+		removeBtn.getComponent().addActionListener(this::removeSelected);
 		add(removeBtn);
 		
-		input = new JTextField(20);
+		input = new WrappedJComponent<JTextField>(JTextField.class, new Object[] {10}, new Class<?>[] {Integer.TYPE});
 		add(input);
-		JButton addWeightBtn = new JButton("Add");
-		addWeightBtn.addActionListener(this::addWeight);
+		WrappedJComponent<JButton> addWeightBtn = WrappedJComponent.create(JButton.class, String.class, "Add");
+		addWeightBtn.getComponent().addActionListener(this::addWeight);
 		
 		add(addWeightBtn);
 		
@@ -74,9 +79,9 @@ public class ScaleComponent extends JPanel {
 		
 		float weightInGrams;
 		try {
-			weightInGrams = Float.parseFloat(input.getText());
+			weightInGrams = Float.parseFloat(input.getComponent().getText());
 		} catch(NumberFormatException e1) {
-			ErrorPopup.showError("Invalid Weight", "The weight " + input.getText() + " is not a valid weight.");
+			ErrorPopup.showError("Invalid Weight", "The weight " + input.getComponent().getText() + " is not a valid weight.");
 			return;
 		}
 		WeightedItem item = new WeightedItem(new Mass(weightInGrams)) {};

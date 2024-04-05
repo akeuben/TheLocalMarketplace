@@ -122,6 +122,8 @@ public class CoinSystemTab extends AbstractHardwareSimTab {
 		} catch(CashOverloadException e) {
 			ErrorPopup.showError("Failed to insert coin", "The coin slot is overloaded.");
 		}
+		updateStorageCount();
+		updateCoinDispensers();
 	}
 	
 	public void updateCoinTray(ActionEvent e) {
