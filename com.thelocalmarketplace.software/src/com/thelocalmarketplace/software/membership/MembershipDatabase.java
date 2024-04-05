@@ -26,6 +26,7 @@
 package com.thelocalmarketplace.software.membership;
 
 import java.util.HashMap;
+import java.util.TreeMap;
 
 /**
  * Represents the membership database in lieu of real database software
@@ -34,37 +35,75 @@ public class MembershipDatabase {
 
     private static MembershipDatabase instance;
 
-    private HashMap<Long, Membership> memberDatabase;//Long represents user id
+    private TreeMap<Long, Membership> memberIDDatabase;//Long represents user id
+    private TreeMap<String, Membership> memberNameDatabase;
     public static MembershipDatabase getInstance() {
         return instance;
     }
 
-    private MembershipDatabase(HashMap<Long, Membership> memberDatabase) {
-        this.memberDatabase = memberDatabase;
+    private MembershipDatabase(TreeMap<Long, Membership> memberIDDatabase) {
+        this.memberIDDatabase = memberIDDatabase;
+        for (Membership m : memberIDDatabase.values()){
+            memberNameDatabase.put(m.getMemberName(), m);
+        }
     }
 
-    public static void initialize(HashMap<Long, Membership> memberDatabase) throws RuntimeException {
+    public static void initialize(TreeMap<Long, Membership> memberIDDatabase) throws RuntimeException {
         if(instance != null){
             throw new RuntimeException("Database already exists");
         }
 
-        instance = new MembershipDatabase(memberDatabase);
+        instance = new MembershipDatabase(memberIDDatabase);
     }
 
+    /**
+     * Check if database has member with id
+     * @param id id number to check
+     * @return bool conditional on member database containing member with id
+     */
     public boolean validateMembershipNumber(long id){
-        return memberDatabase.containsKey((Long) id);
+        return memberIDDatabase.containsKey((Long) id);
     }
 
+    /**
+     * Get the points a member has
+     * @param id member id
+     * @return Points the member has. Always 0 if the member isn't in the database
+     */
     public long getMemberPoints(long id){
-
-        return validateMembershipNumber(id) ? memberDatabase.get(id).getMemberPoints() : 0;
-        /*
-        //In case membership doesn't get validated first
-        if(!validateMembershipNumber(id)){
-            return 0;
-        }
-        return memberDatabase.get(id).getMemberPoints();
-        */
+        return validateMembershipNumber(id) ? memberIDDatabase.get(id).getMemberPoints() : 0;
     }
 
+    /**
+     * Adjust the amount of points a membership has
+     * @param id The id of the member whose points are to be changed
+     * @param points The points value (pos/neg) to adjust by
+     */
+    public void adjustMemberPoints(long id, long points){
+        //In case membership doesn't get validated first
+        long deltaFinal = validateMembershipNumber(id) ? points : 0;
+        memberIDDatabase.get(id).changeMemberPoints(deltaFinal);
+    }
+
+    /**
+     * Add a new membership to the database
+     * @param memberName The name of the member
+     * @param ignoreSameName In the case of a member sharing a name with someone else.
+     *                       Setting this to true will create a new membership
+     *                       in the databse. Even if there already exists soemone with the
+     *                       same name
+     * @return The id assigned to the new member. Will return -1 if member with same name already exists
+     */
+    public long addNewMembership(String memberName, boolean ignoreSameName){
+        if(memberNameDatabase.containsKey(memberName) && !ignoreSameName){
+            return -1;
+        }
+        long newid = memberIDDatabase.lastKey();
+        newid += 1;
+        Membership newMember = new Membership(memberName, newid, 0);
+        memberIDDatabase.put(newid, newMember);
+        memberNameDatabase.put(memberName, newMember);
+        return newid;
+
+    }
 }

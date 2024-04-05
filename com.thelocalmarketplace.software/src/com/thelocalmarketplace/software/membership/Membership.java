@@ -35,6 +35,12 @@ public class Membership {
     private long membershipNumber;
     private long memberPoints;
 
+    public Membership(String memberName, long membershipNumber, long memberPoints) {
+        this.memberName = memberName;
+        this.membershipNumber = membershipNumber;
+        this.memberPoints = memberPoints;
+    }
+
     public String getMemberName() {
         return memberName;
     }
@@ -45,5 +51,9 @@ public class Membership {
 
     public long getMemberPoints() {
         return memberPoints;
+    }
+
+    public void changeMemberPoints(long memberPoints) {
+        this.memberPoints += memberPoints;
     }
 }
