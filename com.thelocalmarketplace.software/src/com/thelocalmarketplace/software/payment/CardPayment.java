@@ -33,7 +33,6 @@ import com.jjjwelectronics.IDeviceListener;
 import com.jjjwelectronics.card.Card.CardData;
 import com.jjjwelectronics.card.CardReaderListener;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
-import com.thelocalmarketplace.software.SelfCheckout;
 
 public class CardPayment implements CardReaderListener, IPayment{
 
@@ -49,8 +48,13 @@ public class CardPayment implements CardReaderListener, IPayment{
 	 * Will attempt to post a transaction using a debit card via swiping
 	 * @return result of transaction, true if successful, false if not
 	 */
+<<<<<<< HEAD
 	public boolean makePayment(CardData data) {
 		this.amountDue = SelfCheckout.getInstance().getCurrentSession().getTransaction().getTotalCost();
+=======
+	public boolean swipePayment(CardData data, BigDecimal amount) {
+		this.amountDue = amount;
+>>>>>>> main
 		// check to see if the bank that corresponds to the card's type exists 
 		if(BankDataBase.getInstance().getDataBase().containsKey(data.getType().toLowerCase())) {
 			

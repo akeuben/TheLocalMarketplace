@@ -30,17 +30,17 @@ import java.math.BigDecimal;
 
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.card.Card.CardData;
-import com.thelocalmarketplace.software.SelfCheckout;
-import com.thelocalmarketplace.software.payment.CashPayment;
 import com.thelocalmarketplace.software.payment.CardPayment;
+import com.thelocalmarketplace.software.payment.CashPayment;
 import com.thelocalmarketplace.software.payment.Transaction;
+import com.thelocalmarketplace.software.session.UserSession;
 
 public class ReadyForPaymentState implements IUserSessionState<UserSessionState> {
 
 	@Override
-	public UserSessionState onStateSet() {
+	public UserSessionState onStateSet(UserSession session) {
 		//Get current balance by creating a transaction instance
-		Transaction transaction = SelfCheckout.getInstance().getCurrentSession().getTransaction(); 
+		Transaction transaction = session.getTransaction(); 
 		
 		if (transaction.getProducts().length == 0) {
 			//If item is at a 0, set state to ready for item
@@ -57,22 +57,22 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 		
 		// Enable the coin slot to allow the user to insert a coin while the software
 		// is in the correct state
-		SelfCheckout.getInstance().getHardware().getCoinSlot().enable();
-		SelfCheckout.getInstance().getHardware().getBanknoteInput().enable();
+		session.getHardware().getCoinSlot().enable();
+		session.getHardware().getBanknoteInput().enable();
 		return null; 
 	}
 	 
 	@Override
-	public UserSessionState onWeightChanged(Mass mass) {
+	public UserSessionState onWeightChanged(UserSession session, Mass mass) {
 		// Possible Weight Discrepancy
 		
 		// Get the relevant masses to compare
-		Transaction transaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();
+		Transaction transaction = session.getTransaction();
 		Mass expectedMass = transaction.getExpectedMass();
 		Mass absoluteDifference = expectedMass.difference(mass).abs();
 		
 		// The maximum difference between masses.
-		Mass maximumDifference = SelfCheckout.getInstance().getHardware().getBaggingArea().getSensitivityLimit();
+		Mass maximumDifference = session.getHardware().getBaggingArea().getSensitivityLimit();
 		
 		// Check if we are within the margin of error. If so, do nothing
 		if(absoluteDifference.compareTo(maximumDifference) == 1) {
@@ -85,12 +85,12 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 	}
 
 	@Override
-	public UserSessionState onCoinInserted(BigDecimal value) {
+	public UserSessionState onCoinInserted(UserSession session, BigDecimal value) {
 		//Create CoinPayment class instance
 		CashPayment payment = new CashPayment(value);
 		
 		//Adding payment onto the current transaction 
-		Transaction transaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();
+		Transaction transaction = session.getTransaction();
 	    transaction.addPayment(payment);
 	    
 	    //Checking when the balance goes down to zero 
@@ -100,18 +100,18 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-	        SelfCheckout.getInstance().getCurrentSession().setState(UserSessionState.PRINT_RECEIPT);
+	        session.setState(UserSessionState.PRINT_RECEIPT);
 	    }
 	    
 	    return null;
 	}
 	
-	public UserSessionState onBanknoteInserted(BigDecimal value) {
+	public UserSessionState onBanknoteInserted(UserSession session, BigDecimal value) {
 		//Create CoinPayment class instance
 		CashPayment payment = new CashPayment(value);
 		
 		//Adding payment onto the current transaction 
-		Transaction transaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();
+		Transaction transaction = session.getTransaction();
 	    transaction.addPayment(payment);
 	    
 	    //Checking when the balance goes down to zero 
@@ -121,21 +121,22 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-	        SelfCheckout.getInstance().getCurrentSession().setState(UserSessionState.PRINT_RECEIPT);
+	        session.setState(UserSessionState.PRINT_RECEIPT);
 	    }
 	    
 	    return null;
 	}
 	
 	@Override 
-	public UserSessionState onCardDataRead(CardData data) {
+	public UserSessionState onCardDataRead(UserSession session, CardData data) {
 		// create a card payment instance, for now it will be debit but I might refactor those two classes into one
 		CardPayment payment = new CardPayment();
-		Transaction transaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();; 
-		if(data != null) {
-			payment.makePayment(data); 
-			transaction.addPayment(payment);
-		}
+
+		Transaction transaction = session.getTransaction();; 
+		payment.swipePayment(data, transaction.getTotalCost()); 
+		System.out.println("Paid amount: " + payment.getAmountPaid().doubleValue());
+		transaction.addPayment(payment);
+
 		
 		
 		if(transaction.getTotalCost().compareTo(BigDecimal.ZERO) <= 0) {
@@ -144,7 +145,7 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-	        SelfCheckout.getInstance().getCurrentSession().setState(UserSessionState.PRINT_RECEIPT);
+	        session.setState(UserSessionState.PRINT_RECEIPT);
 		}
 		return null;
 	}

@@ -1,5 +1,12 @@
 package com.thelocalmarketplace.software.test.state;
 
+import static org.junit.Assert.assertNull;
+
+import java.math.BigDecimal;
+
+import org.junit.Before;
+import org.junit.Test;
+
 /**
  * SENG 300 Project - Group 1:
  * 
@@ -27,68 +34,69 @@ package com.thelocalmarketplace.software.test.state;
  */
 
 import com.jjjwelectronics.Mass;
-import com.thelocalmarketplace.software.SelfCheckout;
+import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
+import com.thelocalmarketplace.software.Software;
+import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.state.PrintReceiptState;
 import com.thelocalmarketplace.software.state.UserSessionState;
-import com.jjjwelectronics.scanner.Barcode;
-import org.junit.Before;
-import org.junit.Test;
+import com.thelocalmarketplace.software.test.stubs.TestableAttendantStation;
+import com.thelocalmarketplace.software.test.stubs.TestableSelfCheckoutStationGold;
 
-import static org.junit.Assert.assertNull;
-
-import java.math.BigDecimal;
+import powerutility.PowerGrid;
 
 
 public class PrintReceiptStateTest {
     private PrintReceiptState state;
+    private UserSession session;
     private Barcode tempBarcode;
     private Mass tempMass;
 
 
     @Before
     public void setUp() {
-		SelfCheckout.uninitialize();
-		SelfCheckout.initialize(new SelfCheckoutConfiguration());
-		SelfCheckout.getInstance().startNewSession();
+		PowerGrid.engageUninterruptiblePowerSource();
+		Software.uninitialize();
+		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		session = Software.getInstance().startNewSession(0);
 		state = new PrintReceiptState();
     }
 
     @Test
     public void testOnStateSet() {
-	    state.onStateSet();
+	    state.onStateSet(session);
     }
     
     @Test
     public void testOnStateUnset() {
-        state.onStateUnset();
+        state.onStateUnset(session);
         // Verify no state changes or method calls
     }
     
     @Test
     public void testOnWeightChanged() {
-		UserSessionState result = state.onWeightChanged(tempMass);
+		UserSessionState result = state.onWeightChanged(session, tempMass);
         assertNull(result);
         // Verify no state changes or method calls
     }
     
     @Test
     public void testOnScanBarcode() {
-		UserSessionState result = state.onScanBarcode(tempBarcode);
+		UserSessionState result = state.onScanBarcode(session, tempBarcode);
         assertNull(result);
         // Verify no state changes or method calls
     }
     
     @Test
     public void testOnCoinInserted() {
-        UserSessionState result = state.onCoinInserted(BigDecimal.ONE);
+        UserSessionState result = state.onCoinInserted(session, BigDecimal.ONE);
         assertNull(result);
         // Verify no state changes or method calls
     }
 
     @Test
     public void testOnPrinterRefilled() {
-        UserSessionState result = state.onPrinterRefilled();
+        UserSessionState result = state.onPrinterRefilled(session);
         assertNull(result);
         // Verify no state changes or method calls
     }
