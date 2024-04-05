@@ -25,7 +25,6 @@
  */
 package com.thelocalmarketplace.software.membership;
 
-import java.util.HashMap;
 import java.util.TreeMap;
 
 /**
@@ -61,8 +60,11 @@ public class MembershipDatabase {
      * @param id id number to check
      * @return bool conditional on member database containing member with id
      */
-    public boolean validateMembershipNumber(long id){
-        return memberIDDatabase.containsKey((Long) id);
+    public boolean validateMembership(long id){
+        return memberIDDatabase.containsKey(id);
+    }
+    public boolean validateMembership(String name){
+        return memberNameDatabase.containsKey(name);
     }
 
     /**
@@ -71,7 +73,7 @@ public class MembershipDatabase {
      * @return Points the member has. Always 0 if the member isn't in the database
      */
     public long getMemberPoints(long id){
-        return validateMembershipNumber(id) ? memberIDDatabase.get(id).getMemberPoints() : 0;
+        return validateMembership(id) ? memberIDDatabase.get(id).getMemberPoints() : 0;
     }
 
     /**
@@ -81,8 +83,10 @@ public class MembershipDatabase {
      */
     public void adjustMemberPoints(long id, long points){
         //In case membership doesn't get validated first
-        long deltaFinal = validateMembershipNumber(id) ? points : 0;
-        memberIDDatabase.get(id).changeMemberPoints(deltaFinal);
+        if(validateMembership(id)){
+            memberIDDatabase.get(id).changeMemberPoints(points);
+        }
+
     }
 
     /**
@@ -90,9 +94,10 @@ public class MembershipDatabase {
      * @param memberName The name of the member
      * @param ignoreSameName In the case of a member sharing a name with someone else.
      *                       Setting this to true will create a new membership
-     *                       in the databse. Even if there already exists soemone with the
+     *                       in the database. Even if there already exists someone with the
      *                       same name
-     * @return The id assigned to the new member. Will return -1 if member with same name already exists
+     * @return The id assigned to the new member. Will return -1 if member with same name
+     * already exists and ignoreSameName is false;
      */
     public long addNewMembership(String memberName, boolean ignoreSameName){
         if(memberNameDatabase.containsKey(memberName) && !ignoreSameName){
