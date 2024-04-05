@@ -1,5 +1,13 @@
 package com.thelocalmarketplace.software.test;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
+
 /**
  * SENG 300 Project - Group 1:
  * 
@@ -26,46 +34,49 @@ package com.thelocalmarketplace.software.test;
  * Winston Wang - 30185321
  */
 
-import com.thelocalmarketplace.software.SelfCheckout;
-import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
+import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.session.ReceiptPrinterHandler;
-import static org.junit.Assert.*;
+import com.thelocalmarketplace.software.session.UserSession;
+import com.thelocalmarketplace.software.test.stubs.TestableAttendantStation;
+import com.thelocalmarketplace.software.test.stubs.TestableSelfCheckoutStationGold;
 
-import org.junit.Before;
-import org.junit.Test;
+import powerutility.PowerGrid;
 
 public class ReceiptHandlerTest {
 	
+	UserSession session;
+	
 	@Before
 	public void setUp() {
-		SelfCheckout.uninitialize();
-		SelfCheckout.initialize(new SelfCheckoutConfiguration());
-		SelfCheckout.getInstance().startNewSession();
+		PowerGrid.engageUninterruptiblePowerSource();
+		Software.uninitialize();
+		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		session = Software.getInstance().startNewSession(0);
 	}
 
     @Test
     public void testRefillFlagsSetWhenNeitherFlagSet() {
-        ReceiptPrinterHandler printerHandler = new ReceiptPrinterHandler(null);
+        ReceiptPrinterHandler printerHandler = new ReceiptPrinterHandler(session);
         assertFalse(printerHandler.refillFlagsSet());
     }
 
     @Test
     public void testRefillFlagsSetWhenInkFlagSet() {
-        ReceiptPrinterHandler printerHandler = new ReceiptPrinterHandler(null);
+        ReceiptPrinterHandler printerHandler = new ReceiptPrinterHandler(session);
         printerHandler.thePrinterIsOutOfInk();
         assertTrue(printerHandler.refillFlagsSet());
     }
 
     @Test
     public void testRefillFlagsSetWhenPaperFlagSet() {
-        ReceiptPrinterHandler printerHandler = new ReceiptPrinterHandler(null);
+        ReceiptPrinterHandler printerHandler = new ReceiptPrinterHandler(session);
         printerHandler.thePrinterIsOutOfPaper();
         assertTrue(printerHandler.refillFlagsSet());
     }
 
     @Test
     public void testRefillFlagsSetWhenBothFlagsSet() {
-        ReceiptPrinterHandler printerHandler = new ReceiptPrinterHandler(null);
+        ReceiptPrinterHandler printerHandler = new ReceiptPrinterHandler(session);
         printerHandler.thePrinterIsOutOfPaper();
         printerHandler.thePrinterIsOutOfInk();
         assertTrue(printerHandler.refillFlagsSet());
@@ -73,7 +84,7 @@ public class ReceiptHandlerTest {
 
     @Test
     public void testRefillFlagsSetWhenFlagsResetAfterRefill() {
-        ReceiptPrinterHandler printerHandler = new ReceiptPrinterHandler(null);
+        ReceiptPrinterHandler printerHandler = new ReceiptPrinterHandler(session);
         printerHandler.thePrinterIsOutOfPaper();
         printerHandler.thePrinterIsOutOfInk();
         assertTrue(printerHandler.refillFlagsSet());

@@ -38,28 +38,33 @@ import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
-import com.thelocalmarketplace.software.SelfCheckoutConfiguration.MachineRating;
+import com.thelocalmarketplace.software.Software;
+import com.thelocalmarketplace.software.test.stubs.TestableAttendantStation;
+import com.thelocalmarketplace.software.test.stubs.TestableSelfCheckoutStationGold;
+
+import powerutility.PowerGrid;
 
 public class SelfCheckoutTest {
 	
 	@Before
 	public void setup() {
-		SelfCheckout.uninitialize();
+		PowerGrid.engageUninterruptiblePowerSource();
+		Software.uninitialize();
 	}
 	
 	@Test
 	public void testDoubleInitilization() {
-		SelfCheckout.initialize(new SelfCheckoutConfiguration());
-		assertThrows(RuntimeException.class, () -> SelfCheckout.initialize(new SelfCheckoutConfiguration()));
-		SelfCheckout.uninitialize();
+		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		assertThrows(RuntimeException.class, () -> Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 0));
+		Software.uninitialize();
 	}
 	
 	@Test
 	public void testSessionWithBronzeMachine() {
-		SelfCheckout.initialize(new SelfCheckoutConfiguration(
-			MachineRating.BRONZE, 
+		Software.initialize(new SelfCheckoutConfiguration(
+			TestableSelfCheckoutStationGold.class,
+			TestableAttendantStation.class,
 			Currency.getInstance(Locale.CANADA), 
 			100, 
 			1000, 
@@ -67,15 +72,16 @@ public class SelfCheckoutTest {
 			new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 
 			100, 
 			100
-		));
-		assertNotNull(SelfCheckout.getInstance());
-		SelfCheckout.uninitialize();
+		), 1);
+		assertNotNull(Software.getInstance());
+		Software.uninitialize();
 	}
 	
 	@Test
 	public void testSessionWithSilverMachine() {
-		SelfCheckout.initialize(new SelfCheckoutConfiguration(
-			MachineRating.SILVER, 
+		Software.initialize(new SelfCheckoutConfiguration(
+			TestableSelfCheckoutStationGold.class,
+			TestableAttendantStation.class,
 			Currency.getInstance(Locale.CANADA), 
 			100, 
 			1000, 
@@ -83,14 +89,15 @@ public class SelfCheckoutTest {
 			new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 
 			100, 
 			100
-		));
-		assertNotNull(SelfCheckout.getInstance());
+		), 1);
+		assertNotNull(Software.getInstance());
 	}
 	
 	@Test
 	public void testSessionWithGoldMachine() {
-		SelfCheckout.initialize(new SelfCheckoutConfiguration(
-			MachineRating.GOLD, 
+		Software.initialize(new SelfCheckoutConfiguration(
+			TestableSelfCheckoutStationGold.class,
+			TestableAttendantStation.class,
 			Currency.getInstance(Locale.CANADA), 
 			100, 
 			1000, 
@@ -98,37 +105,37 @@ public class SelfCheckoutTest {
 			new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 
 			100, 
 			100
-		));
-		assertNotNull(SelfCheckout.getInstance());
+		), 1);
+		assertNotNull(Software.getInstance());
 	}
 	
 	@Test
 	public void testNullType() {
-		assertThrows(NullPointerException.class, () -> SelfCheckout.initialize(null));
-		SelfCheckout.uninitialize();
+		assertThrows(NullPointerException.class, () -> Software.initialize(null, 1));
+		Software.uninitialize();
 	}
 	
 	@Test
 	public void testDoubleSessions() {
-		SelfCheckout check = SelfCheckout.initialize(new SelfCheckoutConfiguration());
-		check.startNewSession();
-		assertThrows(RuntimeException.class, () -> check.startNewSession());
-		SelfCheckout.uninitialize();
+		Software check = Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		check.startNewSession(0);
+		assertThrows(RuntimeException.class, () -> check.startNewSession(0));
+		Software.uninitialize();
 	}
 	
 	@Test
 	public void testSessionEnds() {
-		SelfCheckout check = SelfCheckout.initialize(new SelfCheckoutConfiguration());
-		check.startNewSession();
-		assertEquals(check.endCurrentSession(), true);
-		SelfCheckout.uninitialize();
+		Software check = Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		check.startNewSession(0);
+		assertEquals(check.endCurrentSession(0), true);
+		Software.uninitialize();
 	}
 	
 	@Test
 	public void testSessionEndsNull() {
-		SelfCheckout check = SelfCheckout.initialize(new SelfCheckoutConfiguration());
-		assertEquals(check.endCurrentSession(), false);
-		SelfCheckout.uninitialize();
+		Software check = Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		assertEquals(check.endCurrentSession(0), false);
+		Software.uninitialize();
 	}
 
 	@Test
@@ -141,7 +148,8 @@ public class SelfCheckoutTest {
 		int TrayCapTest = 15;
 
 		SelfCheckoutConfiguration config = new SelfCheckoutConfiguration(
-				SelfCheckoutConfiguration.MachineRating.BRONZE,
+				TestableSelfCheckoutStationGold.class,
+				TestableAttendantStation.class,
 				currencyTest,
 				DispenserCapTest,
 				StorageCapTest,
@@ -152,56 +160,56 @@ public class SelfCheckoutTest {
 				100
 				);
 
-		SelfCheckout check = SelfCheckout.initialize(config);
-		check.startNewSession();
+		Software check = Software.initialize(config, 1);
+		check.startNewSession(0);
 
-		assertEquals(Currency.getInstance(Locale.CANADA), config.getCurrency());
-		assertEquals(50 , config.getCoinDispenserCapacity());
-		assertEquals(250, config.getCoinStorageUnitCapacity());
-		assertEquals(15 , config.getCoinTrayCapacity());
-		assertArrayEquals(new BigDecimal[]{BigDecimal.valueOf(0.25), BigDecimal.valueOf(1.00)}, config.getCoinDenominations());
+		assertEquals(Currency.getInstance(Locale.CANADA), config.currency);
+		assertEquals(50 , config.coinDispenserCapacity);
+		assertEquals(250, config.coinStorageUnitCapacity);
+		assertEquals(15 , config.coinTrayCapacity);
+		assertArrayEquals(new BigDecimal[]{BigDecimal.valueOf(0.25), BigDecimal.valueOf(1.00)}, config.coinDenominations);
 
-		SelfCheckout.uninitialize();
+		Software.uninitialize();
 	}
   
 	@Test
 	public void testGetInstanceNoInstance() {
-		assertThrows(RuntimeException.class, () -> SelfCheckout.getInstance());
+		assertThrows(RuntimeException.class, () -> Software.getInstance());
 	}
 	
 	@Test
 	public void testSelfCheckoutEnabledFromDisable() {
-		SelfCheckout.initialize(new SelfCheckoutConfiguration());
-		SelfCheckout.getInstance().disableStation();
-		assertEquals(true, SelfCheckout.getInstance().enableStation());
+		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		Software.getInstance().disableStation(0);
+		assertEquals(true, Software.getInstance().enableStation(0));
 	}
 	
 	@Test
 	public void testSelfCheckoutEnabledFromEnabled() {
-		SelfCheckout.initialize(new SelfCheckoutConfiguration());
-		assertEquals(false, SelfCheckout.getInstance().enableStation());
+		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		assertEquals(false, Software.getInstance().enableStation(0));
 	}
 	
 	@Test
 	public void testSelfCheckoutEnabledOnInitialize() {
-		SelfCheckout.initialize(new SelfCheckoutConfiguration());
-		assertEquals(true, SelfCheckout.getInstance().getStationEnabledState());
+		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		assertEquals(true, Software.getInstance().getStationEnabledState(0));
 	}
 	
 	@Test
 	public void testSelfCheckoutResponse() {
-		SelfCheckout.initialize(new SelfCheckoutConfiguration());
-		SelfCheckout.getInstance().enableStation();
-		assertEquals(true, SelfCheckout.getInstance().getStationEnabledState());
-		SelfCheckout.getInstance().disableStation();
-		assertEquals(false, SelfCheckout.getInstance().getStationEnabledState());
+		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		Software.getInstance().enableStation(0);
+		assertEquals(true, Software.getInstance().getStationEnabledState(0));
+		Software.getInstance().disableStation(0);
+		assertEquals(false, Software.getInstance().getStationEnabledState(0));
 	}
 	
 	@Test
 	public void testDisableDuringSession() {
-		SelfCheckout.initialize(new SelfCheckoutConfiguration());
-		SelfCheckout.getInstance().startNewSession();
-		assertEquals(false, SelfCheckout.getInstance().disableStation());
+		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		Software.getInstance().startNewSession(0);
+		assertEquals(false, Software.getInstance().disableStation(0));
 	}
 	
 }
