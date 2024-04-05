@@ -34,11 +34,13 @@ import java.util.UUID;
 
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Mass.MassDifference;
+import com.jjjwelectronics.keyboard.USKeyboardQWERTY;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
+import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.session.UserSession;
 
@@ -77,6 +79,12 @@ public class Transaction {
         else {
             throw new NullPointerException("product");
         }
+    }
+    
+    public void addItemByText() {
+    	String description = session.getAttendantKeyboardHandler().getInput();
+    	BarcodedProduct item =  ProductDatabases.BARCODED_PRODUCT_DATABASE.get(description);
+    	addItem(item);
     }
 
     /**

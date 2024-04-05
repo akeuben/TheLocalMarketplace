@@ -44,6 +44,7 @@ public class UserSession {
     private ReceiptPrinterHandler receiptPrinterHandler;
     private UIHandler uiHandler;
     private CardReaderHandler cardReaderHandler;
+    private AttendantKeyboardHandler attendantKeyboardHandler;
     private int machineID;
     
     /**
@@ -61,6 +62,7 @@ public class UserSession {
 		this.receiptPrinterHandler = new ReceiptPrinterHandler(this);
     	this.uiHandler = new UIHandler(this);
     	this.cardReaderHandler = new CardReaderHandler(this);
+    	this.attendantKeyboardHandler = new AttendantKeyboardHandler(this);
     	this.machineID = machineID;
     }
     
@@ -164,5 +166,9 @@ public class UserSession {
 	 */
 	public AbstractSelfCheckoutStation getHardware() {
 		return Software.getInstance().getHardware(machineID);
+	}
+	
+	public AttendantKeyboardHandler getAttendantKeyboardHandler() {
+		return attendantKeyboardHandler;
 	}
 }
