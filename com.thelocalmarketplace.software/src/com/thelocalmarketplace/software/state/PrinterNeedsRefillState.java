@@ -26,28 +26,27 @@ package com.thelocalmarketplace.software.state;
  * Winston Wang - 30185321
  */
 
-/**/import com.thelocalmarketplace.software.Software;
-/**/import com.thelocalmarketplace.software.session.UserSession;
+import com.thelocalmarketplace.software.Software;
+import com.thelocalmarketplace.software.session.UserSession;
 
 public class PrinterNeedsRefillState implements IUserSessionState<UserSessionState> {
     @Override
-    /**/public UserSessionState onStateSet(UserSession session) {
-        /**/// Disable the coin slot to prevent the user from inserting a coin while the software
-        /**/// is not in the correct state
-        /**/session.getHardware().getCoinSlot().disable();
-        /**/session.getHardware().getBanknoteInput().disable();
-
-        /**/Software.getInstance().attendantStationFlagged = true;
+    public UserSessionState onStateSet(UserSession session) {
+        // Disable the coin slot to prevent the user from inserting a coin while the software
+        // is not in the correct state
+        session.getHardware().getCoinSlot().disable();
+        session.getHardware().getBanknoteInput().disable();
+        Software.getInstance().attendantStationFlagged = true;
         return null;
     }
 
     @Override
-    /**/public void onStateUnset(UserSession session) {
-        /**/Software.getInstance().attendantStationFlagged = false;
+    public void onStateUnset(UserSession session) {
+        Software.getInstance().attendantStationFlagged = false;
     }
 
     @Override
-    /**/public UserSessionState onPrinterRefilled(UserSession session) {
-        /**/return UserSessionState.PRINT_RECEIPT;
+    public UserSessionState onPrinterRefilled(UserSession session) {
+        return UserSessionState.PRINT_RECEIPT;
     }
 }

@@ -48,9 +48,9 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
      * The onStateSetMethod should be doing most of the work for this state
      */
     @Override
-    /**/public UserSessionState onStateSet(UserSession session) {
-        /**/hardwarePrinter = session.getHardware().getPrinter();
-        /**/finalTransactionRecord = session.getTransaction();//prob add a null check just incase
+    public UserSessionState onStateSet(UserSession session) {
+        hardwarePrinter = session.getHardware().getPrinter();
+        finalTransactionRecord = session.getTransaction();//prob add a null check just incase
         itemizedTransaction = new ArrayList<String>();
         String workingString = "";
         int totalCharsToPrint = 0;
@@ -68,10 +68,10 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
         //assuming it is then move on to the rest
         try {
             if(hardwarePrinter.inkRemaining() < totalCharsToPrint){
-                /**/session.getReceiptPrinterHandler().thePrinterIsOutOfInk();
+                session.getReceiptPrinterHandler().thePrinterIsOutOfInk();
                 session.setState(UserSessionState.PRINTER_NEEDS_REFILL);
             } else if (hardwarePrinter.paperRemaining() < (totalCharsToPrint/60)) {
-                /**/session.getReceiptPrinterHandler().thePrinterIsOutOfPaper();
+                session.getReceiptPrinterHandler().thePrinterIsOutOfPaper();
                 session.setState(UserSessionState.PRINTER_NEEDS_REFILL);
             }
         } catch (UnsupportedOperationException e){
@@ -86,10 +86,10 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
                         hardwarePrinter.print(c);
                     }
                     catch(EmptyDevice empty){
-                        /**/session.getReceiptPrinterHandler().thePrinterIsOutOfPaper();
-                        /**/session.getReceiptPrinterHandler().thePrinterIsOutOfInk();
                         //its not possible to tell if its the ink or paper that ran out so set both flags
-                        /**/session.setState(UserSessionState.PRINTER_NEEDS_REFILL);
+                        session.getReceiptPrinterHandler().thePrinterIsOutOfPaper();
+                        session.getReceiptPrinterHandler().thePrinterIsOutOfInk();
+                        session.setState(UserSessionState.PRINTER_NEEDS_REFILL);
                     }
                     catch(OverloadedDevice overload){
                         try {
@@ -99,9 +99,9 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
                             throw new RuntimeException(e);//if another error happens here ill be surprised
                         }
                         catch(EmptyDevice empty){
-                            /**/session.getReceiptPrinterHandler().thePrinterIsOutOfPaper();
-                            /**/session.getReceiptPrinterHandler().thePrinterIsOutOfInk();
                             //its not possible to tell if its the ink or paper that ran out so set both flags
+                            session.getReceiptPrinterHandler().thePrinterIsOutOfPaper();
+                            session.getReceiptPrinterHandler().thePrinterIsOutOfInk();
                             session.setState(UserSessionState.PRINTER_NEEDS_REFILL);
                         }
 
@@ -111,7 +111,7 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
                     hardwarePrinter.print('\n');//once an item has been printed out fully move to the next line
                 } catch (EmptyDevice e) {
                     //newline char doesn't use ink but will throw out of paper
-                    /**/session.getReceiptPrinterHandler().thePrinterIsOutOfPaper();
+                    session.getReceiptPrinterHandler().thePrinterIsOutOfPaper();
                     session.setState(UserSessionState.PRINTER_NEEDS_REFILL);
                 } catch (OverloadedDevice e) {
                     //this really should never happen based on what the printer class looks like but
@@ -121,9 +121,10 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
 
         }
 
-        hardwarePrinter.cutPaper();
         //After receipt printing the use case states the station should return to a ready state
-        /**/Software.getInstance().endCurrentSession(session.getMachineID());
+        hardwarePrinter.cutPaper();
+        hardwarePrinter.removeReceipt();
+        Software.getInstance().endCurrentSession(session.getMachineID());
         return null;
     }
 }
