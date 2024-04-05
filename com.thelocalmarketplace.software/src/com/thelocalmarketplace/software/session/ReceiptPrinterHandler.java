@@ -81,7 +81,7 @@ public class ReceiptPrinterHandler extends AbstractUserSessionHandler implements
     public void paperHasBeenAddedToThePrinter() {
         fillPaperFlag = false;
         if(!refillFlagsSet()){
-            getUserSession().getState().onPrinterRefilled(getUserSession());
+            /**/getUserSession().getState().onPrinterRefilled(getUserSession());
         }
     }
 
@@ -89,7 +89,7 @@ public class ReceiptPrinterHandler extends AbstractUserSessionHandler implements
     public void inkHasBeenAddedToThePrinter() {
         fillInkFlag = false;
         if(!refillFlagsSet()){
-            getUserSession().getState().onPrinterRefilled(getUserSession());
+            /**/getUserSession().getState().onPrinterRefilled(getUserSession());
         }
     }
 
