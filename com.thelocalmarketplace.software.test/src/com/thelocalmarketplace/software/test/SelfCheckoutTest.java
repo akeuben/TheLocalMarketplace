@@ -177,4 +177,39 @@ public class SelfCheckoutTest {
 		assertThrows(RuntimeException.class, () -> Software.getInstance());
 	}
 	
+	@Test
+	public void testSelfCheckoutEnabledFromDisable() {
+		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		Software.getInstance().disableStation(0);
+		assertEquals(true, Software.getInstance().enableStation(0));
+	}
+	
+	@Test
+	public void testSelfCheckoutEnabledFromEnabled() {
+		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		assertEquals(false, Software.getInstance().enableStation(0));
+	}
+	
+	@Test
+	public void testSelfCheckoutEnabledOnInitialize() {
+		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		assertEquals(true, Software.getInstance().getStationEnabledState(0));
+	}
+	
+	@Test
+	public void testSelfCheckoutResponse() {
+		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		Software.getInstance().enableStation(0);
+		assertEquals(true, Software.getInstance().getStationEnabledState(0));
+		Software.getInstance().disableStation(0);
+		assertEquals(false, Software.getInstance().getStationEnabledState(0));
+	}
+	
+	@Test
+	public void testDisableDuringSession() {
+		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		Software.getInstance().startNewSession(0);
+		assertEquals(false, Software.getInstance().disableStation(0));
+	}
+	
 }

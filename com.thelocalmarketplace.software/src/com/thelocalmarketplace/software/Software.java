@@ -46,12 +46,17 @@ public class Software {
 	private AttendantStation attendantStation;
 	private AbstractSelfCheckoutStation[] selfCheckoutStations;
 
+	private boolean[] isStationEnabled;
+	private boolean[] disableStationQueued;
+
 	public boolean attendantStationFlagged; //placeholder for any case where the attendant station may be flagged
 	
 	private Software(SelfCheckoutConfiguration configuration, int stationCount) {
 		this.configuration = configuration;
 		currentSession = new UserSession[stationCount];
 		selfCheckoutStations = new AbstractSelfCheckoutStation[stationCount];
+		isStationEnabled = new boolean[stationCount];
+		disableStationQueued = new boolean[stationCount];
 		try {
 			attendantStation = configuration.attendantType.getConstructor().newInstance();
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
@@ -70,6 +75,7 @@ public class Software {
 				e.printStackTrace();
 				return;
 			}
+			isStationEnabled[i] = true;
 			station.plugIn(PowerGrid.instance());
 			station.turnOn();
 			selfCheckoutStations[i] = station;
@@ -185,5 +191,37 @@ public class Software {
 	 */
 	public AbstractSelfCheckoutStation getHardware(int machineID) {
 		return selfCheckoutStations[machineID];
+	}
+
+	/**
+	 * Gets the value of isStationEnabled.
+	 * @return true if the station is currently enabled, false if it is currently disabled.
+	 */
+	public boolean getStationEnabledState(int machineId) {
+		return isStationEnabled[machineId];
+	}
+
+	/**
+	 * Enables the self checkout station.
+	 * @return false if the station was already enabled; true if the station was changed from disabled to enabled.
+	 */
+	public boolean enableStation(int machineId) {
+		boolean returnBool = !isStationEnabled[machineId];
+		isStationEnabled[machineId] = true;
+		return returnBool;
+	}
+
+	/**
+	 * Attempts to disable the self checkout station.
+	 * @return true if the station was successfully disabled, false if it could not be disabled.
+	 */
+	public boolean disableStation(int machineId) {
+		if(currentSession[machineId] == null) {
+			isStationEnabled[machineId] = false;
+			return true;
+		} else {
+			disableStationQueued[machineId] = true;
+			return false;
+		}
 	}
 }
