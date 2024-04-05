@@ -25,6 +25,7 @@ public class UIHardwareSimulation extends JFrame {
 		
 		JTabbedPane attendantPane = new JTabbedPane();
 		
+		attendantPane.add("Product Database", new ProductDatabaseTab());
 		
 		stationSelector.add("Attendant Station", attendantPane);
 		

@@ -1,6 +1,8 @@
 package com.thelocalmarketplace.software.UI.components;
 
 import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JPanel;
@@ -22,13 +24,15 @@ public class WrappedJComponent<T extends Component> extends JPanel {
 	}
 
 	public WrappedJComponent(Class<T> clazz, Object[] args, Class<?>[] types) {
+		setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
 		try {
 			component = clazz.getConstructor(types).newInstance(args);
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
 		}
-		add(component);
+		add(component, gbc);
 	}
 	
 	public T getComponent() {
