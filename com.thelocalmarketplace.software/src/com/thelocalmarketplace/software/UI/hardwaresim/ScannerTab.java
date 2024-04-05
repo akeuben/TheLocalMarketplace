@@ -15,12 +15,11 @@ import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.jjjwelectronics.scanner.IBarcodeScanner;
-import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.UI.components.ErrorPopup;
 import com.thelocalmarketplace.software.UI.components.WrappedJComponent;
 
 public class ScannerTab extends JPanel {
-
+/*
 	private static final long serialVersionUID = 8792155096453005653L;
 	
 	private JTextField mainBarcodeField;
@@ -75,4 +74,5 @@ public class ScannerTab extends JPanel {
 		Barcode bc = new Barcode(digits);
 		scanner.scan(new BarcodedItem(bc, Mass.ONE_GRAM));
 	}
+	*/
 }

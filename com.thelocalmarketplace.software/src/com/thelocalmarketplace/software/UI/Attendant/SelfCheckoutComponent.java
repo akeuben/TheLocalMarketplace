@@ -26,6 +26,7 @@ public class SelfCheckoutComponent extends JPanel{
 	private WrappedJComponent<JButton> alertButton; 
 	private WrappedJComponent<JLabel> statusField;
 	private WrappedJComponent<JButton> overrideButton;  
+	private WrappedJComponent<JButton> assistButton; 
 	
 	// attendant's view of a self checkout machine
 	public SelfCheckoutComponent() {
@@ -44,19 +45,19 @@ public class SelfCheckoutComponent extends JPanel{
 		c.gridx = 0; 
 		c.gridy = 0;
 		c.weightx = 1; 
-		c.anchor = GridBagConstraints.NORTHEAST; 
+		c.anchor = GridBagConstraints.NORTH; 
 		add(alertButton, c);
 		
 		// add the status field
-		statusField = new WrappedJComponent<JLabel>(JLabel.class, "Status:");
-		statusField.getComponent().setSize(100, 75);
+		statusField = new WrappedJComponent<JLabel>(JLabel.class, "Status: Ready For Payment");
+		statusField.getComponent().setSize(300, 90);
 		statusField.setBackground(Color.GRAY);
 		statusField.getComponent().setFont(new Font("regular", Font.BOLD, 22));
 		statusField.setPreferredSize(statusField.getComponent().getSize());
 		c = new GridBagConstraints(); 
 		c.gridx = 1; 
 		c.gridy = 0; 
-		c.weightx = 0; 
+		c.weightx = 1; 
 		c.weighty = 0; 
 		c.anchor = GridBagConstraints.NORTH;
 		add(statusField, c);
@@ -70,7 +71,7 @@ public class SelfCheckoutComponent extends JPanel{
 		c.gridx = 2; 
 		c.gridy = 0; 
 		c.weightx = 0;
-		c.anchor = GridBagConstraints.NORTHWEST; 
+		c.anchor = GridBagConstraints.NORTH; 
 		add(overrideButton, c);
 		
 		// now add the transaction viewer as a JList using default model
@@ -91,9 +92,19 @@ public class SelfCheckoutComponent extends JPanel{
 		c.fill = GridBagConstraints.BOTH; 
 		add(transactionViewer, c);
 		
+		// add the assist button
+		assistButton = new WrappedJComponent<JButton>(JButton.class, "Assist");
+		assistButton.getComponent().setSize(75, 50);
+		assistButton.setPreferredSize(assistButton.getComponent().getSize());
+		assistButton.setBackground(Color.GRAY);
 		
-		
-		
+		c = new GridBagConstraints();
+		c.gridy = 2; 
+		c.gridx = 2; 
+		c.weightx = 0.1; 
+		c.weighty = 0.1; 
+		c.anchor = GridBagConstraints.SOUTHWEST; 
+		add(assistButton, c);
 		setVisible(true);
 		
 	}

@@ -7,9 +7,7 @@ import java.util.Locale;
 
 import javax.swing.JFrame;
 
-import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
-import com.thelocalmarketplace.software.SelfCheckoutConfiguration.MachineRating;
 import com.thelocalmarketplace.software.UI.Attendant.AttendantUI;
 import com.thelocalmarketplace.software.UI.Attendant.SelfCheckoutComponent;
 import com.thelocalmarketplace.software.UI.hardwaresim.UIHardwareSimulation;
@@ -43,7 +41,7 @@ public class Simulation {
 		UIHardwareSimulation.startHardwareSimulationUI();
 		SelfCheckoutComponent test = new SelfCheckoutComponent();
 		JFrame frame = new JFrame();
-		frame.setSize(350,500);
+		frame.setSize(475,600);
 		frame.setLayout(new GridLayout(1,1));
 		frame.getContentPane().add(test);
 		frame.setVisible(true);

@@ -25,12 +25,12 @@ import com.tdc.NoCashAvailableException;
 import com.tdc.coin.Coin;
 import com.tdc.coin.ICoinDispenser;
 import com.thelocalmarketplace.hardware.CoinTray;
-import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.UI.components.ErrorPopup;
 
 import ca.ucalgary.seng300.simulation.SimulationException;
 
 public class CoinSystemTab extends JPanel {
+	/*
 	private static final long serialVersionUID = -7616750139837556826L;
 	
 	private DefaultListModel<Coin> collectedCoinModel;
@@ -179,4 +179,5 @@ public class CoinSystemTab extends JPanel {
 		SelfCheckout.getInstance().getHardware().getCoinStorage().unload();
 		updateStorageCount();
 	}
+	*/
 }

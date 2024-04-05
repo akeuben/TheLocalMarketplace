@@ -15,11 +15,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import com.jjjwelectronics.card.Card;
-import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.UI.components.ErrorPopup;
 
 public class CardTab extends JPanel {
-	
+	/*
 	private enum CardKind {
 		VISA, MASTERCARD, AMEX, DEBIT
 	}
@@ -125,4 +124,5 @@ public class CardTab extends JPanel {
 			ErrorPopup.showError("Failed to tap card", e1.getStackTrace().toString());
 		}
 	}
+	*/
 }

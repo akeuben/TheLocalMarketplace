@@ -25,13 +25,13 @@ import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
 import com.tdc.banknote.BanknoteDispensationSlot;
 import com.tdc.banknote.IBanknoteDispenser;
-import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.UI.components.ErrorPopup;
 
 import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
 import ca.ucalgary.seng300.simulation.SimulationException;
 
 public class BanknoteSystemTab extends JPanel {
+	/*
 private static final long serialVersionUID = -7616750139837556826L;
 	
 	private DefaultListModel<Banknote> collectedBanknoteModel;
@@ -229,4 +229,5 @@ private static final long serialVersionUID = -7616750139837556826L;
 		SelfCheckout.getInstance().getHardware().getBanknoteStorage().unload();
 		updateStorageCount();
 	}
+	*/
 }
