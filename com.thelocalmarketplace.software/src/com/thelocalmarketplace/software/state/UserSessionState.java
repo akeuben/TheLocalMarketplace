@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.card.Card.CardData;
 import com.jjjwelectronics.scanner.Barcode;
+import com.thelocalmarketplace.software.session.UserSession;
 
 public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	/**
@@ -71,42 +72,42 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	}
 
 	@Override
-	public UserSessionState onStateSet() {
-		return state.onStateSet();
+	public UserSessionState onStateSet(UserSession session) {
+		return state.onStateSet(session);
 	}
 
 	@Override
-	public void onStateUnset() {
-		state.onStateUnset();
+	public void onStateUnset(UserSession session) {
+		state.onStateUnset(session);
 	}
 
 	@Override
-	public UserSessionState onScanBarcode(Barcode barcode) {
-		return state.onScanBarcode(barcode);
+	public UserSessionState onScanBarcode(UserSession session, Barcode barcode) {
+		return state.onScanBarcode(session, barcode);
 	}
 
 	@Override
-	public UserSessionState onWeightChanged(Mass mass) {
-		return state.onWeightChanged(mass);
+	public UserSessionState onWeightChanged(UserSession session, Mass mass) {
+		return state.onWeightChanged(session, mass);
 	}
 
 	@Override
-	public UserSessionState onCoinInserted(BigDecimal value) {
-		return state.onCoinInserted(value);
+	public UserSessionState onCoinInserted(UserSession session, BigDecimal value) {
+		return state.onCoinInserted(session, value);
 	}
 
 	@Override
-	public UserSessionState onPrinterRefilled() {
-		return null;
+	public UserSessionState onPrinterRefilled(UserSession session) {
+		return state.onPrinterRefilled(session);
 	}
 	
 	@Override
-	public UserSessionState onBanknoteInserted(BigDecimal value) {
-		return state.onBanknoteInserted(value);
+	public UserSessionState onBanknoteInserted(UserSession session, BigDecimal value) {
+		return state.onBanknoteInserted(session, value);
 	}
 	
 	@Override
-	public UserSessionState onCardDataRead(CardData data) {
-		return state.onCardDataRead(data);
+	public UserSessionState onCardDataRead(UserSession session, CardData data) {
+		return state.onCardDataRead(session, data);
 	}
 }

@@ -1,34 +1,29 @@
 package com.thelocalmarketplace.software.UI.hardwaresim;
 
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
-import com.jjjwelectronics.IllegalDigitException;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.jjjwelectronics.scanner.IBarcodeScanner;
-import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.UI.components.ErrorPopup;
 import com.thelocalmarketplace.software.UI.components.WrappedJComponent;
 
-public class ScannerTab extends JPanel {
+public class ScannerTab extends AbstractHardwareSimTab {
 
 	private static final long serialVersionUID = 8792155096453005653L;
 	
 	private JTextField mainBarcodeField;
 	private JTextField handheldBarcodeField;
 
-	public ScannerTab() {
-		setLayout(new GridLayout(0, 1));
-		setBorder(new EmptyBorder(10, 10, 10, 10));
+	public ScannerTab(int machineId) {
+		super(machineId, 2);
 
 		mainBarcodeField = new JTextField(10);
 		handheldBarcodeField = new JTextField(10);
@@ -53,12 +48,12 @@ public class ScannerTab extends JPanel {
 	}
 	
 	private void scanMainScanner(ActionEvent e) {
-		IBarcodeScanner scanner = SelfCheckout.getInstance().getHardware().getMainScanner();
+		IBarcodeScanner scanner = getHardware().getMainScanner();
 		scan(mainBarcodeField.getText(), scanner);
 	}
 	
 	private void scanHandheldScanner(ActionEvent e) {
-		IBarcodeScanner scanner = SelfCheckout.getInstance().getHardware().getHandheldScanner();
+		IBarcodeScanner scanner = getHardware().getHandheldScanner();
 		scan(handheldBarcodeField.getText(), scanner);
 	}
 	

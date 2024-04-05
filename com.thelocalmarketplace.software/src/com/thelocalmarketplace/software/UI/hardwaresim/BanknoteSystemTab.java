@@ -25,14 +25,14 @@ import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
 import com.tdc.banknote.BanknoteDispensationSlot;
 import com.tdc.banknote.IBanknoteDispenser;
-import com.thelocalmarketplace.software.SelfCheckout;
+import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.UI.components.ErrorPopup;
 
 import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
 import ca.ucalgary.seng300.simulation.SimulationException;
 
-public class BanknoteSystemTab extends JPanel {
-private static final long serialVersionUID = -7616750139837556826L;
+public class BanknoteSystemTab extends AbstractHardwareSimTab {
+	private static final long serialVersionUID = -7616750139837556826L;
 	
 	private DefaultListModel<Banknote> collectedBanknoteModel;
 	private Map<BigDecimal, JLabel> dispenserLabels;
@@ -40,9 +40,8 @@ private static final long serialVersionUID = -7616750139837556826L;
 	private JLabel countLabel;
 	private JLabel isDangling;
 
-	public BanknoteSystemTab() {
-		setLayout(new GridLayout(0, 2, 20, 20));
-		setBorder(new EmptyBorder(10, 10, 10, 10));
+	public BanknoteSystemTab(int machineId) {
+		super(machineId, 2);
 		
 		dispenserLabels = new HashMap<BigDecimal, JLabel>();
 		
@@ -64,7 +63,7 @@ private static final long serialVersionUID = -7616750139837556826L;
 		banknoteDispenserScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		banknoteDispenserScrollPane.setBorder(new TitledBorder("Banknote Dispensers"));
 		
-		for(BigDecimal denomination : SelfCheckout.getInstance().getConfiguration().getBanknoteDenominations()) {
+		for(BigDecimal denomination : Software.getInstance().getConfiguration().banknoteDenominations) {
 			JButton btn = new JButton("$" + denomination.toPlainString());
 			btn.addActionListener((e) -> this.insertBanknote(denomination));
 			banknoteInputPanel.add(btn);
@@ -130,7 +129,7 @@ private static final long serialVersionUID = -7616750139837556826L;
 		updateStorageCount();
 		banknoteStoragePanel.add(countLabel);
 		banknoteStoragePanel.add(new JLabel("Banknote Capacity: "));
-		JLabel capcityLabel = new JLabel("" + SelfCheckout.getInstance().getConfiguration().banknoteStorageCapacity);
+		JLabel capcityLabel = new JLabel("" + Software.getInstance().getConfiguration().banknoteStorageCapacity);
 		banknoteStoragePanel.add(capcityLabel);
 		JButton emptyButton = new JButton("Empty Storage");
 		emptyButton.addActionListener((e) -> emptyStorageUnit());
@@ -140,10 +139,10 @@ private static final long serialVersionUID = -7616750139837556826L;
 	}
 	
 	public void insertBanknote(BigDecimal denomination) {
-		Currency currency = SelfCheckout.getInstance().getConfiguration().getCurrency();
+		Currency currency = Software.getInstance().getConfiguration().currency;
 		Banknote banknote = new Banknote(currency, denomination);
 		try {
-			SelfCheckout.getInstance().getHardware().getBanknoteInput().receive(banknote);
+			getHardware().getBanknoteInput().receive(banknote);
 		} catch (DisabledException | RuntimeException e) {
 			ErrorPopup.showError("Failed to insert banknote", "The banknote input is disabled.");
 		} catch(CashOverloadException e) {
@@ -155,7 +154,7 @@ private static final long serialVersionUID = -7616750139837556826L;
 	
 	public void removeDanglingFromInput(ActionEvent e) {
 		try {
-			SelfCheckout.getInstance().getHardware().getBanknoteInput().removeDanglingBanknote();
+			getHardware().getBanknoteInput().removeDanglingBanknote();
 		} catch(NullPointerSimulationException e1) {
 			ErrorPopup.showError("Failed to collect dangling banknotes", "There are no banknotes dangling to collect!");
 		}
@@ -163,12 +162,12 @@ private static final long serialVersionUID = -7616750139837556826L;
 	}
 	
 	public void updateInputDanglingStatus() {
-		boolean dangling = SelfCheckout.getInstance().getHardware().getBanknoteInput().hasDanglingBanknotes();
+		boolean dangling = getHardware().getBanknoteInput().hasDanglingBanknotes();
 		isDangling.setText("" + dangling);
 	}
 	
 	public void updateBanknoteOutput(ActionEvent e) {
-		BanknoteDispensationSlot slot = SelfCheckout.getInstance().getHardware().getBanknoteOutput();
+		BanknoteDispensationSlot slot = getHardware().getBanknoteOutput();
 		try {
 			List<Banknote> collected = slot.removeDanglingBanknotes();
 			collectedBanknoteModel.clear();
@@ -179,13 +178,13 @@ private static final long serialVersionUID = -7616750139837556826L;
 	}
 	
 	public void releaseBanknoteOutput(ActionEvent e) {
-		BanknoteDispensationSlot slot = SelfCheckout.getInstance().getHardware().getBanknoteOutput();
+		BanknoteDispensationSlot slot = getHardware().getBanknoteOutput();
 		slot.dispense();
 	}
 	
 	public void reloadDispenser(BigDecimal denomination) {
-		Currency currency = SelfCheckout.getInstance().getConfiguration().getCurrency();
-		IBanknoteDispenser dispenser = SelfCheckout.getInstance().getHardware().getBanknoteDispensers().get(denomination);
+		Currency currency = Software.getInstance().getConfiguration().currency;
+		IBanknoteDispenser dispenser = getHardware().getBanknoteDispensers().get(denomination);
 		while(dispenser.size() < dispenser.getCapacity()) {
 			try {
 				dispenser.load(new Banknote(currency, denomination));
@@ -198,7 +197,7 @@ private static final long serialVersionUID = -7616750139837556826L;
 	}
 	
 	public void emitDispenser(BigDecimal denomination) {
-		IBanknoteDispenser dispenser = SelfCheckout.getInstance().getHardware().getBanknoteDispensers().get(denomination);
+		IBanknoteDispenser dispenser = getHardware().getBanknoteDispensers().get(denomination);
 		
 		try {
 			dispenser.emit();
@@ -214,19 +213,19 @@ private static final long serialVersionUID = -7616750139837556826L;
 	
 	public void updateBanknoteDispensers() {
 		for(BigDecimal denomination : dispenserLabels.keySet()) {
-			IBanknoteDispenser dispenser = SelfCheckout.getInstance().getHardware().getBanknoteDispensers().get(denomination);
+			IBanknoteDispenser dispenser = getHardware().getBanknoteDispensers().get(denomination);
 			int count = dispenser.size();
 			dispenserLabels.get(denomination).setText(count + "");
 		}
 	}
 	
 	public void updateStorageCount() {
-		int count = SelfCheckout.getInstance().getHardware().getBanknoteStorage().getBanknoteCount();
+		int count = getHardware().getBanknoteStorage().getBanknoteCount();
 		countLabel.setText("" + count);
 	}
 	
 	public void emptyStorageUnit() {
-		SelfCheckout.getInstance().getHardware().getBanknoteStorage().unload();
+		getHardware().getBanknoteStorage().unload();
 		updateStorageCount();
 	}
 }

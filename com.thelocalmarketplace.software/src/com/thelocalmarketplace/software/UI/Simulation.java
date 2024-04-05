@@ -7,15 +7,17 @@ import java.util.Locale;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import com.thelocalmarketplace.software.SelfCheckout;
+import com.thelocalmarketplace.hardware.AttendantStation;
+import com.thelocalmarketplace.hardware.SelfCheckoutStationGold;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
-import com.thelocalmarketplace.software.SelfCheckoutConfiguration.MachineRating;
+import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.UI.hardwaresim.UIHardwareSimulation;
 
 public class Simulation {
 	public static void main(String[] args) {
-		SelfCheckout.initialize(new SelfCheckoutConfiguration(
-			MachineRating.BRONZE, 
+		Software.initialize(new SelfCheckoutConfiguration(
+			SelfCheckoutStationGold.class,
+			AttendantStation.class,
 			Currency.getInstance(Locale.CANADA), 
 			100, 
 			1000, 
@@ -36,7 +38,7 @@ public class Simulation {
 			}, 
 			100, 
 			100
-		));
+		), 2);
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
@@ -44,6 +46,6 @@ public class Simulation {
 			// this should never happen!
 			e.printStackTrace();
 		}
-		UIHardwareSimulation.startHardwareSimulationUI();
+		UIHardwareSimulation.startHardwareSimulationUI(2);
 	}
 }

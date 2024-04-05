@@ -11,14 +11,12 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import com.jjjwelectronics.card.Card;
-import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.UI.components.ErrorPopup;
 
-public class CardTab extends JPanel {
+public class CardTab extends AbstractHardwareSimTab {
 	
 	private enum CardKind {
 		VISA, MASTERCARD, AMEX, DEBIT
@@ -34,9 +32,8 @@ public class CardTab extends JPanel {
 	JCheckBox tapEnabledField; 
 	JCheckBox hasChipField; 
 
-	public CardTab() {
-		setLayout(new GridLayout(0, 1, 20, 20));
-		setBorder(new EmptyBorder(10, 10, 10, 10));
+	public CardTab(int machineId) {
+		super(machineId, 1);
 		
 		JPanel cardInputPanel = new JPanel();
 		cardInputPanel.setBorder(new TitledBorder("Card Details"));
@@ -94,7 +91,7 @@ public class CardTab extends JPanel {
 	private void swipe(ActionEvent e) {
 		Card card = getEnteredCard();
 		try {
-			SelfCheckout.getInstance().getHardware().getCardReader().swipe(card);
+			getHardware().getCardReader().swipe(card);
 		} catch (IOException | RuntimeException e1) {
 			ErrorPopup.showError("Failed to swipe card", e1.getStackTrace().toString());
 		}
@@ -104,7 +101,7 @@ public class CardTab extends JPanel {
 		Card card = getEnteredCard();
 		String pin = JOptionPane.showInputDialog("Enter Pin");
 		try {
-			SelfCheckout.getInstance().getHardware().getCardReader().insert(card, pin);
+			getHardware().getCardReader().insert(card, pin);
 		} catch (IOException | RuntimeException e1) {
 			StringBuilder sb = new StringBuilder();
 			for(StackTraceElement elem : e1.getStackTrace()) {
@@ -113,14 +110,14 @@ public class CardTab extends JPanel {
 			}
 			ErrorPopup.showError("Failed to insert card", sb.toString());
 		} finally {
-			SelfCheckout.getInstance().getHardware().getCardReader().remove();
+			getHardware().getCardReader().remove();
 		}
 	}
 	
 	private void tap(ActionEvent e) {
 		Card card = getEnteredCard();
 		try {
-			SelfCheckout.getInstance().getHardware().getCardReader().tap(card);
+			getHardware().getCardReader().tap(card);
 		} catch (IOException | RuntimeException e1) {
 			ErrorPopup.showError("Failed to tap card", e1.getStackTrace().toString());
 		}
