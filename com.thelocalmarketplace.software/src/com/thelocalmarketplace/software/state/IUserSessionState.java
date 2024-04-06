@@ -34,6 +34,7 @@ import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.IBarcodeScanner;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
+import com.thelocalmarketplace.hardware.PriceLookUpCode;
 
 public interface IUserSessionState<T> {
 	/**
@@ -92,4 +93,6 @@ public interface IUserSessionState<T> {
 	 * @return The state that should be transition to after the function executes, null if state is same. 
 	 */
 	default T onCardDataRead(CardData data) {return null;};
+	
+	default T onPLUentered(PriceLookUpCode plu ) {return null;};
 }

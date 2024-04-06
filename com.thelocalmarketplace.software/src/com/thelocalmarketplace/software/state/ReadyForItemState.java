@@ -32,6 +32,8 @@ import com.jjjwelectronics.scale.AbstractElectronicScale;
 import com.jjjwelectronics.scale.IElectronicScale;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.hardware.PLUCodedProduct;
+import com.thelocalmarketplace.hardware.PriceLookUpCode;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.Globals;
 import com.thelocalmarketplace.software.SelfCheckout;
@@ -75,6 +77,23 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 		}
 		return null; 
 		
+	}
+	
+	@Override
+	public UserSessionState onPLUentered(PriceLookUpCode plu) {;
+		PLUCodedProduct product = ProductDatabases.PLU_PRODUCT_DATABASE.get(plu);
+		IElectronicScale scale = SelfCheckout.getInstance().getHardware().getBaggingArea();
+		Mass massOnScale;
+		try {
+			massOnScale = ((AbstractElectronicScale) scale).getCurrentMassOnTheScale();
+		} catch (OverloadedDevice e) {
+			throw new RuntimeException("The scale is currently overloaded.");
+		}
+		if (product!=null) {
+			SelfCheckout.getInstance().getCurrentSession().getTransaction().addItem(product, massOnScale);
+			return UserSessionState.WAITING_FOR_BAGGING;
+		}
+		return null;
 	}
  
 	@Override

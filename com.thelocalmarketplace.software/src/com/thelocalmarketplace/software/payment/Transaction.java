@@ -37,6 +37,9 @@ import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.jjjwelectronics.Mass.MassDifference;
+import com.jjjwelectronics.OverloadedDevice;
+import com.jjjwelectronics.scale.AbstractElectronicScale;
+import com.jjjwelectronics.scale.IElectronicScale;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.hardware.Product;
@@ -47,7 +50,8 @@ public class Transaction {
     /**
      * Items contained in an instance of transaction TODO Create constructor
      */
-    private final ArrayList<BarcodedProduct> products = new ArrayList<>();
+    //private final ArrayList<BarcodedProduct> products = new ArrayList<>();
+	private final ArrayList<Product> products = new ArrayList<>();
     
     private Mass expectedMass = Mass.ZERO;
     
@@ -72,13 +76,23 @@ public class Transaction {
             throw new NullPointerException("product");
         }
     }
-
-    public void addItem(PLUCodedProduct product) {
+    
+    /**
+     * Adds a PLUcoded product to current transaction
+     * calculates cost based on weight on scale
+     * @param product
+     * @param mass on scale
+     */
+    public void addItem(PLUCodedProduct product, Mass mass) {
         if (product != null) {
             products.add(product);
-            totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
+            //convert mass to kilograms
+            BigDecimal massInKilo = new BigDecimal(mass.inMicrograms().divide(BigInteger.valueOf(1000000000)));
+            BigDecimal pricePerKilo = BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100));
+            BigDecimal itemCost = massInKilo.multiply(pricePerKilo);
+            totalCost = totalCost.add(itemCost);
             // TODO determine how to handle expected weight for PLU coded products
-            expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM)));
+            expectedMass = expectedMass.sum(mass);
         }
         else {
             throw new NullPointerException("product");
@@ -171,7 +185,7 @@ public class Transaction {
 		return products;
 	}
 
-    public ArrayList<BarcodedProduct> getBarcodedProducts(){
+    public ArrayList<Product> getBarcodedProducts(){
         return products;
     }
 
