@@ -41,9 +41,18 @@ import com.jjjwelectronics.scanner.Barcode;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
+//<<<<<<< HEAD
+import com.jjjwelectronics.Mass.MassDifference;
+import com.jjjwelectronics.OverloadedDevice;
+import com.jjjwelectronics.scale.AbstractElectronicScale;
+import com.jjjwelectronics.scale.IElectronicScale;
+//=======
+//>>>>>>> refs/heads/main
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
+
 import com.thelocalmarketplace.hardware.PriceLookUpCode;
+
 import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.Software;
@@ -55,7 +64,10 @@ public class Transaction {
     /**
      * Items contained in an instance of transaction TODO Create constructor
      */
-    private final ArrayList<BarcodedProduct> products = new ArrayList<>();
+    //private final ArrayList<BarcodedProduct> products = new ArrayList<>();
+	private final ArrayList<BarcodedProduct> barcodedProducts = new ArrayList<>();
+	
+	private final ArrayList<PLUCodedProductAdded> pluProducts = new ArrayList<>();
     
     private Mass expectedMass = Mass.ZERO;
     
@@ -80,7 +92,7 @@ public class Transaction {
      */
     public void addItem(BarcodedProduct product) {
         if (product != null) {
-            products.add(product);
+            barcodedProducts.add(product);
             totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
             expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM))));
         }
@@ -89,7 +101,49 @@ public class Transaction {
         }
     }
     
+    /**
+     * Adds a PLUcoded product to current transaction
+     * calculates cost based on weight on scale
+     * @param product
+     * @param mass on scale
+     */
+    public void addItem(PLUCodedProduct product, Mass mass) {
+        if (product != null) {
+            //convert mass to kilograms
+            BigDecimal massInKilo = new BigDecimal(mass.inMicrograms().divide(BigInteger.valueOf(1000000000)));
+            BigDecimal pricePerKilo = BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100));
+            BigDecimal itemCost = massInKilo.multiply(pricePerKilo);
+            totalCost = totalCost.add(itemCost);
+            // TODO determine how to handle expected weight for PLU coded products
+            expectedMass = expectedMass.sum(mass);
+            pluProducts.add(new PLUCodedProductAdded(product, totalCost));
+        }
+        else {
+            throw new NullPointerException("product");
+        }
+    }
     
+    /**
+     * class that instantiates PLU coded product with the cost that is added to the transaction
+     */
+    public class PLUCodedProductAdded {
+    	private PLUCodedProduct product;
+    	private BigDecimal totalCost;
+    	
+    	public PLUCodedProductAdded(PLUCodedProduct product, BigDecimal totalCost) {
+    		this.product = product;
+    		this.totalCost = totalCost;
+    	}
+    	
+    	public PLUCodedProduct getPLUCodedProduct() {
+    		return product;
+    	}
+    	
+    	public BigDecimal getTotalCost() {
+    		return totalCost;
+    	}
+    }
+
     /**
      * Removes weight of bulky item from transaction
      * @param product item being added to transaction/products
@@ -135,7 +189,7 @@ public class Transaction {
      * @param product item being removed from transaction/products
      */
     public void removeItem(BarcodedProduct product) {
-    	products.remove(product);
+    	barcodedProducts.remove(product);
     	totalCost = totalCost.subtract(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
     	expectedMass = expectedMass.difference(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight()*Mass.MICROGRAMS_PER_GRAM)))).abs();
     }
@@ -172,12 +226,17 @@ public class Transaction {
 
 	public Product[] getProducts() {
 		Product[] products = new Product[0];
-		products = this.products.toArray(products);
+		products = this.barcodedProducts.toArray(products);
+		products = this.pluProducts.toArray(products);
 		return products;
 	}
 
     public ArrayList<BarcodedProduct> getBarcodedProducts(){
-        return products;
+        return barcodedProducts;
+    }
+    
+    public ArrayList<PLUCodedProductAdded> getPLUCodedProducts() {
+    	return pluProducts;
     }
 
 
