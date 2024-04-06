@@ -35,11 +35,12 @@ import org.junit.Test;
 
 import com.thelocalmarketplace.software.payment.CashPayment;
 
+import powerutility.PowerGrid;
+
 public class CashPaymentTest {
     @Before
     public void setup() {
-
-
+		PowerGrid.engageUninterruptiblePowerSource();
     }
     @Test
     public void testNewPayment() {

@@ -33,17 +33,22 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.Mass.MassDifference;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
+//<<<<<<< HEAD
 import com.jjjwelectronics.Mass.MassDifference;
 import com.jjjwelectronics.OverloadedDevice;
 import com.jjjwelectronics.scale.AbstractElectronicScale;
 import com.jjjwelectronics.scale.IElectronicScale;
+//=======
+//>>>>>>> refs/heads/main
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.hardware.Product;
-import com.thelocalmarketplace.software.SelfCheckout;
+import com.thelocalmarketplace.software.Software;
+import com.thelocalmarketplace.software.session.UserSession;
 
 public class Transaction {
 
@@ -58,6 +63,12 @@ public class Transaction {
     private BigDecimal totalCost = BigDecimal.ZERO;
 
     private final HashMap<UUID, IPayment> payments = new HashMap<>();
+
+    private UserSession session;
+    
+    public Transaction(UserSession session) {
+    	this.session = session;
+    }
     
 
     /**
@@ -198,9 +209,9 @@ public class Transaction {
 
     public void calculateChange() throws Exception  {
         if (totalCost.compareTo(BigDecimal.ZERO) < 0) {
-            SelfCheckout instance = SelfCheckout.getInstance();
+            Software instance = Software.getInstance();
             BigDecimal change = totalCost.negate();
-            BigDecimal[] banknoteDenominations =instance.getConfiguration().banknoteDenominations;
+            BigDecimal[] banknoteDenominations = instance.getConfiguration().banknoteDenominations;
             BigDecimal[] coinDenominations = instance.getConfiguration().coinDenominations;
             
             final int BANKNOTE = 0;
@@ -211,13 +222,13 @@ public class Transaction {
 	                int dispense = -1;
 	                BigDecimal value = BigDecimal.valueOf(-1);
 	                for (BigDecimal banknote : banknoteDenominations) {
-	                    if (change.compareTo(banknote) >= 0 && banknote.compareTo(value) > 0 && instance.getHardware().getBanknoteDispensers().get(banknote).size() > 0) {
+	                    if (change.compareTo(banknote) >= 0 && banknote.compareTo(value) > 0 && session.getHardware().getBanknoteDispensers().get(banknote).size() > 0) {
 	                        value = banknote;
 	                        dispense = BANKNOTE;
 	                    }
 	                }
 	                for (BigDecimal coin : coinDenominations) {
-	                    if (change.compareTo(coin) >= 0 && coin.compareTo(value) > 0 && instance.getHardware().getCoinDispensers().get(coin).size() > 0) {
+	                    if (change.compareTo(coin) >= 0 && coin.compareTo(value) > 0 && session.getHardware().getCoinDispensers().get(coin).size() > 0) {
 	                        value = coin;
 	                        dispense = COIN;
 	                    }
@@ -228,10 +239,10 @@ public class Transaction {
 	                    change = change.subtract(value);
 	                    if (dispense == COIN) {
 	                        // Coin Dispensation
-	                        instance.getHardware().getCoinDispensers().get(value).emit();
+	                        session.getHardware().getCoinDispensers().get(value).emit();
 	                    } else {
 	                        // Banknote Dispensation
-	                        instance.getHardware().getBanknoteDispensers().get(value).emit();
+	                        session.getHardware().getBanknoteDispensers().get(value).emit();
 	                    }
 	                }
 	            }
@@ -241,7 +252,7 @@ public class Transaction {
                 // Rethrow the exception to be handled by the caller
                 throw e;
             }
-            SelfCheckout.getInstance().getHardware().getBanknoteOutput().dispense();
+            session.getHardware().getBanknoteOutput().dispense();
         }
     }
 }

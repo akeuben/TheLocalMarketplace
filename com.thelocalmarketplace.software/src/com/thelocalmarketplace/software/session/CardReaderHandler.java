@@ -55,7 +55,7 @@ public class CardReaderHandler extends AbstractUserSessionHandler implements Car
 
 	@Override
 	public void theDataFromACardHasBeenRead(CardData data) {
-		UserSessionState newState = getUserSession().getState().onCardDataRead(data);
+		UserSessionState newState = getUserSession().getState().onCardDataRead(getUserSession(), data);
 		if(newState != null) {
 			getUserSession().setState(newState);
 		}
