@@ -30,19 +30,25 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.Map.Entry;
 
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Mass.MassDifference;
 import com.jjjwelectronics.keyboard.USKeyboardQWERTY;
+import com.jjjwelectronics.scanner.Barcode;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.hardware.PLUCodedProduct;
+import com.thelocalmarketplace.hardware.PriceLookUpCode;
 import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.session.UserSession;
+import com.thelocalmarketplace.software.state.UserSessionState;
 
 public class Transaction {
 
@@ -58,6 +64,8 @@ public class Transaction {
     private final HashMap<UUID, IPayment> payments = new HashMap<>();
 
     private UserSession session;
+    
+    private String attendantInput;
     
     public Transaction(UserSession session) {
     	this.session = session;
@@ -80,6 +88,7 @@ public class Transaction {
             throw new NullPointerException("product");
         }
     }
+    
     
     /**
      * Removes weight of bulky item from transaction
