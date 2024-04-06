@@ -35,6 +35,7 @@ import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.payment.Transaction;
+import com.thelocalmarketplace.software.payment.Transaction.PLUCodedProductAdded;
 import com.thelocalmarketplace.software.session.UserSession;
 
 public class PrintReceiptState implements IUserSessionState<UserSessionState> {
@@ -67,10 +68,10 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
             String strippedString = workingString.replaceAll("\\s", "");
             totalCharsToPrint += strippedString.length();
         }
-        for (PLUCodedProduct product : finalTransactionRecord.getPLUCodedProducts()){
-            workingString = product.getPLUCode().toString();
+        for (PLUCodedProductAdded product : finalTransactionRecord.getPLUCodedProducts()){
+            workingString = product.getPLUCodedProduct().getPLUCode().toString();
             workingString += " : $";
-            workingString += String.valueOf(product.getPrice());
+            workingString += String.valueOf(product.getTotalCost());
             itemizedTransaction.add(workingString);
             String strippedString = workingString.replaceAll("\\s", "");
             totalCharsToPrint += strippedString.length();

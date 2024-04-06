@@ -58,7 +58,7 @@ public class Transaction {
     //private final ArrayList<BarcodedProduct> products = new ArrayList<>();
 	private final ArrayList<BarcodedProduct> barcodedProducts = new ArrayList<>();
 	
-	private final ArrayList<PLUCodedProduct> pluProducts = new ArrayList<>();
+	private final ArrayList<PLUCodedProductAdded> pluProducts = new ArrayList<>();
     
     private Mass expectedMass = Mass.ZERO;
     
@@ -98,7 +98,6 @@ public class Transaction {
      */
     public void addItem(PLUCodedProduct product, Mass mass) {
         if (product != null) {
-            pluProducts.add(product);
             //convert mass to kilograms
             BigDecimal massInKilo = new BigDecimal(mass.inMicrograms().divide(BigInteger.valueOf(1000000000)));
             BigDecimal pricePerKilo = BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100));
@@ -106,10 +105,32 @@ public class Transaction {
             totalCost = totalCost.add(itemCost);
             // TODO determine how to handle expected weight for PLU coded products
             expectedMass = expectedMass.sum(mass);
+            pluProducts.add(new PLUCodedProductAdded(product, totalCost));
         }
         else {
             throw new NullPointerException("product");
         }
+    }
+    
+    /**
+     * class that instantiates PLU coded product with the cost that is added to the transaction
+     */
+    public class PLUCodedProductAdded {
+    	private PLUCodedProduct product;
+    	private BigDecimal totalCost;
+    	
+    	public PLUCodedProductAdded(PLUCodedProduct product, BigDecimal totalCost) {
+    		this.product = product;
+    		this.totalCost = totalCost;
+    	}
+    	
+    	public PLUCodedProduct getPLUCodedProduct() {
+    		return product;
+    	}
+    	
+    	public BigDecimal getTotalCost() {
+    		return totalCost;
+    	}
     }
 
     /**
@@ -203,7 +224,7 @@ public class Transaction {
         return barcodedProducts;
     }
     
-    public ArrayList<PLUCodedProduct> getPLUCodedProducts() {
+    public ArrayList<PLUCodedProductAdded> getPLUCodedProducts() {
     	return pluProducts;
     }
 
