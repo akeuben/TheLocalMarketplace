@@ -158,12 +158,14 @@ public class Software {
 		
 		// Remove old listeners
 		selfCheckoutStations[machineID].getMainScanner().deregisterAll();
+		selfCheckoutStations[machineID].getHandheldScanner().deregisterAll();
 		selfCheckoutStations[machineID].getBaggingArea().deregisterAll();
 		selfCheckoutStations[machineID].getCoinValidator().detachAll();
 		selfCheckoutStations[machineID].getPrinter().deregisterAll();
 		
 		// Register new listeners
 		selfCheckoutStations[machineID].getMainScanner().register(currentSession[machineID].getBarcodeHandler());
+		selfCheckoutStations[machineID].getHandheldScanner().register(currentSession[machineID].getBarcodeHandler());
 		selfCheckoutStations[machineID].getBaggingArea().register(currentSession[machineID].getElectronicScaleHandler());
 		selfCheckoutStations[machineID].getCardReader().register(currentSession[machineID].getCardReaderHandler());
 		selfCheckoutStations[machineID].getCoinValidator().attach(currentSession[machineID].getCoinValidatorHandler());
