@@ -6,18 +6,22 @@ import java.util.Map.Entry;
 
 import com.jjjwelectronics.IDevice;
 import com.jjjwelectronics.IDeviceListener;
+import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.OverloadedDevice;
 import com.jjjwelectronics.keyboard.KeyboardListener;
+import com.jjjwelectronics.scale.AbstractElectronicScale;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.hardware.PriceLookUpCode;
 import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
+import com.thelocalmarketplace.software.Software;
 
 public class AttendantKeyboardHandler extends AbstractUserSessionHandler implements KeyboardListener {
 	
 	private String input = new String();
-	private ArrayList<BarcodedProduct> matchingItems = new ArrayList<>();
+	private ArrayList<Product> matchingItems = new ArrayList<>();
 	
 	public AttendantKeyboardHandler(UserSession session) {
 		super(session);
@@ -66,7 +70,7 @@ public class AttendantKeyboardHandler extends AbstractUserSessionHandler impleme
 	
 			}
 		}
-		/*
+		
 		//checks PLUcoded item database to see if any items match object description
 		for (Entry<PriceLookUpCode, PLUCodedProduct> entry :ProductDatabases.PLU_PRODUCT_DATABASE.entrySet()) {
 			PLUCodedProduct itemToCheck = entry.getValue();
@@ -75,7 +79,7 @@ public class AttendantKeyboardHandler extends AbstractUserSessionHandler impleme
 				matchingItems.add(itemToCheck);
 				}
 			}
-			*/
+			input = null;
 		}
 		
 		//if attendant selects enter after a database check has been done, input is used to make a selection from the choices and add item to transaction
@@ -83,10 +87,21 @@ public class AttendantKeyboardHandler extends AbstractUserSessionHandler impleme
 			Integer i = new Integer(0);
 			try {
 				i = Integer.parseInt(input);
-				getUserSession().getTransaction().addItem(matchingItems.get(i-1));
+				getUserSession().getTransaction().addItem((BarcodedProduct) matchingItems.get(i-1));
+			}
+			catch (ClassCastException e) {
+				i = Integer.parseInt(input);
+				Mass massOnScale;
+				try {
+					massOnScale = (((AbstractElectronicScale) Software.getInstance().getHardware(0).getScanningArea()).getCurrentMassOnTheScale());
+				} catch (OverloadedDevice f) {
+					throw new RuntimeException("The scale is currently overloaded.");
+				}
+				getUserSession().getTransaction().addItem((PLUCodedProduct) matchingItems.get(i-1), massOnScale);
 			}
 			catch (NumberFormatException e) {
 			}
+			input=null;
 		}
 		
 		//if backspace chosen, last element from input string removed
@@ -95,8 +110,8 @@ public class AttendantKeyboardHandler extends AbstractUserSessionHandler impleme
 		}
 		
 		//concatonates label to end of input string
-		else {
-			input = input + label;
+		else if (label.length()==1) {
+			input += label;
 		}
 		
 	}
