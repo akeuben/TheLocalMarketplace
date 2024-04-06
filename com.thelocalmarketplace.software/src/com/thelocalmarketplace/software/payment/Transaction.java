@@ -96,15 +96,16 @@ public class Transaction {
      * @param product
      * @param mass on scale
      */
-    public void addItem(PLUCodedProduct product, Mass mass) {
+    public void addItem(PLUCodedProduct product, Mass mass) throws OverloadedDevice {
         if (product != null) {
             //convert mass to kilograms
             BigDecimal massInKilo = new BigDecimal(mass.inMicrograms().divide(BigInteger.valueOf(1000000000)));
             BigDecimal pricePerKilo = BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100));
             BigDecimal itemCost = massInKilo.multiply(pricePerKilo);
             totalCost = totalCost.add(itemCost);
-            // TODO determine how to handle expected weight for PLU coded products
-            expectedMass = expectedMass.sum(mass);
+            AbstractElectronicScale scale = (AbstractElectronicScale) session.getHardware().getBaggingArea();
+            Mass itemMass = expectedMass.difference(scale.getCurrentMassOnTheScale()).abs();
+            expectedMass = expectedMass.sum(itemMass);
             pluProducts.add(new PLUCodedProductAdded(product, totalCost));
         }
         else {

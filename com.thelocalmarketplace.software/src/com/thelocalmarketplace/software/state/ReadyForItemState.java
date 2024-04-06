@@ -92,7 +92,11 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 			throw new RuntimeException("The scale is currently overloaded.");
 		}
 		if (product!=null) {
-			Software.getInstance().getCurrentSession(checkoutID).getTransaction().addItem(product, massOnScale);
+			try {
+				Software.getInstance().getCurrentSession(checkoutID).getTransaction().addItem(product, massOnScale);
+			} catch (OverloadedDevice e) {
+				throw new RuntimeException(e);
+			}
 			return UserSessionState.WAITING_FOR_BAGGING;
 		}
 		return null;
