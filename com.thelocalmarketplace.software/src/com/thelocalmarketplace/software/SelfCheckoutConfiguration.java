@@ -76,7 +76,6 @@ public class SelfCheckoutConfiguration {
 		);
 		this.language = Locale.CANADA;
 	}
-//<<<<<<< HEAD
 
 	public Currency getCurrency() {
 		return currency;
@@ -105,7 +104,5 @@ public class SelfCheckoutConfiguration {
 	public Locale getLanguage() {
 		return language;
 	}
-	
-//=======
-//>>>>>>> refs/heads/main
+
 }

@@ -29,7 +29,7 @@ import java.util.Locale;
  */
 
 import com.thelocalmarketplace.hardware.BarcodedProduct;
-import com.thelocalmarketplace.software.SelfCheckout;
+import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.UI.UIObserver;
 import com.thelocalmarketplace.software.state.UserSessionState;
 
@@ -78,7 +78,7 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 	 */
 	@Override
 	public void selectLanguage(Locale newLanguage) {
-		SelfCheckout.getInstance().getConfiguration().language = newLanguage;
+		Software.getInstance().getConfiguration().language = newLanguage;
 	}
 
 }
