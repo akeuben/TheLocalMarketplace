@@ -34,6 +34,7 @@ import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.Globals;
+import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.payment.Transaction;
 import com.thelocalmarketplace.software.session.UserSession; 
 
@@ -96,6 +97,7 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 		
 		// The change in mass was within the margin of error. It is okay to
 		// allow the customer to continue. Stay on the same state.
+		
 		return null;
 	}
 }

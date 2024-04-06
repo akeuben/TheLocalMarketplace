@@ -54,6 +54,6 @@ public class WaitingForBaggingState implements IUserSessionState<UserSessionStat
 			return UserSessionState.READY_FOR_ITEM; 					  // go back to ReadyForItemState
 		}
 			
-		return null; // If item is not the correct weight, weight for correct item to be placed/removed from bagging area
+		return null; // If item is not the correct weight, wait for correct item to be placed/removed from bagging area
 	}
 }
