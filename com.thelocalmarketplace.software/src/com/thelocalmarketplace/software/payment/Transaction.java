@@ -81,12 +81,6 @@ public class Transaction {
         }
     }
     
-    public void addItemByText() {
-    	String description = session.getAttendantKeyboardHandler().getInput();
-    	BarcodedProduct item =  ProductDatabases.BARCODED_PRODUCT_DATABASE.get(description);
-    	addItem(item);
-    }
-
     /**
      * Removes weight of bulky item from transaction
      * @param product item being added to transaction/products
