@@ -56,7 +56,9 @@ public class Transaction {
      * Items contained in an instance of transaction TODO Create constructor
      */
     //private final ArrayList<BarcodedProduct> products = new ArrayList<>();
-	private final ArrayList<Product> products = new ArrayList<>();
+	private final ArrayList<BarcodedProduct> barcodedProducts = new ArrayList<>();
+	
+	private final ArrayList<PLUCodedProduct> pluProducts = new ArrayList<>();
     
     private Mass expectedMass = Mass.ZERO;
     
@@ -79,7 +81,7 @@ public class Transaction {
      */
     public void addItem(BarcodedProduct product) {
         if (product != null) {
-            products.add(product);
+            barcodedProducts.add(product);
             totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
             expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM))));
         }
@@ -96,7 +98,7 @@ public class Transaction {
      */
     public void addItem(PLUCodedProduct product, Mass mass) {
         if (product != null) {
-            products.add(product);
+            pluProducts.add(product);
             //convert mass to kilograms
             BigDecimal massInKilo = new BigDecimal(mass.inMicrograms().divide(BigInteger.valueOf(1000000000)));
             BigDecimal pricePerKilo = BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100));
@@ -155,7 +157,7 @@ public class Transaction {
      * @param product item being removed from transaction/products
      */
     public void removeItem(BarcodedProduct product) {
-    	products.remove(product);
+    	barcodedProducts.remove(product);
     	totalCost = totalCost.subtract(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
     	expectedMass = expectedMass.difference(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight()*Mass.MICROGRAMS_PER_GRAM)))).abs();
     }
@@ -192,12 +194,17 @@ public class Transaction {
 
 	public Product[] getProducts() {
 		Product[] products = new Product[0];
-		products = this.products.toArray(products);
+		products = this.barcodedProducts.toArray(products);
+		products = this.pluProducts.toArray(products);
 		return products;
 	}
 
-    public ArrayList<Product> getBarcodedProducts(){
-        return products;
+    public ArrayList<BarcodedProduct> getBarcodedProducts(){
+        return barcodedProducts;
+    }
+    
+    public ArrayList<PLUCodedProduct> getPLUCodedProducts() {
+    	return pluProducts;
     }
 
 

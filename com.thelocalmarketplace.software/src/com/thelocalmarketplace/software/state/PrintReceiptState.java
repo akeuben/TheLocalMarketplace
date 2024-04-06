@@ -32,6 +32,7 @@ import com.jjjwelectronics.EmptyDevice;
 import com.jjjwelectronics.OverloadedDevice;
 import com.jjjwelectronics.printer.IReceiptPrinter;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.payment.Transaction;
 import com.thelocalmarketplace.software.session.UserSession;
@@ -66,6 +67,15 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
             String strippedString = workingString.replaceAll("\\s", "");
             totalCharsToPrint += strippedString.length();
         }
+        for (PLUCodedProduct product : finalTransactionRecord.getPLUCodedProducts()){
+            workingString = product.getPLUCode().toString();
+            workingString += " : $";
+            workingString += String.valueOf(product.getPrice());
+            itemizedTransaction.add(workingString);
+            String strippedString = workingString.replaceAll("\\s", "");
+            totalCharsToPrint += strippedString.length();
+        }
+        
 
         //because the printer can know how many more chars and lines it has left we can probably
         //use totalCharToPrint to see if the receipt is even printable
