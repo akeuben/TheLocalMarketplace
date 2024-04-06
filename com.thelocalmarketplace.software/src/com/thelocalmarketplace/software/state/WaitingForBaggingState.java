@@ -28,24 +28,25 @@ package com.thelocalmarketplace.software.state;
 
 import com.jjjwelectronics.Mass;
 import com.thelocalmarketplace.software.Globals;
-import com.thelocalmarketplace.software.SelfCheckout;
+import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.payment.Transaction;
+import com.thelocalmarketplace.software.session.UserSession;
 
 public class WaitingForBaggingState implements IUserSessionState<UserSessionState> {
 	
 	@Override
-	public UserSessionState onStateSet() {
+	public UserSessionState onStateSet(UserSession session) {
 		// Disable the coin slot to prevent the user from inserting a coin while the software
 		// is not in the correct state
-		SelfCheckout.getInstance().getHardware().getCoinSlot().disable();
-		SelfCheckout.getInstance().getHardware().getBanknoteInput().disable();
+		session.getHardware().getCoinSlot().disable();
+		session.getHardware().getBanknoteInput().disable();
 		
 		return null;
 	}
 	
 	@Override
-	public UserSessionState onWeightChanged(Mass mass) {
-		Transaction currentTransaction = SelfCheckout.getInstance().getCurrentSession().getTransaction(); // Get current transaction
+	public UserSessionState onWeightChanged(UserSession session, Mass mass) {
+		Transaction currentTransaction = session.getTransaction(); // Get current transaction
 		Mass expectedMass = currentTransaction.getExpectedMass(); // Get expected mass
 		Mass absoluteDifference = expectedMass.difference(mass).abs(); // Compare expected and actual mass of item placed in bagging area
 		

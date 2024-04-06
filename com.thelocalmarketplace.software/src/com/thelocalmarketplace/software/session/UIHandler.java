@@ -44,7 +44,7 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 		//sets state to add bag state
 		getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
 		//new state changed back to waiting for item after add bag completed
-		UserSessionState newState = getUserSession().getState().onStateSet();
+		UserSessionState newState = getUserSession().getState().onStateSet(getUserSession());
 		if (newState!=null) {
 			getUserSession().setState(newState);
 		}
