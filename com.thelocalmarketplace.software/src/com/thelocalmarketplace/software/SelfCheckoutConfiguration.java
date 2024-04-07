@@ -74,4 +74,5 @@ public class SelfCheckoutConfiguration {
 			100
 		);
 	}
+
 }

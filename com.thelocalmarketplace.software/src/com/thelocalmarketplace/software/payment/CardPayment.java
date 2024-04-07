@@ -45,7 +45,7 @@ public class CardPayment implements CardReaderListener, IPayment{
 	}
 	
 	/**
-	 * Will attempt to post a transaction using a debit card via swiping
+	 * Will attempt to post a transaction using a credit/debit card via swiping, tap and insert
 	 * @return result of transaction, true if successful, false if not
 	 */
 	public boolean makePayment(BigDecimal amount) {
