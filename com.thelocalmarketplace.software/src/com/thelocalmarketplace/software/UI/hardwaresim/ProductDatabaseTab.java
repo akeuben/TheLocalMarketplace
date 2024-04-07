@@ -1,4 +1,4 @@
-package com.thelocalmarketplace.software.UI.components;
+package com.thelocalmarketplace.software.UI.hardwaresim;
 
 /**
  * SENG 300 Project - Group 1:
@@ -26,10 +26,21 @@ package com.thelocalmarketplace.software.UI.components;
  * Winston Wang - 30185321
  */
 
-import javax.swing.JOptionPane;
+import javax.swing.JTabbedPane;
 
-public class ErrorPopup {
-	public static void showError(String title, String message) {
-		JOptionPane.showMessageDialog(null, message, title, 0, null);
+import com.thelocalmarketplace.software.UI.hardwaresim.components.BarcodedProductDatabaseTab;
+import com.thelocalmarketplace.software.UI.hardwaresim.components.PLUProductDatabaseTab;
+
+public class ProductDatabaseTab extends AbstractAttendantTab {
+
+	private static final long serialVersionUID = -5221044028265491112L;
+
+	public ProductDatabaseTab() {
+		super(1);
+		JTabbedPane pane = new JTabbedPane();
+		pane.add("Barcoded Products", new BarcodedProductDatabaseTab());
+		pane.add("PLU Coded Products", new PLUProductDatabaseTab());
+		add(pane);
 	}
- }
+
+}

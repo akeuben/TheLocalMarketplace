@@ -17,7 +17,7 @@ import javax.swing.JScrollPane;
 
 import com.thelocalmarketplace.software.UI.components.WrappedJComponent;
 
-public class SelfCheckoutComponent extends JPanel{
+public class SelfCheckoutComponent extends JPanel {
 	// gonna have a bidirectional communication channel with the self checkout station 
 	// add a transaction viewer as a wrapped component as a JList
 	private JPanel transactionViewer;

@@ -1,4 +1,4 @@
-package com.thelocalmarketplace.software.UI.components;
+package com.thelocalmarketplace.software.UI.hardwaresim;
 
 /**
  * SENG 300 Project - Group 1:
@@ -26,10 +26,17 @@ package com.thelocalmarketplace.software.UI.components;
  * Winston Wang - 30185321
  */
 
-import javax.swing.JOptionPane;
+import java.awt.GridLayout;
 
-public class ErrorPopup {
-	public static void showError(String title, String message) {
-		JOptionPane.showMessageDialog(null, message, title, 0, null);
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+public abstract class AbstractAttendantTab extends JPanel {
+	
+	private static final long serialVersionUID = 5053495616877039194L;
+	
+	public AbstractAttendantTab(int columns) {
+		setLayout(new GridLayout(0, columns, 20, 20));
+		setBorder(new EmptyBorder(10, 10, 10, 10));
 	}
- }
+}

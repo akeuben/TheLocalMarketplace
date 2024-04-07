@@ -48,11 +48,11 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
      */
     @Override
     public UserSessionState onStateSet(UserSession session) {
-		// Disable the coin slot to prevent the user from inserting a coin while the software
-		// is not in the correct state
-		session.getHardware().getCoinSlot().disable();
-		session.getHardware().getBanknoteInput().disable();
-		
+        // Disable the coin slot to prevent the user from inserting a coin while the software
+        // is not in the correct state
+        session.getHardware().getCoinSlot().disable();
+        session.getHardware().getBanknoteInput().disable();
+
         hardwarePrinter = session.getHardware().getPrinter();
         finalTransactionRecord = session.getTransaction();//prob add a null check just incase
         itemizedTransaction = new ArrayList<String>();
@@ -115,7 +115,7 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
                     hardwarePrinter.print('\n');//once an item has been printed out fully move to the next line
                 } catch (EmptyDevice e) {
                     //newline char doesn't use ink but will throw out of paper
-                    session.getReceiptPrinterHandler().thePrinterIsOutOfPaper();
+                     session.getReceiptPrinterHandler().thePrinterIsOutOfPaper();
                     return UserSessionState.PRINTER_NEEDS_REFILL;
                 } catch (OverloadedDevice e) {
                     //this really should never happen based on what the printer class looks like but
@@ -128,7 +128,7 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
         hardwarePrinter.cutPaper();
 
         //After receipt printing the use case states the station should return to a ready state
-        Software.getInstance().endCurrentSession(session.getMachineID());
+        /**/Software.getInstance().endCurrentSession(session.getMachineID());
         return null;
     }
 }
