@@ -1,4 +1,4 @@
-package com.thelocalmarketplace.software.payment;
+package com.thelocalmarketplace.software.UI.hardwaresim;
 
 /**
  * SENG 300 Project - Group 1:
@@ -26,22 +26,21 @@ package com.thelocalmarketplace.software.payment;
  * Winston Wang - 30185321
  */
 
-import java.math.BigDecimal;
+import javax.swing.JTabbedPane;
 
-public class CashPayment implements IPayment {
-    private BigDecimal amountPaid;
+import com.thelocalmarketplace.software.UI.hardwaresim.components.BarcodedProductDatabaseTab;
+import com.thelocalmarketplace.software.UI.hardwaresim.components.PLUProductDatabaseTab;
 
+public class ProductDatabaseTab extends AbstractAttendantTab {
 
-    public CashPayment(BigDecimal amountPaid) {
-        this.amountPaid = amountPaid;
-    }
-    
-    @Override
-    public BigDecimal getAmountPaid() {
-    	return amountPaid;
-    }
-    @Override
-    public String toString() {
-    	return "Cash: $" + getAmountPaid().doubleValue(); 
-    }
+	private static final long serialVersionUID = -5221044028265491112L;
+
+	public ProductDatabaseTab() {
+		super(1);
+		JTabbedPane pane = new JTabbedPane();
+		pane.add("Barcoded Products", new BarcodedProductDatabaseTab());
+		pane.add("PLU Coded Products", new PLUProductDatabaseTab());
+		add(pane);
+	}
+
 }

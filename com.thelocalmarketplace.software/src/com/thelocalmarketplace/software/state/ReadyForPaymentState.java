@@ -130,11 +130,12 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 	@Override 
 	public UserSessionState onCardDataRead(UserSession session, CardData data) {
 		// create a card payment instance, for now it will be debit but I might refactor those two classes into one
-		CardPayment payment = new CardPayment();
+		CardPayment payment = new CardPayment(data);
 		Transaction transaction = session.getTransaction();; 
-		payment.swipePayment(data, transaction.getTotalCost()); 
+		payment.makePayment(transaction.getTotalCost()); 
 		System.out.println("Paid amount: " + payment.getAmountPaid().doubleValue());
 		transaction.addPayment(payment);
+
 		
 		
 		if(transaction.getTotalCost().compareTo(BigDecimal.ZERO) <= 0) {
