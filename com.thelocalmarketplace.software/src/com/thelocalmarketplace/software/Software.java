@@ -1,6 +1,8 @@
 package com.thelocalmarketplace.software;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * SENG 300 Project - Group 1:
@@ -51,6 +53,8 @@ public class Software {
 
 	public boolean attendantStationFlagged; //placeholder for any case where the attendant station may be flagged
 	
+	private List<List<SoftwareObserver>> observers;
+	
 	private Software(SelfCheckoutConfiguration configuration, int stationCount) {
 		this.configuration = configuration;
 		currentSession = new UserSession[stationCount];
@@ -82,6 +86,11 @@ public class Software {
 			station.turnOn();
 			selfCheckoutStations[i] = station;
 			attendantStation.add(station);
+		}
+		
+		this.observers = new LinkedList<List<SoftwareObserver>>();
+		for(int i = 0; i < stationCount; i++) {
+			
 		}
 	}
 	
@@ -158,11 +167,9 @@ public class Software {
     	
 		currentSession[machineID].setState(UserSessionState.READY_FOR_ITEM);
 		
-		// Remove old listeners
-		selfCheckoutStations[machineID].getMainScanner().deregisterAll();
-		selfCheckoutStations[machineID].getBaggingArea().deregisterAll();
-		selfCheckoutStations[machineID].getCoinValidator().detachAll();
-		selfCheckoutStations[machineID].getPrinter().deregisterAll();
+		for(SoftwareObserver obs : this.observers[machineID]) {
+			obs.onSessionStart();
+		}
 		
 		// Register new listeners
 		selfCheckoutStations[machineID].getMainScanner().register(currentSession[machineID].getBarcodeHandler());
@@ -182,6 +189,18 @@ public class Software {
 	 */
 	public boolean endCurrentSession(int machineID) {
 		if(currentSession[machineID] == null) return false;
+		
+		for(SoftwareObserver obs : this.observers[machineID]) {
+			obs.onSessionEnd();
+		}
+		
+		// Remove old listeners
+		selfCheckoutStations[machineID].getMainScanner().deregister(currentSession[machineID].getBarcodeHandler());
+		selfCheckoutStations[machineID].getBaggingArea().deregister(currentSession[machineID].getElectronicScaleHandler());
+		selfCheckoutStations[machineID].getCardReader().deregister(currentSession[machineID].getCardReaderHandler());
+		selfCheckoutStations[machineID].getCoinValidator().detach(currentSession[machineID].getCoinValidatorHandler());
+		selfCheckoutStations[machineID].getPrinter().deregister(currentSession[machineID].getReceiptPrinterHandler());
+		selfCheckoutStations[machineID].getBanknoteValidator().detach(currentSession[machineID].getBanknoteValidatorHandler());
 		
 		currentSession[machineID] = null;
 		return true;
@@ -225,5 +244,31 @@ public class Software {
 			disableStationQueued[machineId] = true;
 			return false;
 		}
+	}
+	
+	/**
+	 * Registers a observer for a particular machine
+	 * @param machineID The machine to observe
+	 * @param observer The observer
+	 */
+	public void register(int machineID, SoftwareObserver observer) {
+		this.observers[machineID].add(observer);
+	}
+	
+	/**
+	 * Deregisters an observer for a particular machine
+	 * @param machineID The machine to observe
+	 * @param observer The observer
+	 */
+	public void deregister(int machineID, SoftwareObserver observer) {
+		this.observers[machineID].remove(observer);
+	}
+	
+	/**
+	 * Deregisters all observer for a particular machine
+	 * @param machineID The machine to observe
+	 */
+	public void deregisterAll(int machineID) {
+		this.observers[machineID].removeAll(this.observers[machineID]);
 	}
 }

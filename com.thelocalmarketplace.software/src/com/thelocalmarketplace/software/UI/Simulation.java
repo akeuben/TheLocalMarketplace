@@ -44,6 +44,7 @@ import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.UI.Attendant.SelfCheckoutComponent;
 import com.thelocalmarketplace.software.UI.hardwaresim.UIHardwareSimulation;
+import com.thelocalmarketplace.software.UI.user.MainUserPanel;
 import com.thelocalmarketplace.software.payment.BankDataBase;
 
 public class Simulation {
@@ -88,5 +89,7 @@ public class Simulation {
 		
 		BankDataBase.initialize(new HashMap<String, CardIssuer>());
 		UIHardwareSimulation.startHardwareSimulationUI(1);
+		
+		Software.getInstance().getHardware(0).getScreen().getFrame().add(new MainUserPanel(0));
 	}
 }
