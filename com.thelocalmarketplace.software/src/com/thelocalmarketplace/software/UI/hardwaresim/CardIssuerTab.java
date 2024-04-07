@@ -137,6 +137,7 @@ public class CardIssuerTab extends AbstractAttendantTab {
 		}
 		
 		BankDataBase.getInstance().getDataBase().remove(selected);
+		CardIssuerTabDetails.onRemove(selected);
 		cardIssuerModel.removeElement(selected);
 		recreateTabs();
 	}

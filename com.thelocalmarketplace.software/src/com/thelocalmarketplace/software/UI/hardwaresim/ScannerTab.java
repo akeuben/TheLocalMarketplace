@@ -36,8 +36,8 @@ public class ScannerTab extends AbstractHardwareSimTab {
 	public ScannerTab(int machineId) {
 		super(machineId, 2);
 
-		add(new ScannerComponent(getHardware().getMainScanner()));
-		add(new ScannerComponent(getHardware().getHandheldScanner()));
+		add(new ScannerComponent(getHardware().getMainScanner(), "Main Scanner"));
+		add(new ScannerComponent(getHardware().getHandheldScanner(), "Handheld Scanner"));
 	}
 	
 }

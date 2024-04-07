@@ -178,4 +178,8 @@ public class CardIssuerTabDetails extends AbstractAttendantTab implements ListCe
 		cardModel.addElement(data);
 		existingCardData.get(this.cardIssuer).add(data);
 	}
+	
+	public static void onRemove(String cardIssuer) {
+		existingCardData.remove(cardIssuer);
+	}
 }

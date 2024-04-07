@@ -50,14 +50,14 @@ public class ScannerComponent extends JPanel {
 	IBarcodeScanner scanner;
 	JTextField input;
 	
-	public ScannerComponent(IBarcodeScanner scanner) {
+	public ScannerComponent(IBarcodeScanner scanner, String name) {
 		this.scanner = scanner;
 
 		input = new JTextField(10);
 		WrappedJComponent<JButton> button = new WrappedJComponent<JButton>(JButton.class, new Object[] {"Scan"}, new Class<?>[] {String.class});
 		button.getComponent().addActionListener(this::scan);
 
-		setBorder(new TitledBorder("Main Scanner"));
+		setBorder(new TitledBorder(name));
 		add(input);
 		add(button);
 	}
