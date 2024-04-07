@@ -102,7 +102,7 @@ public class Transaction {
             totalCost = totalCost.add(itemCost);
             // TODO determine how to handle expected weight for PLU coded products
             expectedMass = expectedMass.sum(mass);
-            pluProducts.add(new PLUCodedProductAdded(product, totalCost, new Mass(massInKilo)));
+            pluProducts.add(new PLUCodedProductAdded(product, totalCost, mass));
         }
         else {
             throw new NullPointerException("product");
