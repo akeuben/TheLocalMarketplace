@@ -81,10 +81,10 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 	}
 	
 	@Override
-	public UserSessionState onPLUentered(PriceLookUpCode plu) {;
+	public UserSessionState onPLUentered(UserSession session, PriceLookUpCode plu) {;
 		PLUCodedProduct product = ProductDatabases.PLU_PRODUCT_DATABASE.get(plu);
 		int checkoutID = 0;
-		IElectronicScale scale = Software.getInstance().getHardware(checkoutID).getScanningArea();
+		IElectronicScale scale = session.getHardware().getScanningArea();
 		Mass massOnScale;
 		try {
 			massOnScale = ((AbstractElectronicScale) scale).getCurrentMassOnTheScale();
