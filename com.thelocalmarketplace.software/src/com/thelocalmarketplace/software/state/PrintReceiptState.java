@@ -51,12 +51,12 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
      */
     @Override
     public UserSessionState onStateSet(UserSession session) {
-    	// Disable the coin slot to prevent the user from inserting a coin while the software
-		// is not in the correct state
-		session.getHardware().getCoinSlot().disable();
-		session.getHardware().getBanknoteInput().disable();
-		
+        // Disable the coin slot to prevent the user from inserting a coin while the software
+        // is not in the correct state
+        session.getHardware().getCoinSlot().disable();
+        session.getHardware().getBanknoteInput().disable();
         hardwarePrinter = session.getHardware().getPrinter();
+        
         finalTransactionRecord = session.getTransaction();//prob add a null check just incase
         
         int totalCharsToPrint = findWorkingString(); 
@@ -166,7 +166,7 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
                     pair[1] = 0; 
                 } catch (EmptyDevice e) {
                     //newline char doesn't use ink but will throw out of paper
-                    session.getReceiptPrinterHandler().thePrinterIsOutOfPaper();
+                     session.getReceiptPrinterHandler().thePrinterIsOutOfPaper();
                     return UserSessionState.PRINTER_NEEDS_REFILL;
                 } catch (OverloadedDevice e) {
                     //this really should never happen based on what the printer class looks like but
@@ -176,10 +176,11 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
 
         }
         hardwarePrinter.cutPaper();
+        
         // if we are able to cut the paper then set the machinepointers back to zero 
         pair = new Integer[] {0,0}; 
         Software.getInstance().endCurrentSession(session.getMachineID());
-        return null; 
+        return null;
     }
     
 }
