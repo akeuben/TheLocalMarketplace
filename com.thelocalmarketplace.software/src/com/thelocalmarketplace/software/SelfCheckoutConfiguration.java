@@ -77,32 +77,4 @@ public class SelfCheckoutConfiguration {
 		this.language = Locale.ENGLISH;
 	}
 
-	public Currency getCurrency() {
-		return currency;
-	}
-
-	public int getCoinDispenserCapacity() {
-		return coinDispenserCapacity;
-	}
-
-	public int getCoinStorageUnitCapacity() {
-		return coinStorageUnitCapacity;
-	}
-
-	public int getCoinTrayCapacity() {
-		return coinTrayCapacity;
-	}
-
-	public BigDecimal[] getCoinDenominations() {
-		return coinDenominations.clone();
-	}
-	
-	public static enum MachineRating {
-		GOLD, SILVER, BRONZE
-	}
-	
-	public Locale getLanguage() {
-		return language;
-	}
-
 }
