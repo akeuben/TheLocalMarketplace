@@ -64,8 +64,6 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 	@Override
 	public void skipBaggingSelected(BarcodedProduct product) {
 		super.getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
-		super.getUserSession().getTransaction().skipBagging(product);
-		super.getUserSession().setState(UserSessionState.READY_FOR_ITEM);
 	}
 
 }
