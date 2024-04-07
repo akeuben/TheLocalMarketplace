@@ -50,6 +50,7 @@ import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.payment.CashPayment;
 import com.thelocalmarketplace.software.payment.IPayment;
 import com.thelocalmarketplace.software.payment.Transaction;
+import com.thelocalmarketplace.software.session.AttendantKeyboardHandler;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.test.stubs.TestableAttendantStation;
 import com.thelocalmarketplace.software.test.stubs.TestableSelfCheckoutStationGold;
@@ -64,7 +65,6 @@ public class TransactionTest {
 	private BarcodedProduct bulkyItem;
 	private Numeral num;
 	private Barcode bc;
-	private AttendantKeyboardHandler akh;
 	
     // simulate a payment by defining a payment stub
     private static class PaymentStub implements IPayment {
