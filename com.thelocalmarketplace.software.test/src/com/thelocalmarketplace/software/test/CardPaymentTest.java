@@ -260,9 +260,9 @@ public class CardPaymentTest {
 		} 
 
         // Initialize CardPayment and attempt payment
-        CardPayment payment = new CardPayment();
+        CardPayment payment = new CardPayment(cardData);
 
-        boolean result = payment.makePayment(cardData, transaction.getTotalCost());
+        boolean result = payment.makePayment(transaction.getTotalCost());
 
 
         // Assert payment success
@@ -291,9 +291,9 @@ public class CardPaymentTest {
 		} 
 
         // Initialize CardPayment and attempt payment
-        CardPayment payment = new CardPayment();
+        CardPayment payment = new CardPayment(cardData);
 
-        boolean result = payment.makePayment(cardData, sc.getCurrentSession(0).getTransaction().getTotalCost());
+        boolean result = payment.makePayment( sc.getCurrentSession(0).getTransaction().getTotalCost());
 
 
         // Assert payment fail
@@ -336,9 +336,9 @@ public class CardPaymentTest {
 
 	        // Prepare card data (simulate swiping the card)
 	        CardData cardData = null;
-	        CardPayment payment = new CardPayment();
+	        CardPayment payment = new CardPayment(cardData);
 
-	        payment.makePayment(cardData, transaction.getTotalCost());
+	        payment.makePayment( transaction.getTotalCost());
 	}
 	
 	/**

@@ -38,17 +38,17 @@ public class CardPayment implements CardReaderListener, IPayment{
 
 	private BigDecimal amountDue;
 	private BigDecimal amountPaid; 
-	
-	public CardPayment() {
+	private CardData data; 
+	public CardPayment(CardData data) {
 		this.amountPaid = BigDecimal.ZERO;
-		
+		this.data = data; 
 	}
 	
 	/**
 	 * Will attempt to post a transaction using a debit card via swiping
 	 * @return result of transaction, true if successful, false if not
 	 */
-	public boolean makePayment(CardData data, BigDecimal amount) {
+	public boolean makePayment(BigDecimal amount) {
 		this.amountDue = amount;
 
 		// check to see if the bank that corresponds to the card's type exists 
@@ -78,6 +78,13 @@ public class CardPayment implements CardReaderListener, IPayment{
 		return false;
 	}
 
+	@Override
+	public String toString() {
+		return data.getType() + " ending in " + data.getNumber().substring(data.getNumber().length() - 4) + ": $" + getAmountPaid().doubleValue(); 
+	}
+	
+	
+	
 	@Override
 	public void aDeviceHasBeenEnabled(IDevice<? extends IDeviceListener> device) {
 		
