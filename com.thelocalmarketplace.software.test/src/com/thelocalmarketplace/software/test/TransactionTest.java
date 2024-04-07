@@ -45,6 +45,8 @@ import com.tdc.CashOverloadException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.hardware.PLUCodedProduct;
+import com.thelocalmarketplace.hardware.PriceLookUpCode;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.Software;
@@ -67,6 +69,8 @@ public class TransactionTest {
 	private Numeral num;
 	private Barcode bc;
 	private AttendantKeyboardHandler akh;
+	private PLUCodedProduct pluProductOne;
+	private PLUCodedProduct pluProductTwo;
 	
     // simulate a payment by defining a payment stub
     private static class PaymentStub implements IPayment {
@@ -94,6 +98,8 @@ public class TransactionTest {
 		this.productOne = new BarcodedProduct(bc, "test1", 100, 1);
 		this.productTwo = new BarcodedProduct(bc, "test2", 200, 2);
 		this.bulkyItem = new BarcodedProduct(bc,"bulky item", 50, 100);
+		this.pluProductOne = new PLUCodedProduct(new PriceLookUpCode("1"), "plu1", 1);
+		this.pluProductTwo = new PLUCodedProduct(new PriceLookUpCode("2"), "plu2", 2);
 	}
 	
 	@Test
@@ -132,9 +138,8 @@ public class TransactionTest {
 	}
 	
 	
-	
 	@Test
-	public void testAddItemByKeyboard() {
+	public void testAddBarcodedItemByKeyboard() {
 		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(bc, productOne);
 		akh.aKeyHasBeenReleased("t");
 		akh.aKeyHasBeenReleased("e");
@@ -142,6 +147,17 @@ public class TransactionTest {
 		akh.aKeyHasBeenReleased("1");
 		akh.aKeyHasBeenReleased("Enter");
 		Assert.assertTrue(transaction.getBarcodedProducts().contains(productOne));
+	}
+	
+	@Test
+	public void testAddPLUItemByKeyboard() {
+		ProductDatabases.PLU_PRODUCT_DATABASE.put(new PriceLookUpCode("1"), pluProductOne);
+		akh.aKeyHasBeenReleased("p");
+		akh.aKeyHasBeenReleased("l");
+		akh.aKeyHasBeenReleased("Enter");
+		akh.aKeyHasBeenReleased("1");
+		akh.aKeyHasBeenReleased("Enter");
+		Assert.assertEquals(transaction.getPLUCodedProducts().get(0).getPLUCodedProduct(),pluProductOne);
 	}
 	
 	
