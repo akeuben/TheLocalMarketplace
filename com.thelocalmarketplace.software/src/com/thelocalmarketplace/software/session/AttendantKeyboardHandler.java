@@ -123,6 +123,10 @@ public class AttendantKeyboardHandler extends AbstractUserSessionHandler impleme
 	public ArrayList<Product> getMatchingItems() {
 		return matchingItems;
 	}
+	
+	public String getInput() {
+		return input;
+	}
 
 
 }

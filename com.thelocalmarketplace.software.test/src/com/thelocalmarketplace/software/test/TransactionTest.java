@@ -45,11 +45,13 @@ import com.tdc.CashOverloadException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.payment.CashPayment;
 import com.thelocalmarketplace.software.payment.IPayment;
 import com.thelocalmarketplace.software.payment.Transaction;
+import com.thelocalmarketplace.software.session.AttendantKeyboardHandler;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.test.stubs.TestableAttendantStation;
 import com.thelocalmarketplace.software.test.stubs.TestableSelfCheckoutStationGold;
@@ -64,6 +66,7 @@ public class TransactionTest {
 	private BarcodedProduct bulkyItem;
 	private Numeral num;
 	private Barcode bc;
+	private AttendantKeyboardHandler akh;
 	
     // simulate a payment by defining a payment stub
     private static class PaymentStub implements IPayment {
@@ -113,6 +116,34 @@ public class TransactionTest {
 	public void testPositiveCost() {
 		Assert.assertTrue(transaction.getTotalCost().compareTo(BigDecimal.ZERO) >= 0);
 	}
+	
+	@Test
+	public void testInputOnKeyBoard() {
+		akh.aKeyHasBeenReleased("1");
+		Assert.assertEquals(akh.getInput(), "1");
+	}
+	
+	@Test
+	public void testBackSpaceOnKeyBoard() {
+		akh.aKeyHasBeenReleased("1");
+		akh.aKeyHasBeenReleased("2");
+		akh.aKeyHasBeenReleased("Backspace");
+		Assert.assertEquals(akh.getInput(), "1");
+	}
+	
+	
+	
+	@Test
+	public void testAddItemByKeyboard() {
+		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(bc, productOne);
+		akh.aKeyHasBeenReleased("t");
+		akh.aKeyHasBeenReleased("e");
+		akh.aKeyHasBeenReleased("Enter");
+		akh.aKeyHasBeenReleased("1");
+		akh.aKeyHasBeenReleased("Enter");
+		Assert.assertTrue(transaction.getBarcodedProducts().contains(productOne));
+	}
+	
 	
 	@Test
 	public void testAddOneItemWeight() {
