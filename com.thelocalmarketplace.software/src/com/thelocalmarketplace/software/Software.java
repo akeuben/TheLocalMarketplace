@@ -1,6 +1,7 @@
 package com.thelocalmarketplace.software;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,6 +34,7 @@ import java.util.List;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.AttendantStation;
 import com.thelocalmarketplace.software.session.UserSession;
+import com.thelocalmarketplace.software.state.PrintReceiptState;
 import com.thelocalmarketplace.software.state.UserSessionState;
 
 import powerutility.PowerGrid;
@@ -126,6 +128,7 @@ public class Software {
 		AbstractSelfCheckoutStation.configureCoinTrayCapacity(configuration.coinTrayCapacity);
 		instance = new Software(configuration, selfCheckoutCount);
 		
+		PrintReceiptState.machinePointers = new ArrayList<Integer[]>(); 
 		return instance;
 	}
 	
@@ -167,7 +170,7 @@ public class Software {
     	
 		currentSession[machineID].setState(UserSessionState.READY_FOR_ITEM);
 		
-		for(SoftwareObserver obs : this.observers[machineID]) {
+		for(SoftwareObserver obs : this.observers.get(machineID)) {
 			obs.onSessionStart();
 		}
 		
@@ -178,6 +181,9 @@ public class Software {
 		selfCheckoutStations[machineID].getCoinValidator().attach(currentSession[machineID].getCoinValidatorHandler());
 		selfCheckoutStations[machineID].getPrinter().register(currentSession[machineID].getReceiptPrinterHandler());
 		selfCheckoutStations[machineID].getBanknoteValidator().attach(currentSession[machineID].getBanknoteValidatorHandler());
+		
+		// set machine pointer to 0 initially
+		PrintReceiptState.machinePointers.add(machineID, new Integer[] {0,0});
 		
 		return currentSession[machineID];
 	}
@@ -190,7 +196,7 @@ public class Software {
 	public boolean endCurrentSession(int machineID) {
 		if(currentSession[machineID] == null) return false;
 		
-		for(SoftwareObserver obs : this.observers[machineID]) {
+		for(SoftwareObserver obs : this.observers.get(machineID)) {
 			obs.onSessionEnd();
 		}
 		
@@ -252,7 +258,7 @@ public class Software {
 	 * @param observer The observer
 	 */
 	public void register(int machineID, SoftwareObserver observer) {
-		this.observers[machineID].add(observer);
+		this.observers.get(machineID).add(observer);
 	}
 	
 	/**
@@ -261,7 +267,7 @@ public class Software {
 	 * @param observer The observer
 	 */
 	public void deregister(int machineID, SoftwareObserver observer) {
-		this.observers[machineID].remove(observer);
+		this.observers.get(machineID).remove(observer);
 	}
 	
 	/**
@@ -269,6 +275,6 @@ public class Software {
 	 * @param machineID The machine to observe
 	 */
 	public void deregisterAll(int machineID) {
-		this.observers[machineID].removeAll(this.observers[machineID]);
+		this.observers.get(machineID).removeAll(this.observers.get(machineID));
 	}
 }
