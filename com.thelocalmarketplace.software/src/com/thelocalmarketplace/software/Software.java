@@ -1,6 +1,7 @@
 package com.thelocalmarketplace.software;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 
 /**
  * SENG 300 Project - Group 1:
@@ -31,6 +32,7 @@ import java.lang.reflect.InvocationTargetException;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.AttendantStation;
 import com.thelocalmarketplace.software.session.UserSession;
+import com.thelocalmarketplace.software.state.PrintReceiptState;
 import com.thelocalmarketplace.software.state.UserSessionState;
 
 import powerutility.PowerGrid;
@@ -115,6 +117,7 @@ public class Software {
 		AbstractSelfCheckoutStation.configureCoinTrayCapacity(configuration.coinTrayCapacity);
 		instance = new Software(configuration, selfCheckoutCount);
 		
+		PrintReceiptState.machinePointers = new ArrayList<Integer[]>(); 
 		return instance;
 	}
 	
@@ -169,6 +172,9 @@ public class Software {
 		selfCheckoutStations[machineID].getCoinValidator().attach(currentSession[machineID].getCoinValidatorHandler());
 		selfCheckoutStations[machineID].getPrinter().register(currentSession[machineID].getReceiptPrinterHandler());
 		selfCheckoutStations[machineID].getBanknoteValidator().attach(currentSession[machineID].getBanknoteValidatorHandler());
+		
+		// set machine pointer to 0 initially
+		PrintReceiptState.machinePointers.add(machineID, new Integer[] {0,0});
 		
 		return currentSession[machineID];
 	}
