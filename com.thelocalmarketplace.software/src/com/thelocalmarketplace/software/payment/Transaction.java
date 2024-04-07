@@ -40,6 +40,7 @@ import com.tdc.NoCashAvailableException;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.Software;
+import com.thelocalmarketplace.software.membership.Membership;
 import com.thelocalmarketplace.software.session.UserSession;
 
 public class Transaction {
@@ -56,6 +57,8 @@ public class Transaction {
     private final HashMap<UUID, IPayment> payments = new HashMap<>();
 
     private UserSession session;
+
+    private long transactionMembershipID;
     
     public Transaction(UserSession session) {
     	this.session = session;
@@ -73,27 +76,6 @@ public class Transaction {
             products.add(product);
             totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
             expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM))));
-        }
-        else {
-            throw new NullPointerException("product");
-        }
-    }
-
-    /**
-     * Removes weight of bulky item from transaction
-     * @param product item being added to transaction/products
-     */
-    public void skipBagging(BarcodedProduct product)
-    {
-    	if (product != null) {
-    		Mass bulkyItemMass = new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM)));
-			MassDifference massDiff = expectedMass.difference(bulkyItemMass);
-			
-			if (massDiff.compareTo(Mass.ZERO) < 0) {
-				expectedMass = Mass.ZERO;
-			} else {
-				expectedMass = massDiff.abs(); // Use the absolute value to ensure it's positive.
-			}
         }
         else {
             throw new NullPointerException("product");
@@ -223,5 +205,13 @@ public class Transaction {
             }
             session.getHardware().getBanknoteOutput().dispense();
         }
+    }
+
+    public long getTransactionMembershipID() {
+        return transactionMembershipID;
+    }
+
+    public void setTransactionMembershipID(long transactionMembershipID) {
+        this.transactionMembershipID = transactionMembershipID;
     }
 }
