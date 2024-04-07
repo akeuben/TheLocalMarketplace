@@ -60,6 +60,11 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 
 
 	}
+	
+	@Override
+	public void purchasingBagsSelected (int numberofBags) {
+		super.getUserSession().getTransaction().purchaseBags(numberofBags);
+	}
 
 	@Override
 	public void skipBaggingSelected(BarcodedProduct product) {
