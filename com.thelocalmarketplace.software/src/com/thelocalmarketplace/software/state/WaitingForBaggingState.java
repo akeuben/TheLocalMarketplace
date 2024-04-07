@@ -27,8 +27,10 @@ package com.thelocalmarketplace.software.state;
  */
 
 import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.OverloadedDevice;
+import com.jjjwelectronics.scale.AbstractElectronicScale;
+import com.jjjwelectronics.scale.IElectronicScale;
 import com.thelocalmarketplace.software.Globals;
-import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.payment.Transaction;
 import com.thelocalmarketplace.software.session.UserSession;
 
@@ -40,6 +42,22 @@ public class WaitingForBaggingState implements IUserSessionState<UserSessionStat
 		// is not in the correct state
 		session.getHardware().getCoinSlot().disable();
 		session.getHardware().getBanknoteInput().disable();
+		
+		Transaction currentTransaction = session.getTransaction(); // Get current transaction
+		Mass expectedMass = currentTransaction.getExpectedMass(); // Get expected mass
+		IElectronicScale scale = session.getHardware().getBaggingArea();
+		if(!(scale instanceof AbstractElectronicScale)) return null;
+		
+		Mass absoluteDifference;
+		try {
+			absoluteDifference = expectedMass.difference(((AbstractElectronicScale) scale).getCurrentMassOnTheScale()).abs();
+		} catch (OverloadedDevice e) {
+			return UserSessionState.WAITING_FOR_ATTENDANT;
+		} // Compare expected and actual mass of item placed in bagging area
+		
+		if(absoluteDifference.compareTo(Globals.MAXIMUM_WEIGHT_DISCREPENCY) == -1) { // If item falls within the scale's sensitivity window,
+			return UserSessionState.READY_FOR_ITEM; 					  // go back to ReadyForItemState
+		}
 		
 		return null;
 	}

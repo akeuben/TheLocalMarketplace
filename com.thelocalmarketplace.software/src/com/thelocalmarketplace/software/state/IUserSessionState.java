@@ -96,11 +96,15 @@ public interface IUserSessionState<T> {
 	 * @param data The Card data of the card that was just read.
 	 * @return The state that should be transition to after the function executes, null if state is same. 
 	 */
-
-	default T onCardDataRead(CardData data) {return null;};
-	
-	default T onPLUentered(PriceLookUpCode plu ) {return null;};
-
 	default T onCardDataRead(UserSession session, CardData data) {return null;};
 
+	/**
+	 * Called when a PLU is entered by the user
+	 * @param session
+	 * @param plu code enetered by user
+	 * @return The state that should be transition to after the function executes, null if state is same. 
+	 */
+	default T onPLUentered(UserSession session, PriceLookUpCode plu ) {return null;};
+
+	
 }

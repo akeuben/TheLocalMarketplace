@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.card.Card.CardData;
 import com.jjjwelectronics.scanner.Barcode;
+import com.thelocalmarketplace.hardware.PriceLookUpCode;
 import com.thelocalmarketplace.software.session.UserSession;
 
 public enum UserSessionState implements IUserSessionState<UserSessionState> {
@@ -109,5 +110,10 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	@Override
 	public UserSessionState onCardDataRead(UserSession session, CardData data) {
 		return state.onCardDataRead(session, data);
+	}
+	
+	@Override
+	public UserSessionState onPLUentered(UserSession session, PriceLookUpCode plu) {
+		return state.onPLUentered(session, plu);
 	}
 }

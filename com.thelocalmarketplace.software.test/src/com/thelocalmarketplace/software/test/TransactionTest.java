@@ -45,11 +45,14 @@ import com.tdc.CashOverloadException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.hardware.PLUCodedProduct;
+import com.thelocalmarketplace.hardware.PriceLookUpCode;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.payment.CashPayment;
 import com.thelocalmarketplace.software.payment.IPayment;
 import com.thelocalmarketplace.software.payment.Transaction;
+import com.thelocalmarketplace.software.session.AttendantKeyboardHandler;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.test.stubs.TestableAttendantStation;
 import com.thelocalmarketplace.software.test.stubs.TestableSelfCheckoutStationGold;
@@ -64,6 +67,10 @@ public class TransactionTest {
 	private BarcodedProduct bulkyItem;
 	private Numeral num;
 	private Barcode bc;
+	private PLUCodedProduct pluProductOne;
+	private PLUCodedProduct pluProductTwo;
+	
+	
 	
     // simulate a payment by defining a payment stub
     private static class PaymentStub implements IPayment {
@@ -91,6 +98,9 @@ public class TransactionTest {
 		this.productOne = new BarcodedProduct(bc, "test1", 100, 1);
 		this.productTwo = new BarcodedProduct(bc, "test2", 200, 2);
 		this.bulkyItem = new BarcodedProduct(bc,"bulky item", 50, 100);
+		this.pluProductOne = new PLUCodedProduct(new PriceLookUpCode("1"), "PLU1", 1);
+		this.pluProductTwo = new PLUCodedProduct(new PriceLookUpCode("2"), "PLU2", 2);
+	
 	}
 	
 	@Test
@@ -137,6 +147,49 @@ public class TransactionTest {
 		transaction.addItem(productOne);
 		Assert.assertEquals(transaction.getTotalCost().compareTo(BigDecimal.valueOf(1.00)), 0);
 	}
+	
+	@Test
+	public void testOnePLUProductMass() {
+		//add 1kg of product
+		transaction.addItem(pluProductOne, new Mass (1000000000));
+		Assert.assertEquals(transaction.getExpectedMass(), 1000000000);
+	}
+	
+	@Test
+	public void testOnePLUProductPrice() {
+		//add 1kg of product
+		transaction.addItem(pluProductOne, new Mass (1000000000));
+		Assert.assertEquals(transaction.getTotalCost(), BigDecimal.valueOf(1));
+	}
+	
+	@Test
+	public void removePLUProductMass() {
+		//add 1kg of each product
+		transaction.addItem(pluProductOne, new Mass (1000000000));
+		transaction.addItem(pluProductTwo, new Mass (1000000000));
+		//remove item 1
+		transaction.removeItem(pluProductOne);
+		Assert.assertEquals(transaction.getExpectedMass(), 1000000000);
+	}
+	
+	@Test
+	public void removePLUProductPrice() {
+		//add 1kg of each product
+		transaction.addItem(pluProductOne, new Mass (1000000000));
+		transaction.addItem(pluProductTwo, new Mass (1000000000));
+		//remove item 1
+		transaction.removeItem(pluProductOne);
+		Assert.assertEquals(transaction.getTotalCost(), BigDecimal.valueOf(2));
+	}
+	
+	@Test
+	public void checkAddedItemTaggedWithPriceAndWeight() {
+		transaction.addItem(pluProductOne, new Mass (1000000000));
+		Assert.assertEquals(transaction.getPLUCodedProducts().get(0).getMass(), 1);
+		Assert.assertEquals(transaction.getPLUCodedProducts().get(0).getTotalCost(), 1);
+		Assert.assertEquals(transaction.getPLUCodedProducts().get(0).getPLUCodedProduct().getDescription(), "PLU1");
+	}
+
 	
 	@Test
 	public void testAddMultipleItemsCost() {
