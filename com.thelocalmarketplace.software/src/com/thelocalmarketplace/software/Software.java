@@ -92,7 +92,7 @@ public class Software {
 		
 		this.observers = new LinkedList<List<SoftwareObserver>>();
 		for(int i = 0; i < stationCount; i++) {
-			
+			this.observers.add(new ArrayList<SoftwareObserver>());
 		}
 	}
 	
