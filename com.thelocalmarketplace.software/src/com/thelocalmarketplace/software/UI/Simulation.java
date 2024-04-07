@@ -42,6 +42,7 @@ import com.thelocalmarketplace.hardware.SelfCheckoutStationGold;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.Software;
+import com.thelocalmarketplace.software.UI.Attendant.AttendantUI;
 import com.thelocalmarketplace.software.UI.Attendant.SelfCheckoutComponent;
 import com.thelocalmarketplace.software.UI.hardwaresim.UIHardwareSimulation;
 import com.thelocalmarketplace.software.UI.user.MainUserPanel;
@@ -81,12 +82,7 @@ public class Simulation {
 			e.printStackTrace();
 		}
 		
-		JFrame test = new JFrame();
-		test.setSize(475, 600);
-		test.setLayout(new GridLayout(1,1));
-		test.add(new SelfCheckoutComponent());
-		test.setVisible(true);
-		
+		AttendantUI ui = new AttendantUI(); 
 		BankDataBase.initialize(new HashMap<String, CardIssuer>());
 		UIHardwareSimulation.startHardwareSimulationUI(1);
 		
