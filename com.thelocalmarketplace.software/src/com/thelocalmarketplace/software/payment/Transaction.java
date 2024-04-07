@@ -31,19 +31,11 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
-
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Mass.MassDifference;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
-//<<<<<<< HEAD
-import com.jjjwelectronics.Mass.MassDifference;
-import com.jjjwelectronics.OverloadedDevice;
-import com.jjjwelectronics.scale.AbstractElectronicScale;
-import com.jjjwelectronics.scale.IElectronicScale;
-//=======
-//>>>>>>> refs/heads/main
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.hardware.Product;
@@ -71,6 +63,8 @@ public class Transaction {
 
     private long transactionMembershipID;
     
+    private String attendantInput;
+    
     public Transaction(UserSession session) {
     	this.session = session;
     }
@@ -93,7 +87,6 @@ public class Transaction {
         }
     }
 
-    
     /**
      * Adds a PLUcoded product to current transaction
      * calculates cost based on weight on scale
@@ -109,7 +102,7 @@ public class Transaction {
             totalCost = totalCost.add(itemCost);
             // TODO determine how to handle expected weight for PLU coded products
             expectedMass = expectedMass.sum(mass);
-            pluProducts.add(new PLUCodedProductAdded(product, totalCost));
+            pluProducts.add(new PLUCodedProductAdded(product, totalCost, new Mass(massInKilo)));
         }
         else {
             throw new NullPointerException("product");
@@ -117,15 +110,17 @@ public class Transaction {
     }
     
     /**
-     * class that instantiates PLU coded product with the cost that is added to the transaction
+     * class that instantiates PLU coded product with the cost that is added to the transaction and the mass in kg
      */
     public class PLUCodedProductAdded {
     	private PLUCodedProduct product;
     	private BigDecimal totalCost;
+    	private Mass massAdded;
     	
-    	public PLUCodedProductAdded(PLUCodedProduct product, BigDecimal totalCost) {
+    	public PLUCodedProductAdded(PLUCodedProduct product, BigDecimal totalCost, Mass massAdded) {
     		this.product = product;
     		this.totalCost = totalCost;
+    		this.massAdded = massAdded;
     	}
     	
     	public PLUCodedProduct getPLUCodedProduct() {
@@ -134,6 +129,10 @@ public class Transaction {
     	
     	public BigDecimal getTotalCost() {
     		return totalCost;
+    	}
+    	
+    	public Mass getMass() {
+    		return massAdded;
     	}
     }
 
@@ -189,17 +188,20 @@ public class Transaction {
     
     
     /**
-     * Prints item descriptions and costs that have been added to transaction 
+     * removes PLU item from the transaction
+     * @param product to be removed
      */
-    //public static void printReceipt() {
-    //	for (int i = 0; i < products.size(); i++ ) {
-    //		Product printProduct = products.get(i);
-    //		System.out.println(printProduct.getDescription()+"\t" + printProduct.getPrice());
-    //	}
-    //	System.out.println("Total cost: " + totalCost);
-    //}
-
+    public void removeItem(PLUCodedProduct product) {
+    	for (PLUCodedProductAdded testProduct : pluProducts) {
+    		if (testProduct.getPLUCodedProduct() == product) {
+    			totalCost = totalCost.subtract(testProduct.getTotalCost());
+    			expectedMass = expectedMass.difference(testProduct.getMass()).abs();
+    			pluProducts.remove(testProduct);
+    		}
+    	}
+    }
     
+
     /**
      * Getter method for expected weight
      * @return expectedWeight
