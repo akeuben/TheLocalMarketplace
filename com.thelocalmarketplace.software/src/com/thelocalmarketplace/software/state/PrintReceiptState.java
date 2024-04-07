@@ -39,7 +39,8 @@ import com.thelocalmarketplace.software.payment.Transaction;
 import com.thelocalmarketplace.software.session.UserSession;
 
 public class PrintReceiptState implements IUserSessionState<UserSessionState> {
-
+	// create a map that holds pointers for each machine printer, index corresponds to machine ID 
+	public static ArrayList<Integer[]> machinePointers; 
 	private Transaction finalTransactionRecord;
 	private ArrayList<String> itemizedTransaction;
 	private IReceiptPrinter hardwarePrinter;
@@ -115,18 +116,20 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
     
     private UserSessionState printOut(UserSession session) {
         //loop through the formatted customer transaction
-        for (String barcodePriceString : itemizedTransaction) {
+    	Integer[] pair = machinePointers.get(session.getMachineID());
+        for (; pair[0] < itemizedTransaction.size(); pair[0]++) {
+        	// get the pair of the machine pointers
+        	String barcodePriceString = itemizedTransaction.get(pair[0]);
             char[] charArray = barcodePriceString.toCharArray();
-                for (char c : charArray) {
-                    try {
+                for (; pair[1] < charArray.length; pair[1]++) {
+                    char c = charArray[pair[1]]; 
+                	try {
+                    	
                         hardwarePrinter.print(c);
+                         
                     }
                     catch(EmptyDevice empty){
-                        // reset the receipt 
-                        hardwarePrinter.cutPaper(); 
-                        hardwarePrinter.removeReceipt();
-                    	
-                    	//its not possible to tell if its the ink or paper that ran out so set both flags
+                    	// its not possible to tell if its the ink or paper that ran out so set both flags
                     	if(empty.getMessage().equals("There is no paper in the printer.")) {
                         	session.getReceiptPrinterHandler().thePrinterIsOutOfPaper();	
                         }
@@ -143,9 +146,6 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
                             throw new RuntimeException(e);//if another error happens here ill be surprised
                         }
                         catch(EmptyDevice empty){
-                        	// reset the receipt 
-                            hardwarePrinter.cutPaper(); 
-                            hardwarePrinter.removeReceipt();
                             //its not possible to tell if its the ink or paper that ran out so set both flags
                             if(empty.getMessage().equals("There is no paper in the printer.")) {
                             	session.getReceiptPrinterHandler().thePrinterIsOutOfPaper();
@@ -162,6 +162,8 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
                 }
                 try{
                     hardwarePrinter.print('\n');//once an item has been printed out fully move to the next line
+                    // reset the character pointer 
+                    pair[1] = 0; 
                 } catch (EmptyDevice e) {
                     //newline char doesn't use ink but will throw out of paper
                     session.getReceiptPrinterHandler().thePrinterIsOutOfPaper();
@@ -174,7 +176,8 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
 
         }
         hardwarePrinter.cutPaper();
-
+        // if we are able to cut the paper then set the machinepointers back to zero 
+        pair = new Integer[] {0,0}; 
         Software.getInstance().endCurrentSession(session.getMachineID());
         return null; 
     }

@@ -282,6 +282,7 @@ public class PrintReceiptStateTest {
 		printer.addInk(1 << 20 - 1);
 		
 		String output = printer.removeReceipt();  
+		
 		assertEquals(output, "Test : $3.0\nPayment Methods:\nCash: $3.0\n");
 		
 		
