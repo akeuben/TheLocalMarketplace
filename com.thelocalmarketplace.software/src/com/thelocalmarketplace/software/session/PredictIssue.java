@@ -17,17 +17,17 @@ public class PredictIssue {
 	
 		private UserSession session;
 		
-		public ArrayList<PredictIssueListener> listeners = new ArrayList<>();
+		public ArrayList<PredictIssueHandler> listeners = new ArrayList<>();
 		
 		private CoinStorageUnit coinStorage;
 		private BanknoteStorageUnit banknoteStorage;
 		private Map<BigDecimal, IBanknoteDispenser> banknoteDispensers;
 		private Map<BigDecimal, ICoinDispenser> coinDispensers;
 		
-		private boolean lowCoins;
-		private boolean fullCoins;
-		private boolean lowBanknotes;
-		private boolean fullBanknotes;
+		public boolean lowCoins;
+		public boolean fullCoins;
+		public boolean lowBanknotes;
+		public boolean fullBanknotes;
 		
 		public boolean hasIssue = false;
 		
@@ -47,30 +47,38 @@ public class PredictIssue {
 		}
 		
 		
+		/**
+		 * Predicts if coinStorage is full
+		 */
 		private void predictCoinsFull() {
 
 			if(!coinStorage.hasSpace()) {
-//				notifyCoinsFull(session);
+				notifyCoinsFull(session);
 				fullCoins = true;
 			} else {
-//				notifyNoIssues(session);
+				notifyNoIssues(session);
 				fullCoins = false;
 			}
 			
 		}
 		
+		/**
+		 * Predicts if banknoteStorage is full
+		 */
 		private void predictBanknotesFull() {
 			
 			if (!banknoteStorage.hasSpace()) {
-//				notifyBanknotesFull(session);
+				notifyBanknotesFull(session);
 				fullBanknotes = true;
 			} else {
-//				notifyNoIssues(session);
+				notifyNoIssues(session);
 				fullBanknotes = false;
 			}
 		}
 		
-		
+		/**
+		 * Predicts if coinDispenser has low coins (25% of threshold)
+		 */
 		private void predictLowCoins() {
 			
 			for (ICoinDispenser dispenser : coinDispensers.values()) {
@@ -78,16 +86,18 @@ public class PredictIssue {
 				int currentCoins = dispenser.size();
 				
 				if (currentCoins <= Math.floorDiv(maxCoins, 4)) {
-//					notifyCoinsLow(session);
+					notifyCoinsLow(session);
 					lowCoins = true;
 				} else {
-//					notifyNoIssues(session);
+					notifyNoIssues(session);
 					lowCoins = false;
 				}
 			}
 		}
 		
-		
+		/**
+		 * Predicts if banknoteDispenser has low bank notes (25% of threshold)
+		 */
 		private void predictLowBankNotes() {
 			
 			for (IBanknoteDispenser dispenser : banknoteDispensers.values()) {
@@ -95,16 +105,19 @@ public class PredictIssue {
 				int currentNotes = dispenser.size();
 				
 				if (currentNotes <= Math.floorDiv(maxNotes, 4)) {
-//					notifyBanknotesLow(session);
+					notifyBanknotesLow(session);
 					lowBanknotes = true;
 				} else {
-//					notifyNoIssues(session);
+					notifyNoIssues(session);  
 					lowBanknotes = false;
 				}
 			}
 		}
 		
 		
+		/**
+		 * Predicts all issues 
+		 */
 		public void predictAllIssues() {
 			predictCoinsFull();
 			predictBanknotesFull();
@@ -120,52 +133,43 @@ public class PredictIssue {
 			
 		}
 		
-		
-		
-	
-		
-		
-		
-		
-		
-		
 
-//	    private void notifyCoinsLow(UserSession session) {
-//	    	for (PredictIssueListener l : listeners)
-//				l.notifyPredictLowCoins(session);
-//	    }
-//
-//	    private void notifyBanknotesLow(UserSession session) {
-//	    	for (PredictIssueListener l : listeners)
-//				l.notifyPredictLowBanknotes(session);
-//	    }
-//
-//	    private void notifyCoinsFull(UserSession session) {
-//	    	for (PredictIssueListener l : listeners)
-//				l.notifyPredictCoinsFull(session);
-//	    }
-//
-//	    private void notifyBanknotesFull(UserSession session) {
-//	    	for (PredictIssueListener l : listeners)
-//				l.notifyPredictBanknotesFull(session);
-//	    }
-//
-//		private void notifyNoIssues(UserSession session) {
-//			for (PredictIssueListener l : listeners)
-//				l.notifyNoIssues(session);
-//		}
-//
-//		public synchronized boolean deregister(PredictIssueListener listener) {
-//			return listeners.remove(listener);
-//		}
-//
-//		public synchronized void deregisterAll() {
-//			listeners.clear();
-//		}
-//
-//		public final synchronized void register(PredictIssueListener listener) {
-//			listeners.add(listener);
-//		}
+	    private void notifyCoinsLow(UserSession session) {
+	    	for (PredictIssueHandler l : listeners)
+				l.notifyPredictLowCoins(session);
+	    }
+
+	    private void notifyBanknotesLow(UserSession session) {
+	    	for (PredictIssueHandler l : listeners)
+				l.notifyPredictLowBanknotes(session);
+	    }
+
+	    private void notifyCoinsFull(UserSession session) {
+	    	for (PredictIssueHandler l : listeners)
+				l.notifyPredictCoinsFull(session);
+	    }
+
+	    private void notifyBanknotesFull(UserSession session) {
+	    	for (PredictIssueHandler l : listeners)
+				l.notifyPredictBanknotesFull(session);
+	    }
+
+		private void notifyNoIssues(UserSession session) {
+			for (PredictIssueHandler l : listeners)
+				l.notifyNoIssues(session);
+		}
+
+		public synchronized boolean deregister(PredictIssueHandler listener) {
+			return listeners.remove(listener);
+		}
+
+		public synchronized void deregisterAll() {
+			listeners.clear();
+		}
+
+		public final synchronized void register(PredictIssueHandler listener) {
+			listeners.add(listener);
+		}
 
 
 }

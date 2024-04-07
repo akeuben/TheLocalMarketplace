@@ -1,6 +1,6 @@
 package com.thelocalmarketplace.software.session;
 
-public interface PredictIssueListener {
+public interface PredictIssueHandler {
  
 	/**
 	 * Signals an event that a coins full issue will shortly occur
