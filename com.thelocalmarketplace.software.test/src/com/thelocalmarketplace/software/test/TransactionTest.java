@@ -98,8 +98,8 @@ public class TransactionTest {
 		this.productOne = new BarcodedProduct(bc, "test1", 100, 1);
 		this.productTwo = new BarcodedProduct(bc, "test2", 200, 2);
 		this.bulkyItem = new BarcodedProduct(bc,"bulky item", 50, 100);
-		this.pluProductOne = new PLUCodedProduct(new PriceLookUpCode("1"), "PLU1", 1);
-		this.pluProductTwo = new PLUCodedProduct(new PriceLookUpCode("2"), "PLU2", 2);
+		this.pluProductOne = new PLUCodedProduct(new PriceLookUpCode("1357"), "PLU1", 100);
+		this.pluProductTwo = new PLUCodedProduct(new PriceLookUpCode("2468"), "PLU2", 200);
 	
 	}
 	
@@ -138,7 +138,7 @@ public class TransactionTest {
 		transaction.addItem(productTwo);
 		Mass productTwoMass = new Mass(productTwo.getExpectedWeight());
 		Mass combinedProductMass = productOneMass.sum(productTwoMass);
-		
+
 		Assert.assertTrue(combinedProductMass.compareTo(transaction.getExpectedMass()) == 0);
 	}
 	
@@ -152,7 +152,7 @@ public class TransactionTest {
 	public void testOnePLUProductMass() {
 		//add 1kg of product
 		transaction.addItem(pluProductOne, new Mass (1000000000));
-		Assert.assertEquals(transaction.getExpectedMass(), 1000000000);
+		Assert.assertEquals(transaction.getExpectedMass(), new Mass(1000000000));
 	}
 	
 	@Test
@@ -165,11 +165,11 @@ public class TransactionTest {
 	@Test
 	public void removePLUProductMass() {
 		//add 1kg of each product
-		transaction.addItem(pluProductOne, new Mass (1000000000));
+		transaction.addItem(pluProductOne, new Mass (2000000000));
 		transaction.addItem(pluProductTwo, new Mass (1000000000));
 		//remove item 1
 		transaction.removeItem(pluProductOne);
-		Assert.assertEquals(transaction.getExpectedMass(), 1000000000);
+		Assert.assertEquals(transaction.getExpectedMass(), new Mass(1000000000));
 	}
 	
 	@Test
@@ -185,8 +185,8 @@ public class TransactionTest {
 	@Test
 	public void checkAddedItemTaggedWithPriceAndWeight() {
 		transaction.addItem(pluProductOne, new Mass (1000000000));
-		Assert.assertEquals(transaction.getPLUCodedProducts().get(0).getMass(), 1);
-		Assert.assertEquals(transaction.getPLUCodedProducts().get(0).getTotalCost(), 1);
+		Assert.assertEquals(transaction.getPLUCodedProducts().get(0).getMass(), new Mass(1000000));
+		Assert.assertEquals(transaction.getPLUCodedProducts().get(0).getTotalCost(), new BigDecimal(1));
 		Assert.assertEquals(transaction.getPLUCodedProducts().get(0).getPLUCodedProduct().getDescription(), "PLU1");
 	}
 
