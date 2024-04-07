@@ -179,10 +179,14 @@ public class Software {
 	 * no active session
 	 */
 	public boolean endCurrentSession(int machineID) {
-		if(currentSession[machineID] == null) return false;
+		if(currentSession[machineID] != null) {
+			currentSession[machineID].startPredictIssueEngine(); // Start issue prediction
+			currentSession[machineID] = null;
+			return true;
+		}
 		
-		currentSession[machineID] = null;
-		return true;
+		return false;
+		
 	}
 
 	/**

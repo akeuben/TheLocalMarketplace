@@ -36,6 +36,7 @@ public class UserSession {
 
     private UserSessionState state = null;
     private Transaction transaction;
+    private PredictIssue predictIssue;
 
     private CoinValidatorHandler coinValidatorHandler;
     private BanknoteValidatorHandler banknoteValidatorHandler;
@@ -164,5 +165,17 @@ public class UserSession {
 	 */
 	public AbstractSelfCheckoutStation getHardware() {
 		return Software.getInstance().getHardware(machineID);
+	}
+	
+	/**
+	 * Predicts issues with hardware
+	 */
+	public void startPredictIssueEngine() {
+		this.predictIssue = new PredictIssue(this);
+		this.predictIssue.predictAllIssues();
+		
+		if (this.predictIssue.hasIssue) {
+			// TODO: Signal the attendant
+		}
 	}
 }
