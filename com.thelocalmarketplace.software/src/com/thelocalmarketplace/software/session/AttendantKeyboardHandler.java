@@ -17,6 +17,7 @@ import com.thelocalmarketplace.hardware.PriceLookUpCode;
 import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.Software;
+import com.thelocalmarketplace.software.state.UserSessionState;
 
 public class AttendantKeyboardHandler extends AbstractUserSessionHandler implements KeyboardListener {
 	
@@ -74,7 +75,7 @@ public class AttendantKeyboardHandler extends AbstractUserSessionHandler impleme
 		//checks PLUcoded item database to see if any items match object description
 		for (Entry<PriceLookUpCode, PLUCodedProduct> entry :ProductDatabases.PLU_PRODUCT_DATABASE.entrySet()) {
 			PLUCodedProduct itemToCheck = entry.getValue();
-			if (itemToCheck.getDescription()==input) {
+			if (itemToCheck.getDescription().contains(input)) {
 				//if item is found, item is added to potential items array list
 				matchingItems.add(itemToCheck);
 				}
@@ -84,24 +85,27 @@ public class AttendantKeyboardHandler extends AbstractUserSessionHandler impleme
 		
 		//if attendant selects enter after a database check has been done, input is used to make a selection from the choices and add item to transaction
 		else if (label=="Enter"&& matchingItems!=null) {
-			Integer i = new Integer(0);
 			try {
+			Integer i = Integer.parseInt(input);
+			if (matchingItems.get(i-1) instanceof BarcodedProduct) {
 				i = Integer.parseInt(input);
 				getUserSession().getTransaction().addItem((BarcodedProduct) matchingItems.get(i-1));
 			}
-			catch (ClassCastException e) {
-				i = Integer.parseInt(input);
-				Mass massOnScale;
+			else {
+				Mass massOnScale = null;
 				try {
-					massOnScale = (((AbstractElectronicScale) Software.getInstance().getHardware(0).getScanningArea()).getCurrentMassOnTheScale());
-				} catch (OverloadedDevice f) {
-					throw new RuntimeException("The scale is currently overloaded.");
+					massOnScale = (((AbstractElectronicScale) getUserSession().getHardware().getScanningArea()).getCurrentMassOnTheScale());
+				} catch (OverloadedDevice e) {
+					getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
 				}
 				getUserSession().getTransaction().addItem((PLUCodedProduct) matchingItems.get(i-1), massOnScale);
 			}
+			}
 			catch (NumberFormatException e) {
+				input=null;
 			}
 			input=null;
+			matchingItems = null;
 		}
 		
 		//if backspace chosen, last element from input string removed
@@ -116,7 +120,9 @@ public class AttendantKeyboardHandler extends AbstractUserSessionHandler impleme
 		
 	}
 	
-	
+	public ArrayList<Product> getMatchingItems() {
+		return matchingItems;
+	}
 
 
 }
