@@ -40,6 +40,7 @@ import com.tdc.NoCashAvailableException;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.Software;
+import com.thelocalmarketplace.software.membership.Membership;
 import com.thelocalmarketplace.software.session.UserSession;
 
 public class Transaction {
@@ -56,6 +57,8 @@ public class Transaction {
     private final HashMap<UUID, IPayment> payments = new HashMap<>();
 
     private UserSession session;
+
+    private long transactionMembershipID;
     
     public Transaction(UserSession session) {
     	this.session = session;
@@ -202,5 +205,13 @@ public class Transaction {
             }
             session.getHardware().getBanknoteOutput().dispense();
         }
+    }
+
+    public long getTransactionMembershipID() {
+        return transactionMembershipID;
+    }
+
+    public void setTransactionMembershipID(long transactionMembershipID) {
+        this.transactionMembershipID = transactionMembershipID;
     }
 }
