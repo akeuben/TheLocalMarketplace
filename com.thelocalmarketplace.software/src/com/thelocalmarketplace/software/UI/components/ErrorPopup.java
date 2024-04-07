@@ -1,4 +1,4 @@
-package com.thelocalmarketplace.software.payment;
+package com.thelocalmarketplace.software.UI.components;
 
 /**
  * SENG 300 Project - Group 1:
@@ -26,22 +26,10 @@ package com.thelocalmarketplace.software.payment;
  * Winston Wang - 30185321
  */
 
-import java.math.BigDecimal;
+import javax.swing.JOptionPane;
 
-public class CashPayment implements IPayment {
-    private BigDecimal amountPaid;
-
-
-    public CashPayment(BigDecimal amountPaid) {
-        this.amountPaid = amountPaid;
-    }
-    
-    @Override
-    public BigDecimal getAmountPaid() {
-    	return amountPaid;
-    }
-    @Override
-    public String toString() {
-    	return "Cash: $" + getAmountPaid().doubleValue(); 
-    }
-}
+public class ErrorPopup {
+	public static void showError(String title, String message) {
+		JOptionPane.showMessageDialog(null, message, title, 0, null);
+	}
+ }

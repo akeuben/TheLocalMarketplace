@@ -11,7 +11,6 @@ public class WaitingForAttendantState implements IUserSessionState<UserSessionSt
 		session.getHardware().getCoinSlot().disable();
 		session.getHardware().getBanknoteInput().disable();
 		
-    	//for now attendant state will automatically override back to ready for item
-        return UserSessionState.READY_FOR_ITEM;
+        return null;
     }
 }

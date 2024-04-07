@@ -1,4 +1,4 @@
-package com.thelocalmarketplace.software.payment;
+package com.thelocalmarketplace.software.UI.hardwaresim;
 
 /**
  * SENG 300 Project - Group 1:
@@ -26,22 +26,17 @@ package com.thelocalmarketplace.software.payment;
  * Winston Wang - 30185321
  */
 
-import java.math.BigDecimal;
+import java.awt.GridLayout;
 
-public class CashPayment implements IPayment {
-    private BigDecimal amountPaid;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
-
-    public CashPayment(BigDecimal amountPaid) {
-        this.amountPaid = amountPaid;
-    }
-    
-    @Override
-    public BigDecimal getAmountPaid() {
-    	return amountPaid;
-    }
-    @Override
-    public String toString() {
-    	return "Cash: $" + getAmountPaid().doubleValue(); 
-    }
+public abstract class AbstractAttendantTab extends JPanel {
+	
+	private static final long serialVersionUID = 5053495616877039194L;
+	
+	public AbstractAttendantTab(int columns) {
+		setLayout(new GridLayout(0, columns, 20, 20));
+		setBorder(new EmptyBorder(10, 10, 10, 10));
+	}
 }
