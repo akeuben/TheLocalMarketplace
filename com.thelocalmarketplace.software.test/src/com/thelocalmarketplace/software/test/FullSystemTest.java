@@ -146,8 +146,8 @@ public class FullSystemTest {
 		
 		IReceiptPrinter printer = software.getHardware(0).getPrinter();
 		try {
-			printer.addInk(1<<5);
-			printer.addPaper(1<<5);
+			printer.addInk(1<<20);
+			printer.addPaper(1024);
 		} catch (OverloadedDevice e) {
 			e.printStackTrace();
 		}

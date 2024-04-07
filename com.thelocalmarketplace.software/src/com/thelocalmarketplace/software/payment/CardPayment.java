@@ -77,6 +77,10 @@ public class CardPayment implements CardReaderListener, IPayment{
 		// if the bank doesn't exist then simply return false
 		return false;
 	}
+	@Override
+	public String toString() {
+		return data.getType() + " ending in " + data.getNumber().substring(data.getNumber().length() - 4) + ": $" + getAmountPaid().doubleValue(); 
+	}
 
 	@Override
 	public String toString() {
@@ -124,6 +128,7 @@ public class CardPayment implements CardReaderListener, IPayment{
 		
 		return this.amountPaid;
 	}
+	
 	
 	protected void setAmountPaid(BigDecimal amountPaid) {
 		this.amountPaid = amountPaid; 

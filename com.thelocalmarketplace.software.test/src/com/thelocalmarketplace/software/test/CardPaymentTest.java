@@ -84,7 +84,7 @@ public class CardPaymentTest {
 	
 	
 	@Before
-	public void setup() {
+	public void setup() throws OverloadedDevice, RuntimeException {
 		PowerGrid.engageUninterruptiblePowerSource();
 		Software.uninitialize(); 
 		BankDataBase.uninitialize();
@@ -261,9 +261,7 @@ public class CardPaymentTest {
 
         // Initialize CardPayment and attempt payment
         CardPayment payment = new CardPayment(cardData);
-
         boolean result = payment.makePayment(transaction.getTotalCost());
-
 
         // Assert payment success
         assertTrue("Payment should succeed", result);
@@ -292,9 +290,7 @@ public class CardPaymentTest {
 
         // Initialize CardPayment and attempt payment
         CardPayment payment = new CardPayment(cardData);
-
         boolean result = payment.makePayment( sc.getCurrentSession(0).getTransaction().getTotalCost());
-
 
         // Assert payment fail
         assertFalse("Payment should fail", result);
@@ -337,7 +333,6 @@ public class CardPaymentTest {
 	        // Prepare card data (simulate swiping the card)
 	        CardData cardData = null;
 	        CardPayment payment = new CardPayment(cardData);
-
 	        payment.makePayment( transaction.getTotalCost());
 	}
 	
