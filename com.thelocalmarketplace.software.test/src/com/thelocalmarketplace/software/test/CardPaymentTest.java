@@ -96,15 +96,15 @@ public class CardPaymentTest {
 		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(barcode, product); 
 		
 		bank = new CardIssuer("bank", 10);
-		debit = new Card("visa", "1234", "name", "503", "1234", false, false);
+		debit = new Card("visa", "1234", "name", "503", "1234", true, true);
 		Calendar expiry = Calendar.getInstance();
 		expiry.set(2026, 1, 1);
 		bank.addCardData(debit.number, debit.cardholder, expiry, debit.cvv, 100);
 		
-		credit = new Card("visa", "4321", "name", "405", "1234", false, false);
+		credit = new Card("visa", "4321", "name", "405", "1234", true, true);
 		bank.addCardData(credit.number, credit.cardholder, expiry, credit.cvv, 200);
 		 
-		fake = new Card("card", "1111", "notName", "101", "1234", false, false);
+		fake = new Card("card", "1111", "notName", "101", "1234", true, true);
 		
 		HashMap<String, CardIssuer> map = new HashMap<>(); 
 		map.put("visa", bank); 
@@ -113,8 +113,8 @@ public class CardPaymentTest {
 		
 		IReceiptPrinter printer = Software.getInstance().getHardware(0).getPrinter();
 		try {
-			printer.addInk(1<<5);
-			printer.addPaper(1<<5);
+			printer.addInk(1<<20);
+			printer.addPaper(1024);
 		} catch (OverloadedDevice e) {
 			e.printStackTrace();
 		}
@@ -134,7 +134,6 @@ public class CardPaymentTest {
 		scanner.scan(new BarcodedItem(barcode, new Mass(100)));
 		baggingArea.addAnItem(new BarcodedItem(barcode, new Mass(100)));
 
-		System.out.println("Transaction before: " + transaction.getTotalCost().doubleValue());
 		session.setState(UserSessionState.READY_FOR_PAYMENT); 
 		try {
 			session.getHardware().getCardReader().swipe(debit);
@@ -143,11 +142,102 @@ public class CardPaymentTest {
 			
 			e.printStackTrace();
 		}
-		System.out.println("Transaction after: " + transaction.getTotalCost().doubleValue());
 		assertNull(sc.getCurrentSession(0));
 		
 		
 	}
+	
+	@Test 
+	public void testDebitTapPayment() {
+		Software sc = Software.getInstance(); 
+		UserSession session = sc.startNewSession(0); 
+		Transaction transaction = session.getTransaction(); 
+		
+		IBarcodeScanner scanner = session.getHardware().getMainScanner(); 
+		IElectronicScale baggingArea = session.getHardware().getBaggingArea(); 
+		scanner.scan(new BarcodedItem(barcode, new Mass(100)));
+		baggingArea.addAnItem(new BarcodedItem(barcode, new Mass(100)));
+
+		session.setState(UserSessionState.READY_FOR_PAYMENT); 
+		try {
+			session.getHardware().getCardReader().tap(debit);
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
+		assertNull(sc.getCurrentSession(0));	
+	}
+	
+	@Test
+	public void testDebitInsert() {
+		Software sc = Software.getInstance(); 
+		UserSession session = sc.startNewSession(0); 
+		Transaction transaction = session.getTransaction(); 
+		
+		IBarcodeScanner scanner = session.getHardware().getMainScanner(); 
+		IElectronicScale baggingArea = session.getHardware().getBaggingArea(); 
+		scanner.scan(new BarcodedItem(barcode, new Mass(100)));
+		baggingArea.addAnItem(new BarcodedItem(barcode, new Mass(100)));
+
+		session.setState(UserSessionState.READY_FOR_PAYMENT); 
+		try {
+			session.getHardware().getCardReader().insert(debit, "1234");
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
+		assertNull(sc.getCurrentSession(0));
+		
+		
+		
+	}
+	
+	@Test 
+	public void testTapPayment() {
+		Software sc = Software.getInstance(); 
+		UserSession session = sc.startNewSession(0); 
+		Transaction transaction = session.getTransaction(); 
+		
+		IBarcodeScanner scanner = session.getHardware().getMainScanner(); 
+		IElectronicScale baggingArea = session.getHardware().getBaggingArea(); 
+		scanner.scan(new BarcodedItem(barcode, new Mass(100)));
+		baggingArea.addAnItem(new BarcodedItem(barcode, new Mass(100)));
+
+		session.setState(UserSessionState.READY_FOR_PAYMENT); 
+		try {
+			session.getHardware().getCardReader().tap(credit);
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
+		assertNull(sc.getCurrentSession(0));
+	}
+	
+	@Test 
+	public void testInsetrPayment() {
+		Software sc = Software.getInstance(); 
+		UserSession session = sc.startNewSession(0); 
+		Transaction transaction = session.getTransaction(); 
+		
+		IBarcodeScanner scanner = session.getHardware().getMainScanner(); 
+		IElectronicScale baggingArea = session.getHardware().getBaggingArea(); 
+		scanner.scan(new BarcodedItem(barcode, new Mass(100)));
+		baggingArea.addAnItem(new BarcodedItem(barcode, new Mass(100)));
+
+		session.setState(UserSessionState.READY_FOR_PAYMENT); 
+		try {
+			session.getHardware().getCardReader().insert(credit, "1234");
+			
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
+		assertNull(sc.getCurrentSession(0));
+	}
+	
 	
 	
 	@Test
@@ -172,7 +262,7 @@ public class CardPaymentTest {
         // Initialize CardPayment and attempt payment
         CardPayment payment = new CardPayment();
 
-        boolean result = payment.swipePayment(cardData, transaction.getTotalCost());
+        boolean result = payment.makePayment(cardData, transaction.getTotalCost());
 
 
         // Assert payment success
@@ -203,7 +293,7 @@ public class CardPaymentTest {
         // Initialize CardPayment and attempt payment
         CardPayment payment = new CardPayment();
 
-        boolean result = payment.swipePayment(cardData, sc.getCurrentSession(0).getTransaction().getTotalCost());
+        boolean result = payment.makePayment(cardData, sc.getCurrentSession(0).getTransaction().getTotalCost());
 
 
         // Assert payment fail
@@ -248,7 +338,7 @@ public class CardPaymentTest {
 	        CardData cardData = null;
 	        CardPayment payment = new CardPayment();
 
-	        payment.swipePayment(cardData, transaction.getTotalCost());
+	        payment.makePayment(cardData, transaction.getTotalCost());
 	}
 	
 	/**

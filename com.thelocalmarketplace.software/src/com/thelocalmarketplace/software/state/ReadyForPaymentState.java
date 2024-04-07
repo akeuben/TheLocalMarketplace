@@ -133,7 +133,7 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 		CardPayment payment = new CardPayment();
 
 		Transaction transaction = session.getTransaction();; 
-		payment.swipePayment(data, transaction.getTotalCost()); 
+		payment.makePayment(data, transaction.getTotalCost()); 
 		System.out.println("Paid amount: " + payment.getAmountPaid().doubleValue());
 		transaction.addPayment(payment);
 
