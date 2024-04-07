@@ -175,7 +175,7 @@ public class UserSession {
 		this.predictIssue.predictAllIssues();
 		
 		if (this.predictIssue.hasIssue) {
-			// TODO: Signal the attendant
+			// TODO: Signal the attendant, remove if listener can be attached
 		}
 	}
 }
