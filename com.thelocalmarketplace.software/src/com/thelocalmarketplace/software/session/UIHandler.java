@@ -51,15 +51,8 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 	public void removeItemSelected(BarcodedProduct product) {
 		super.getUserSession().getTransaction().removeItem(product);
 		super.getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
-		// Waits for user to remove item from bagging area
-		//TODO Not sure how this should be implemented. Is there a way to get the current mass of the scale???
-		//if (super.getUserSession().getTransaction().getExpectedMass() != super.getUserSession().getTransaction().getExpectedMass() + product.getExpectedWeight()) {
-			// Changes state back to READY_FOR_ITEM when item is removed
-			//super.getUserSession().setState(UserSessionState.READY_FOR_ITEM);
-		//}
-
-
 	}
+
 	@Override
 	public void skipBaggingSelected(BarcodedProduct product) {
 		super.getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);

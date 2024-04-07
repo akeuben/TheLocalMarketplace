@@ -30,17 +30,16 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import com.jjjwelectronics.Mass;
-import com.jjjwelectronics.Mass.MassDifference;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.Software;
-import com.thelocalmarketplace.software.membership.Membership;
 import com.thelocalmarketplace.software.session.UserSession;
 
 public class Transaction {
@@ -60,8 +59,11 @@ public class Transaction {
 
     private long transactionMembershipID;
     
+    private List<TransactionObserver> observers;
+    
     public Transaction(UserSession session) {
     	this.session = session;
+    	this.observers = new ArrayList<TransactionObserver>();
     }
     
 
@@ -76,6 +78,10 @@ public class Transaction {
             products.add(product);
             totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
             expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM))));
+            
+            for(TransactionObserver obs : this.observers) {
+            	obs.barcodedProductAdded(product);
+            }
         }
         else {
             throw new NullPointerException("product");
@@ -87,6 +93,10 @@ public class Transaction {
      */
     public void addBag(Mass bagMass) {
 		expectedMass = expectedMass.sum(bagMass);
+		
+		for(TransactionObserver obs : this.observers) {
+        	obs.bagAdded(bagMass);
+        }
     }
 
 
@@ -99,6 +109,10 @@ public class Transaction {
     	UUID transactionId = UUID.randomUUID(); // Generate a unique ID for this transaction/payment
     	payments.put(transactionId, payment); // Add payment to HashMap
     	totalCost = totalCost.subtract(payment.getAmountPaid());
+    	
+    	for(TransactionObserver obs : this.observers) {
+        	obs.paymentAdded(payment);
+        }
     }
 
     /**
@@ -109,6 +123,10 @@ public class Transaction {
     	products.remove(product);
     	totalCost = totalCost.subtract(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
     	expectedMass = expectedMass.difference(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight()*Mass.MICROGRAMS_PER_GRAM)))).abs();
+        
+        for(TransactionObserver obs : this.observers) {
+        	obs.barcodedProductRemoved(product);
+        }
     }
     
     
@@ -214,4 +232,27 @@ public class Transaction {
     public void setTransactionMembershipID(long transactionMembershipID) {
         this.transactionMembershipID = transactionMembershipID;
     }
+	
+	/**
+	 * Registers a listener for this user session
+	 * @param observer The observer to register
+	 */
+	public void register(TransactionObserver observer) {
+		this.observers.add(observer);
+	}
+	
+	/**
+	 * Deregister a listener for this user session
+	 * @param observer The observer to deregister
+	 */
+	public void deregister(TransactionObserver observer) {
+		this.observers.remove(observer);
+	}
+	
+	/**
+	 * Degregister all listeners for this user session
+	 */
+	public void deregisterAll() {
+		this.observers.removeAll(this.observers);
+	}
 }
