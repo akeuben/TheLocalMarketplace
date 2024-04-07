@@ -40,4 +40,8 @@ public class CashPayment implements IPayment {
     public BigDecimal getAmountPaid() {
     	return amountPaid;
     }
+    @Override
+    public String toString() {
+    	return "Cash: $" + getAmountPaid().doubleValue(); 
+    }
 }

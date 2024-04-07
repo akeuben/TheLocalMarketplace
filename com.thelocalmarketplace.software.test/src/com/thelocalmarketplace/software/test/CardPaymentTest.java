@@ -84,7 +84,7 @@ public class CardPaymentTest {
 	
 	
 	@Before
-	public void setup() {
+	public void setup() throws OverloadedDevice, RuntimeException {
 		PowerGrid.engageUninterruptiblePowerSource();
 		Software.uninitialize(); 
 		BankDataBase.uninitialize();
@@ -113,8 +113,8 @@ public class CardPaymentTest {
 		
 		IReceiptPrinter printer = Software.getInstance().getHardware(0).getPrinter();
 		try {
-			printer.addInk(1<<5);
-			printer.addPaper(1<<5);
+			printer.addInk(1<<20);
+			printer.addPaper(1024);
 		} catch (OverloadedDevice e) {
 			e.printStackTrace();
 		}
@@ -143,7 +143,6 @@ public class CardPaymentTest {
 			
 			e.printStackTrace();
 		}
-		System.out.println("Transaction after: " + transaction.getTotalCost().doubleValue());
 		assertNull(sc.getCurrentSession(0));
 		
 		
@@ -170,8 +169,8 @@ public class CardPaymentTest {
 		} 
 
         // Initialize CardPayment and attempt payment
-        CardPayment payment = new CardPayment();
-        boolean result = payment.swipePayment(cardData, transaction.getTotalCost());
+        CardPayment payment = new CardPayment(cardData);
+        boolean result = payment.swipePayment( transaction.getTotalCost());
 
         // Assert payment success
         assertTrue("Payment should succeed", result);
@@ -199,8 +198,8 @@ public class CardPaymentTest {
 		} 
 
         // Initialize CardPayment and attempt payment
-        CardPayment payment = new CardPayment();
-        boolean result = payment.swipePayment(cardData, sc.getCurrentSession(0).getTransaction().getTotalCost());
+        CardPayment payment = new CardPayment(cardData);
+        boolean result = payment.swipePayment( sc.getCurrentSession(0).getTransaction().getTotalCost());
 
         // Assert payment fail
         assertFalse("Payment should fail", result);
@@ -242,8 +241,8 @@ public class CardPaymentTest {
 
 	        // Prepare card data (simulate swiping the card)
 	        CardData cardData = null;
-	        CardPayment payment = new CardPayment();
-	        payment.swipePayment(cardData, transaction.getTotalCost());
+	        CardPayment payment = new CardPayment(cardData);
+	        payment.swipePayment(transaction.getTotalCost());
 	}
 	
 	/**
