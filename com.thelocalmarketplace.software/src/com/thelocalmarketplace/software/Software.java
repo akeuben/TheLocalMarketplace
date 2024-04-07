@@ -1,6 +1,7 @@
 package com.thelocalmarketplace.software;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Locale;
 
 /**
  * SENG 300 Project - Group 1:
@@ -45,6 +46,8 @@ public class Software {
 	
 	private AttendantStation attendantStation;
 	private AbstractSelfCheckoutStation[] selfCheckoutStations;
+	
+	private Locale[] selfCheckoutLanguages;
 
 	private boolean[] isStationEnabled;
 	private boolean[] disableStationQueued;
@@ -57,6 +60,7 @@ public class Software {
 		selfCheckoutStations = new AbstractSelfCheckoutStation[stationCount];
 		isStationEnabled = new boolean[stationCount];
 		disableStationQueued = new boolean[stationCount];
+		selfCheckoutLanguages = new Locale[stationCount];
 		try {
 			attendantStation = configuration.attendantType.getConstructor().newInstance();
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
@@ -80,6 +84,7 @@ public class Software {
 			station.turnOn();
 			selfCheckoutStations[i] = station;
 			attendantStation.add(station);
+			selfCheckoutLanguages[i] = Locale.ENGLISH;
 		}
 	}
 	
@@ -223,5 +228,16 @@ public class Software {
 			disableStationQueued[machineId] = true;
 			return false;
 		}
+	}
+	
+	/**
+	 * getter method for station language
+	 */
+	public Locale getLanguage(int machineId) {
+		return selfCheckoutLanguages[machineId];
+	}
+	
+	public void setLanguage(int machineId, Locale language) {
+		selfCheckoutLanguages[machineId] = language;
 	}
 }

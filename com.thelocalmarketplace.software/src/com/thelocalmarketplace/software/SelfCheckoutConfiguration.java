@@ -38,7 +38,6 @@ public class SelfCheckoutConfiguration {
 	public Currency currency;
 	public BigDecimal[] coinDenominations;
 	public BigDecimal[] banknoteDenominations;
-	public Locale language;
 	
 	public int coinDispenserCapacity;
 	public int coinStorageUnitCapacity;
@@ -74,7 +73,6 @@ public class SelfCheckoutConfiguration {
 			100, 
 			100
 		);
-		this.language = Locale.ENGLISH;
 	}
 
 }

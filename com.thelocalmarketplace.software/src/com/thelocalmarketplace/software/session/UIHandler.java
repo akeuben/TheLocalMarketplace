@@ -78,7 +78,7 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 	 */
 	@Override
 	public void selectLanguage(Locale newLanguage) {
-		Software.getInstance().getConfiguration().language = newLanguage;
+		Software.getInstance().setLanguage(getUserSession().getMachineID(), newLanguage);
 	}
 
 }
