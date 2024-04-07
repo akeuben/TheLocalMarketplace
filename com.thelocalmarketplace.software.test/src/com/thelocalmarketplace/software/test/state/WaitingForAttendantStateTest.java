@@ -35,12 +35,12 @@ public class WaitingForAttendantStateTest {
     @Test
     public void TestBankNoteInputDisabled() {
         session.setState(UserSessionState.WAITING_FOR_BAGGING);
-        assertTrue(Software.getInstance().getHardware(0).getConfiguration().getBanknoteInput);
+        assertTrue(Software.getInstance().getHardware(0).getBanknoteInput().isDisabled());
     }
 
     @Test
     public void TestReady_for_item_state() {
         session.setState(UserSessionState.READY_FOR_ITEM);
-        assertTrue(session.getState().equals(UserSessionState.WAITING_FOR_BAGGING));
+        assertTrue(session.getState().equals(UserSessionState.READY_FOR_ITEM));
     }
 }
