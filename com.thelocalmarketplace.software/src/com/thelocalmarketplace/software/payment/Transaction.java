@@ -32,6 +32,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
+import java.util.Scanner;
+import com.jjjwelectronics.bag.ResuableBag;
+import com.jjjwelectronics.bag.AbstractReusableBagDispenser;
+
+import com.jjjwelectronics.EmptyDevice;
+import com.jjjwelectronics.Numeral;
+
+
+
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Mass.MassDifference;
 import com.tdc.CashOverloadException;
@@ -107,6 +116,19 @@ public class Transaction {
 		expectedMass = expectedMass.sum(bagMass);
     }
 
+    
+    public void purchaseBags (int numberOfBags) {
+//    	if (session.)
+    	for (int i = 0; i < numberOfBags; i++) {
+    		ReusableBag resuableBag = new ReusableBag();
+    		this.addBag(reusableBag.idealMass);
+    		try {
+    			software.getInstance().getHardware().getReusableBagDispenser().dispense();
+    		} catch (EmptyDevice e) {
+    			throw new EmptyDevice("Bag Dispenser is empty");
+    		}
+    	}
+    }
 
     /**
      *
