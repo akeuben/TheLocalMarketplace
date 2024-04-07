@@ -95,7 +95,7 @@ public class MembershipDatabase {
      * @param ignoreSameName In the case of a member sharing a name with someone else.
      *                       Setting this to true will create a new membership
      *                       in the database. Even if there already exists someone with the
-     *                       same name
+     *                       same name. This member will be assigned a new ID
      * @return The id assigned to the new member. Will return -1 if member with same name
      * already exists and ignoreSameName is false;
      */

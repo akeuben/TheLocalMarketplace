@@ -1,5 +1,6 @@
 package com.thelocalmarketplace.software.test;
 
+import com.thelocalmarketplace.software.membership.Membership;
 import org.junit.Test;
 import org.junit.Before;
 import static org.junit.Assert.*;
