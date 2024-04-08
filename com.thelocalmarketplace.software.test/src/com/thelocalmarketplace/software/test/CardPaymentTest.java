@@ -89,7 +89,19 @@ public class CardPaymentTest {
 		Software.uninitialize(); 
 		BankDataBase.uninitialize();
 		// as of right now this self checkout is bronze, may set to gold to remove some probability
-		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class, Currency.getInstance(Locale.CANADA), 100, 1000, 25, new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 100, 100), 1);
+		Software.initialize(new SelfCheckoutConfiguration(
+				TestableSelfCheckoutStationGold.class, 
+				TestableAttendantStation.class, 
+				Currency.getInstance(Locale.CANADA), 
+				100, 
+				1000, 
+				25, 
+				new BigDecimal[] {BigDecimal.ONE}, 
+				new BigDecimal[] {BigDecimal.valueOf(10)}, 
+				100, 
+				100,
+				BigDecimal.valueOf(1.99)
+		), 1);
 		barcode = new Barcode(new Numeral []{Numeral.one, Numeral.two, Numeral.three});
 		
 		product = new BarcodedProduct(barcode, "item", 1249, 100);
@@ -126,7 +138,7 @@ public class CardPaymentTest {
 		// set up session and self checkout
 		Software sc = Software.getInstance(); 
 		UserSession session = sc.startNewSession(0); 
-		Transaction transaction = session.getTransaction(); 
+		session.getTransaction(); 
 		
 		IBarcodeScanner scanner = session.getHardware().getMainScanner(); 
 		IElectronicScale baggingArea = session.getHardware().getBaggingArea(); 
@@ -151,7 +163,7 @@ public class CardPaymentTest {
 	public void testDebitTapPayment() {
 		Software sc = Software.getInstance(); 
 		UserSession session = sc.startNewSession(0); 
-		Transaction transaction = session.getTransaction(); 
+		session.getTransaction(); 
 		
 		IBarcodeScanner scanner = session.getHardware().getMainScanner(); 
 		IElectronicScale baggingArea = session.getHardware().getBaggingArea(); 
@@ -173,7 +185,7 @@ public class CardPaymentTest {
 	public void testDebitInsert() {
 		Software sc = Software.getInstance(); 
 		UserSession session = sc.startNewSession(0); 
-		Transaction transaction = session.getTransaction(); 
+		session.getTransaction(); 
 		
 		IBarcodeScanner scanner = session.getHardware().getMainScanner(); 
 		IElectronicScale baggingArea = session.getHardware().getBaggingArea(); 
@@ -198,7 +210,7 @@ public class CardPaymentTest {
 	public void testTapPayment() {
 		Software sc = Software.getInstance(); 
 		UserSession session = sc.startNewSession(0); 
-		Transaction transaction = session.getTransaction(); 
+		session.getTransaction(); 
 		
 		IBarcodeScanner scanner = session.getHardware().getMainScanner(); 
 		IElectronicScale baggingArea = session.getHardware().getBaggingArea(); 
@@ -220,7 +232,7 @@ public class CardPaymentTest {
 	public void testInsetrPayment() {
 		Software sc = Software.getInstance(); 
 		UserSession session = sc.startNewSession(0); 
-		Transaction transaction = session.getTransaction(); 
+		session.getTransaction(); 
 		
 		IBarcodeScanner scanner = session.getHardware().getMainScanner(); 
 		IElectronicScale baggingArea = session.getHardware().getBaggingArea(); 
