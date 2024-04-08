@@ -112,11 +112,13 @@ public class MainUserPanel extends JPanel implements SessionObserver, SoftwareOb
 	@Override
 	public void onMachineDisabled() {
 		disabled = true;
+		redraw();
 	}
 
 	@Override
 	public void onMachineEnabled() {
 		disabled = false;
+		redraw();
 	}
 	
 }

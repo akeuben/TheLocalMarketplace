@@ -300,4 +300,15 @@ public class Software {
 	public void deregisterAll(int machineID) {
 		this.observers.get(machineID).removeAll(this.observers.get(machineID));
 	}
+	/**
+	 * Provides Access to the instance of attendant station
+	 * @return Attendant station that corresponds to the software
+	 */
+	public AttendantStation getAttendantStation() {
+		return attendantStation; 
+	}
+	
+	
+	
+	
 }

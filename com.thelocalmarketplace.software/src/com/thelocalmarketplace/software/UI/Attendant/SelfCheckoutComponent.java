@@ -6,18 +6,37 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import com.thelocalmarketplace.software.Software;
+import com.thelocalmarketplace.software.SoftwareObserver;
 import com.thelocalmarketplace.software.UI.components.WrappedJComponent;
+import com.thelocalmarketplace.software.session.SessionObserver;
+import com.thelocalmarketplace.software.session.UserSession;
+import com.thelocalmarketplace.software.state.UserSessionState;
+/*
+ * TODO: 
+ * Add functionality for the assist button 
+ * Add alert button functionality
+ * Add functionality for adding item through text 
+ *  
+ */
 
-public class SelfCheckoutComponent extends JPanel {
+
+
+public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, SessionObserver {
 	// gonna have a bidirectional communication channel with the self checkout station 
 	// add a transaction viewer as a wrapped component as a JList
 	private JPanel transactionViewer;
@@ -25,11 +44,19 @@ public class SelfCheckoutComponent extends JPanel {
 	private DefaultListModel<String> transactionListModel; 
 	private JPanel alertButton; 
 	private JPanel statusField;
-	private JPanel overrideButton;  
-	private JPanel assistButton; 
+	private JPanel closeBox;  
+	private JPanel assistButtonPanel; 
+	private JButton assistButton; 
+	private int machineID; 
+	
+	private UserSessionState state = null; 
 	
 	// attendant's view of a self checkout machine
-	public SelfCheckoutComponent() {
+	public SelfCheckoutComponent(int newmachineID) {
+		this.machineID = newmachineID; 
+		// register the listener 
+		Software.getInstance().register(machineID, this);
+		
 		// gridbaglayout will be used
 		setLayout(new GridBagLayout());
 		setBackground(Color.GRAY);
@@ -67,20 +94,37 @@ public class SelfCheckoutComponent extends JPanel {
 		c.anchor = GridBagConstraints.NORTH;
 		add(statusField, c);
 		
-		// add the override button 
-		overrideButton = new JPanel();
-		overrideButton.setLayout(new GridLayout(1,1));
-		button = new JButton("Override");
-		button.setSize(75,50);
-		overrideButton.setPreferredSize(button.getSize());
-		overrideButton.setBackground(Color.GRAY);
-		overrideButton.add(button); 
+		// add the close checkbox, when checked the machine is disabled
+		closeBox = new JPanel();
+		closeBox.setLayout(new GridLayout(1,1));
+		JCheckBox checkbox = new JCheckBox("Disable");
+		checkbox.setSize(75,50);
+		closeBox.setPreferredSize(checkbox.getSize());
+		closeBox.setBackground(Color.GRAY);
+		checkbox.setBackground(Color.GRAY);
+		checkbox.addItemListener( new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if(e.getStateChange() == ItemEvent.SELECTED) {
+					// in the event the checkbox is selected then you want to disable the corresponding machine
+					Software.getInstance().disableStation(machineID);
+				}else {
+					//otherwise enable the station 
+					Software.getInstance().enableStation(machineID);
+				}
+				
+			}	
+		});
+		
+		
+		closeBox.add(checkbox); 
 		c = new GridBagConstraints();
 		c.gridx = 2; 
 		c.gridy = 0; 
 		c.weightx = 0;
 		c.anchor = GridBagConstraints.NORTH; 
-		add(overrideButton, c);
+		add(closeBox, c);
 		
 		// now add the transaction viewer as a JList using default model
 		transactionListModel = new DefaultListModel<String>();
@@ -101,14 +145,15 @@ public class SelfCheckoutComponent extends JPanel {
 		add(transactionViewer, c);
 		
 		// add the assist button
-		assistButton = new JPanel();
-		assistButton.setLayout(new GridLayout(1,1));
+		assistButtonPanel = new JPanel();
+		assistButtonPanel.setLayout(new GridLayout(1,1));
 		
-		button = new JButton("Assist");
-		button.setSize(75, 50);
-		assistButton.setPreferredSize(button.getSize());
-		assistButton.setBackground(Color.GRAY);
-		assistButton.add(button);
+		assistButton = new JButton("Assist");
+		
+		assistButton.setSize(75, 50);
+		assistButtonPanel.setPreferredSize(assistButton.getSize());
+		assistButtonPanel.setBackground(Color.GRAY);
+		assistButtonPanel.add(assistButton);
 		
 		c = new GridBagConstraints();
 		c.gridy = 2; 
@@ -116,7 +161,35 @@ public class SelfCheckoutComponent extends JPanel {
 		c.weightx = 0.1; 
 		c.weighty = 0.1; 
 		c.anchor = GridBagConstraints.SOUTHWEST; 
-		add(assistButton, c);
+		add(assistButtonPanel, c);
 		setVisible(true);	
+	}
+	
+	
+	
+	
+	@Override
+	public void onStateChanged(UserSessionState newState) {
+		this.state = newState; 
+		
+	}
+
+	@Override
+	public void onSessionStart() {
+		UserSession currentSession = Software.getInstance().getCurrentSession(machineID); 
+		// remember that this is also a listener
+		currentSession.register(this);
+		// we also want to set the state to be whatever the state current session is in
+		state = currentSession.getState(); 
+	}
+
+	@Override
+	public void onSessionEnd() {
+		state = null; 
+	}
+	
+	
+	public JButton getAssistButton() {
+		return this.assistButton; 
 	}
 }
