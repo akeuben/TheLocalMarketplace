@@ -8,6 +8,7 @@ import javax.swing.border.TitledBorder;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.SoftwareObserver;
 import com.thelocalmarketplace.software.UI.user.screens.AbstractUserScreen;
+import com.thelocalmarketplace.software.UI.user.screens.AddingBagsScreen;
 import com.thelocalmarketplace.software.UI.user.screens.PrintingScreen;
 import com.thelocalmarketplace.software.UI.user.screens.ReadyForItemScreen;
 import com.thelocalmarketplace.software.UI.user.screens.ReadyForPaymentScreen;
@@ -70,6 +71,8 @@ public class MainUserPanel extends JPanel implements SessionObserver, SoftwareOb
 			case WAITING_FOR_BAGGING:
 				currentScreen = new WaitingForBaggingScreen(machineID);
 				break;
+			case ADDING_BAGS_STATE:
+				currentScreen = new AddingBagsScreen(machineID);
 			default:
 				break;
 		}

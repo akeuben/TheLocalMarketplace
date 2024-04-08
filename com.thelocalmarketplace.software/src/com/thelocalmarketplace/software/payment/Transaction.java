@@ -125,7 +125,7 @@ public class Transaction {
     }
     
     public void addOwnBag() {
-		expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf(5_000_000)));
+		expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf(15_000_000)));
     }
 
     /**

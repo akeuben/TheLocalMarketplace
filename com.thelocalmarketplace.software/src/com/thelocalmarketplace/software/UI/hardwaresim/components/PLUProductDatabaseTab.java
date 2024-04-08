@@ -65,7 +65,7 @@ public class PLUProductDatabaseTab extends AbstractProductDatabaseTab<PLUCodedPr
 				description,
 				new JLabel("PLU:"),
 				plu,
-				new JLabel("Price ($/gram):"),
+				new JLabel("Price ($/kg):"),
 				pricePerGram,
 		};
 	}
@@ -92,7 +92,7 @@ public class PLUProductDatabaseTab extends AbstractProductDatabaseTab<PLUCodedPr
 		long dollars = price / 100;
 		long cents = price % 100;
 		
-		return "$" + dollars + "." + cents + "/g";
+		return "$" + dollars + "." + cents + "/kg";
 	}
 	
 	private PriceLookUpCode getPLU() {
