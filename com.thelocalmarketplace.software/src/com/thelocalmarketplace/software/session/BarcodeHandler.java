@@ -53,7 +53,7 @@ public class BarcodeHandler extends AbstractUserSessionHandler implements Barcod
 
 	@Override
 	public void aBarcodeHasBeenScanned(IBarcodeScanner barcodeScanner, Barcode barcode) {
-		UserSessionState newState = getUserSession().getState().onScanBarcode(barcode);
+		UserSessionState newState = getUserSession().getState().onScanBarcode(getUserSession(), barcode);
 		if(newState != null) {
 			getUserSession().setState(newState); 
 		}

@@ -32,22 +32,25 @@ import com.jjjwelectronics.scale.AbstractElectronicScale;
 import com.jjjwelectronics.scale.IElectronicScale;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.hardware.PLUCodedProduct;
+import com.thelocalmarketplace.hardware.PriceLookUpCode;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.Globals;
-import com.thelocalmarketplace.software.SelfCheckout;
-import com.thelocalmarketplace.software.payment.Transaction; 
+import com.thelocalmarketplace.software.Software;
+import com.thelocalmarketplace.software.payment.Transaction;
+import com.thelocalmarketplace.software.session.UserSession; 
 
 public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 
 	@Override
-	public UserSessionState onStateSet() {
+	public UserSessionState onStateSet(UserSession session) {
 		// Disable the coin slot to prevent the user from inserting a coin while the software
 		// is not in the correct state
-		SelfCheckout.getInstance().getHardware().getCoinSlot().disable();
-		SelfCheckout.getInstance().getHardware().getBanknoteInput().disable();
-		Transaction currentTransaction = SelfCheckout.getInstance().getCurrentSession().getTransaction(); // Get current transaction
+		session.getHardware().getCoinSlot().disable();
+		session.getHardware().getBanknoteInput().disable();
+		Transaction currentTransaction = session.getTransaction(); // Get current transaction
 		Mass expectedMass = currentTransaction.getExpectedMass(); // Get expected mass
-		IElectronicScale scale = SelfCheckout.getInstance().getHardware().getBaggingArea();
+		IElectronicScale scale = session.getHardware().getBaggingArea();
 		if(!(scale instanceof AbstractElectronicScale)) return null;
 		
 		Mass absoluteDifference;
@@ -64,11 +67,11 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 	}
 
 	@Override
-	public UserSessionState onScanBarcode(Barcode barcode) {
+	public UserSessionState onScanBarcode(UserSession session, Barcode barcode) {
 		BarcodedProduct barcodeProduct = ProductDatabases.BARCODED_PRODUCT_DATABASE.get(barcode);
 		// want to check to see if the product exists within the database
 		if(barcodeProduct != null) {
-			Transaction currentTransaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();
+			Transaction currentTransaction = session.getTransaction();
 			currentTransaction.addItem(barcodeProduct);
 			
 			return UserSessionState.WAITING_FOR_BAGGING;	
@@ -76,18 +79,37 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 		return null; 
 		
 	}
+	
+	@Override
+	public UserSessionState onPLUentered(UserSession session, PriceLookUpCode plu) {;
+		PLUCodedProduct product = ProductDatabases.PLU_PRODUCT_DATABASE.get(plu);
+
+		IElectronicScale scale = session.getHardware().getScanningArea();
+
+		Mass massOnScale;
+		try {
+			massOnScale = ((AbstractElectronicScale) scale).getCurrentMassOnTheScale();
+		} catch (OverloadedDevice e) {
+			throw new RuntimeException("The scale is currently overloaded.");
+		}
+		if (product!=null) {
+			session.getTransaction().addItem(product, massOnScale);
+			return UserSessionState.WAITING_FOR_BAGGING;
+		}
+		return null;
+	}
  
 	@Override
-	public UserSessionState onWeightChanged(Mass mass) {
+	public UserSessionState onWeightChanged(UserSession session, Mass mass) {
 		// Possible Weight Discrepancy
 		
 		// Get the relevant masses to compare
-		Transaction transaction = SelfCheckout.getInstance().getCurrentSession().getTransaction();
+		Transaction transaction = session.getTransaction();
 		Mass expectedMass = transaction.getExpectedMass();
 		Mass absoluteDifference = expectedMass.difference(mass).abs();
 		
 		// The maximum difference between masses.
-		Mass maximumDifference = SelfCheckout.getInstance().getHardware().getBaggingArea().getSensitivityLimit();
+		Mass maximumDifference = session.getHardware().getBaggingArea().getSensitivityLimit();
 		
 		// Check if we are within the margin of error. If so, do nothing
 		if(absoluteDifference.compareTo(maximumDifference) == 1) {

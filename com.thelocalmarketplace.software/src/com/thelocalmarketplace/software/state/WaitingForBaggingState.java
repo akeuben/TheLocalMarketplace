@@ -27,25 +27,44 @@ package com.thelocalmarketplace.software.state;
  */
 
 import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.OverloadedDevice;
+import com.jjjwelectronics.scale.AbstractElectronicScale;
+import com.jjjwelectronics.scale.IElectronicScale;
 import com.thelocalmarketplace.software.Globals;
-import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.payment.Transaction;
+import com.thelocalmarketplace.software.session.UserSession;
 
 public class WaitingForBaggingState implements IUserSessionState<UserSessionState> {
 	
 	@Override
-	public UserSessionState onStateSet() {
+	public UserSessionState onStateSet(UserSession session) {
 		// Disable the coin slot to prevent the user from inserting a coin while the software
 		// is not in the correct state
-		SelfCheckout.getInstance().getHardware().getCoinSlot().disable();
-		SelfCheckout.getInstance().getHardware().getBanknoteInput().disable();
+		session.getHardware().getCoinSlot().disable();
+		session.getHardware().getBanknoteInput().disable();
+		
+		Transaction currentTransaction = session.getTransaction(); // Get current transaction
+		Mass expectedMass = currentTransaction.getExpectedMass(); // Get expected mass
+		IElectronicScale scale = session.getHardware().getBaggingArea();
+		if(!(scale instanceof AbstractElectronicScale)) return null;
+		
+		Mass absoluteDifference;
+		try {
+			absoluteDifference = expectedMass.difference(((AbstractElectronicScale) scale).getCurrentMassOnTheScale()).abs();
+		} catch (OverloadedDevice e) {
+			return UserSessionState.WAITING_FOR_ATTENDANT;
+		} // Compare expected and actual mass of item placed in bagging area
+		
+		if(absoluteDifference.compareTo(Globals.MAXIMUM_WEIGHT_DISCREPENCY) == -1) { // If item falls within the scale's sensitivity window,
+			return UserSessionState.READY_FOR_ITEM; 					  // go back to ReadyForItemState
+		}
 		
 		return null;
 	}
 	
 	@Override
-	public UserSessionState onWeightChanged(Mass mass) {
-		Transaction currentTransaction = SelfCheckout.getInstance().getCurrentSession().getTransaction(); // Get current transaction
+	public UserSessionState onWeightChanged(UserSession session, Mass mass) {
+		Transaction currentTransaction = session.getTransaction(); // Get current transaction
 		Mass expectedMass = currentTransaction.getExpectedMass(); // Get expected mass
 		Mass absoluteDifference = expectedMass.difference(mass).abs(); // Compare expected and actual mass of item placed in bagging area
 		

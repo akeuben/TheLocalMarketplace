@@ -58,12 +58,9 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 		super.getUserSession().getTransaction().removeItem(product);
 		//Program will wait until bagging is corrected and state is changed back to ready.
 	}
-
 	@Override
 	public void skipBaggingSelected(BarcodedProduct product) {
 		super.getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
-		super.getUserSession().getTransaction().skipBagging(product);
-		super.getUserSession().setState(UserSessionState.READY_FOR_ITEM);
 	}
 
 	@Override

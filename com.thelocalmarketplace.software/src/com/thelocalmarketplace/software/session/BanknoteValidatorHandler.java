@@ -58,7 +58,7 @@ public class BanknoteValidatorHandler extends AbstractUserSessionHandler impleme
 
 	@Override
 	public void goodBanknote(BanknoteValidator validator, Currency currency, BigDecimal denomination) {
-		getUserSession().getState().onBanknoteInserted(denomination);
+		getUserSession().getState().onBanknoteInserted(getUserSession(), denomination);
 	}
 
 	@Override

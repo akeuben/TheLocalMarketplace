@@ -28,25 +28,32 @@ package com.thelocalmarketplace.software.test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Locale;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
-import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
+import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.state.UserSessionState;
+import com.thelocalmarketplace.software.test.stubs.TestableAttendantStation;
+import com.thelocalmarketplace.software.test.stubs.TestableSelfCheckoutStationGold;
+
+import powerutility.PowerGrid;
 
 public class UserSessionTest {
 
     private UserSession session;
     @Before
     public void setup() {
-    	SelfCheckout.uninitialize();
-    	SelfCheckout.initialize(new SelfCheckoutConfiguration());
-    	session = SelfCheckout.getInstance().startNewSession();
+		PowerGrid.engageUninterruptiblePowerSource();
+    	Software.uninitialize();
+    	Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+    	session = Software.getInstance().startNewSession(0);
     }
     @Test
     public void testInitialState() {

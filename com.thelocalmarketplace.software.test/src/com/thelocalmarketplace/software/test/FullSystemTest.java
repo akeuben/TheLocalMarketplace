@@ -40,6 +40,8 @@ import org.junit.Test;
 
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
+import com.jjjwelectronics.OverloadedDevice;
+import com.jjjwelectronics.printer.IReceiptPrinter;
 import com.jjjwelectronics.scale.IElectronicScale;
 import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.BarcodedItem;
@@ -58,12 +60,15 @@ import com.tdc.coin.CoinValidator;
 import com.tdc.coin.CoinValidatorObserver;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
-import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
-import com.thelocalmarketplace.software.SelfCheckoutConfiguration.MachineRating;
+import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.payment.Transaction;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.state.UserSessionState;
+import com.thelocalmarketplace.software.test.stubs.TestableAttendantStation;
+import com.thelocalmarketplace.software.test.stubs.TestableSelfCheckoutStationGold;
+
+import powerutility.PowerGrid;
 
 public class FullSystemTest {
 
@@ -76,9 +81,11 @@ public class FullSystemTest {
 	
 	@Before
 	public void setup() {
-		SelfCheckout.uninitialize();
-		SelfCheckout.initialize(new SelfCheckoutConfiguration(
-			MachineRating.GOLD, 
+		PowerGrid.engageUninterruptiblePowerSource();
+		Software.uninitialize();
+		Software software = Software.initialize(new SelfCheckoutConfiguration(
+			TestableSelfCheckoutStationGold.class,
+			TestableAttendantStation.class,
 			Currency.getInstance(Locale.CANADA), 
 			100, 
 			1000, 
@@ -86,7 +93,7 @@ public class FullSystemTest {
 			new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 
 			100, 
 			100
-		));
+		), 1);
 		
 		barcode1 = new Barcode(new Numeral[] {
 			Numeral.one,
@@ -135,6 +142,15 @@ public class FullSystemTest {
 		dollarCoin = new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE);
 		fakeCoin = new Coin(Currency.getInstance(Locale.CHINA), BigDecimal.TEN);
 		tenDollarBill = new Banknote(Currency.getInstance(Locale.CANADA), BigDecimal.TEN);
+		
+		
+		IReceiptPrinter printer = software.getHardware(0).getPrinter();
+		try {
+			printer.addInk(1<<20);
+			printer.addPaper(1024);
+		} catch (OverloadedDevice e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private static class CoinValidatorObserverStub implements CoinValidatorObserver {
@@ -181,13 +197,13 @@ public class FullSystemTest {
 	
 	@Test
 	public void TestSingleItemTransaction() {
-		SelfCheckout sc = SelfCheckout.getInstance();
-		UserSession session = sc.startNewSession();
+		Software sc = Software.getInstance();
+		UserSession session = sc.startNewSession(0);
 		Transaction transaction = session.getTransaction();
 
-		IBarcodeScanner scanner = sc.getHardware().getMainScanner(); 
-		IElectronicScale baggingArea = sc.getHardware().getBaggingArea(); 
-		CoinSlot coinSlot = SelfCheckout.getInstance().getHardware().getCoinSlot();
+		IBarcodeScanner scanner = sc.getHardware(0).getMainScanner(); 
+		IElectronicScale baggingArea = sc.getHardware(0).getBaggingArea(); 
+		CoinSlot coinSlot = Software.getInstance().getHardware(0).getCoinSlot();
 
 		assertEquals(session.getState(), UserSessionState.READY_FOR_ITEM);
 		
@@ -215,7 +231,7 @@ public class FullSystemTest {
 		assertEquals(session.getState(), UserSessionState.READY_FOR_PAYMENT);
 		
 		CoinValidatorObserverStub stub = new CoinValidatorObserverStub();
-		SelfCheckout.getInstance().getHardware().getCoinValidator().attach(stub);
+		Software.getInstance().getHardware(0).getCoinValidator().attach(stub);
 		
 		// Pay 1 dollar
 		try {
@@ -250,7 +266,7 @@ public class FullSystemTest {
 		} catch (DisabledException | CashOverloadException e) {
 			throw new RuntimeException();
 		}
-		assertNull(SelfCheckout.getInstance().getCurrentSession());
+		assertNull(Software.getInstance().getCurrentSession(0));
 	}
 	
 	private static class BanknoteValidatorObserverStub implements BanknoteValidatorObserver {
@@ -297,16 +313,16 @@ public class FullSystemTest {
 	
 	@Test
 	public void TestSingleItemTransactionPayWithBanknote() {
-		SelfCheckout sc = SelfCheckout.getInstance();
-		UserSession session = sc.startNewSession();
+		Software sc = Software.getInstance();
+		UserSession session = sc.startNewSession(0);
 		Transaction transaction = session.getTransaction();
 
-		IBarcodeScanner scanner = sc.getHardware().getMainScanner(); 
-		IElectronicScale baggingArea = sc.getHardware().getBaggingArea(); 
-		BanknoteInsertionSlot banknoteInput = SelfCheckout.getInstance().getHardware().getBanknoteInput();
+		IBarcodeScanner scanner = sc.getHardware(0).getMainScanner(); 
+		IElectronicScale baggingArea = sc.getHardware(0).getBaggingArea(); 
+		BanknoteInsertionSlot banknoteInput = Software.getInstance().getHardware(0).getBanknoteInput();
 		
 		try {
-			sc.getHardware().getCoinDispensers().get(BigDecimal.ONE).load(
+			sc.getHardware(0).getCoinDispensers().get(BigDecimal.ONE).load(
 				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE),
 				new Coin(Currency.getInstance(Locale.CANADA), BigDecimal.ONE)
 			);
@@ -341,7 +357,7 @@ public class FullSystemTest {
 		assertEquals(session.getState(), UserSessionState.READY_FOR_PAYMENT);
 		
 		BanknoteValidatorObserverStub stub = new BanknoteValidatorObserverStub();
-		SelfCheckout.getInstance().getHardware().getBanknoteValidator().attach(stub);
+		Software.getInstance().getHardware(0).getBanknoteValidator().attach(stub);
 		
 		// Pay 1 dollar
 		try {
@@ -352,19 +368,19 @@ public class FullSystemTest {
 			throw new RuntimeException();
 		}
 
-        List<Coin> collectedCoins = SelfCheckout.getInstance().getHardware().getCoinTray().collectCoins();
+        List<Coin> collectedCoins = Software.getInstance().getHardware(0).getCoinTray().collectCoins();
         assertEquals(1, collectedCoins.size());
         assertEquals(0, collectedCoins.get(0).getValue().compareTo(BigDecimal.valueOf(1)));
 	}
 	
 	@Test
 	public void TestTryAddWeightDuringPayment() {
-		SelfCheckout sc = SelfCheckout.getInstance();
-		UserSession session = sc.startNewSession();
+		Software sc = Software.getInstance();
+		UserSession session = sc.startNewSession(0);
 		Transaction transaction = session.getTransaction();
 
-		IBarcodeScanner scanner = SelfCheckout.getInstance().getHardware().getMainScanner();
-		IElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().getBaggingArea();
+		IBarcodeScanner scanner = Software.getInstance().getHardware(0).getMainScanner();
+		IElectronicScale baggingArea = Software.getInstance().getHardware(0).getBaggingArea();
 		
 		BarcodedItem item1 = new BarcodedItem(barcode1, new Mass(100.0));
 
@@ -410,10 +426,10 @@ public class FullSystemTest {
 	
 	@Test 
 	public void TestTryAddWeightWithoutItem() {
-		SelfCheckout sc = SelfCheckout.getInstance();
-		UserSession session = sc.startNewSession();
+		Software sc = Software.getInstance();
+		UserSession session = sc.startNewSession(0);
 
-		IElectronicScale baggingArea = SelfCheckout.getInstance().getHardware().getBaggingArea();
+		IElectronicScale baggingArea = Software.getInstance().getHardware(0).getBaggingArea();
 		
 		BarcodedItem item1 = new BarcodedItem(barcode1, new Mass(100.0));
 
@@ -434,10 +450,10 @@ public class FullSystemTest {
 	
 	@Test
 	public void testTryAddItemNotInDataBase() {
-		SelfCheckout sc  = SelfCheckout.getInstance(); 
-		UserSession session = sc.startNewSession();
+		Software sc  = Software.getInstance(); 
+		UserSession session = sc.startNewSession(0);
 		
-		IBarcodeScanner scanner = sc.getHardware().getMainScanner(); 
+		IBarcodeScanner scanner = sc.getHardware(0).getMainScanner(); 
 		Numeral[] dummyCode = {Numeral.one, Numeral.two};
 		BarcodedItem newItem = new BarcodedItem(new Barcode(dummyCode), new Mass(10.0));
 		scanner.scan(newItem); 

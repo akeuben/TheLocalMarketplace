@@ -29,7 +29,7 @@ package com.thelocalmarketplace.software.session;
 import com.jjjwelectronics.IDevice;
 import com.jjjwelectronics.IDeviceListener;
 import com.jjjwelectronics.printer.ReceiptPrinterListener;
-import com.thelocalmarketplace.software.SelfCheckout;
+import com.thelocalmarketplace.software.state.UserSessionState;
 
 public class ReceiptPrinterHandler extends AbstractUserSessionHandler implements ReceiptPrinterListener {
 
@@ -82,7 +82,10 @@ public class ReceiptPrinterHandler extends AbstractUserSessionHandler implements
     public void paperHasBeenAddedToThePrinter() {
         fillPaperFlag = false;
         if(!refillFlagsSet()){
-            SelfCheckout.getInstance().getCurrentSession().getState().onPrinterRefilled();
+        	UserSessionState newState  = getUserSession().getState().onPrinterRefilled(getUserSession());
+            if(newState != null) {
+            	getUserSession().setState(newState);
+            }
         }
     }
 
@@ -90,7 +93,10 @@ public class ReceiptPrinterHandler extends AbstractUserSessionHandler implements
     public void inkHasBeenAddedToThePrinter() {
         fillInkFlag = false;
         if(!refillFlagsSet()){
-            SelfCheckout.getInstance().getCurrentSession().getState().onPrinterRefilled();
+            UserSessionState newState  = getUserSession().getState().onPrinterRefilled(getUserSession());
+            if(newState != null) {
+            	getUserSession().setState(newState);
+            }
         }
     }
 
