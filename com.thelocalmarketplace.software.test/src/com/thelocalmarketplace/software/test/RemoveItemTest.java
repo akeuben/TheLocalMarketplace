@@ -1,0 +1,74 @@
+package com.thelocalmarketplace.software.test;
+
+import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.software.SelfCheckout;
+import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
+import com.thelocalmarketplace.software.session.UIHandler;
+import com.thelocalmarketplace.software.session.UserSession;
+import com.thelocalmarketplace.software.state.UserSessionState;
+import com.jjjwelectronics.scanner.Barcode;
+import com.jjjwelectronics.Numeral;
+import com.jjjwelectronics.Mass;
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Currency;
+import java.util.Locale;
+
+public class RemoveItemTest {
+
+    private UserSession userSession;
+    private UIHandler uiHandler;
+    
+    private Barcode barcode; 
+    private BarcodedProduct product; 
+    private BigDecimal initialTotalCost;
+    private Mass initialExpectedMass;
+
+    @Before
+    public void setup() {
+        // Initialize necessary objects
+    	SelfCheckout.uninitialize();
+		SelfCheckout.initialize(new SelfCheckoutConfiguration());
+		SelfCheckout.getInstance().startNewSession();
+        userSession = new UserSession();
+        uiHandler = new UIHandler(userSession);
+
+        // Initialize barcode and product
+        barcode = new Barcode(new Numeral[]{Numeral.one, Numeral.two, Numeral.three});
+        product = new BarcodedProduct(barcode, "Test Product", 1000, 100.0); // Example data
+        userSession.getTransaction().addItem(product); // Add the product to the transaction
+        
+        // Save initial total cost and expected mass
+        initialTotalCost = userSession.getTransaction().getTotalCost();
+        initialExpectedMass = userSession.getTransaction().getExpectedMass();
+    }
+
+    @Test
+    public void removeItemTest() {
+        // Set initial state
+        userSession.setState(UserSessionState.READY_FOR_ITEM);
+
+        // Call the method under test
+        uiHandler.removeItemSelected(product);
+
+        // Assertions
+        assertEquals(UserSessionState.WAITING_FOR_BAGGING, userSession.getState());
+        assertNotNull(userSession.getTransaction());
+        
+        // Calculate the new total cost without the removed item
+        BigDecimal newTotalCost = initialTotalCost.subtract(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
+        
+        // Calculate the new expected mass without the removed item
+        Mass newExpectedMass = initialExpectedMass.difference(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM)))).abs();
+        
+        // Check if the total cost is updated correctly
+        assertEquals(newTotalCost, userSession.getTransaction().getTotalCost());
+        
+        // Check if the expected mass is updated correctly
+        assertEquals(newExpectedMass, userSession.getTransaction().getExpectedMass());
+    }
+}
