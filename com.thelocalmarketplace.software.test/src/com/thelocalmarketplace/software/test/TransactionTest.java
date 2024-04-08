@@ -41,10 +41,12 @@ import org.junit.Test;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
+import com.jjjwelectronics.scanner.BarcodedItem;
 import com.tdc.CashOverloadException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.payment.CashPayment;
@@ -64,6 +66,7 @@ public class TransactionTest {
 	private BarcodedProduct bulkyItem;
 	private Numeral num;
 	private Barcode bc;
+	private BarcodedItem itemOne;
 	
     // simulate a payment by defining a payment stub
     private static class PaymentStub implements IPayment {
@@ -91,6 +94,7 @@ public class TransactionTest {
 		this.productOne = new BarcodedProduct(bc, "test1", 100, 1);
 		this.productTwo = new BarcodedProduct(bc, "test2", 200, 2);
 		this.bulkyItem = new BarcodedProduct(bc,"bulky item", 50, 100);
+		this.itemOne = new BarcodedItem(bc,new Mass(BigDecimal.valueOf(1)));
 	}
 	
 	@Test
@@ -195,6 +199,13 @@ public class TransactionTest {
         transaction.addItem(productOne);
         assertEquals(1, transaction.getProducts().length);
     }
+	
+	@Test
+	public void testAddItemByHandheldScanner() {
+		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(bc, productOne);
+		session.getHardware().getHandheldScanner().scan(itemOne);
+		Assert.assertTrue(session.getTransaction().getBarcodedProducts().contains(productOne));
+	}
 
 	@Test
     public void testZeroTotalCostChange() throws Exception {
