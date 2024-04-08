@@ -9,12 +9,14 @@ import java.math.BigInteger;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.jjjwelectronics.Item;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.Software;
+import com.thelocalmarketplace.software.payment.TransactionItem;
 import com.thelocalmarketplace.software.session.UIHandler;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.state.UserSessionState;
@@ -28,6 +30,7 @@ public class RemoveItemTest {
     
     private Barcode barcode; 
     private BarcodedProduct product; 
+    private TransactionItem item;
     private BigDecimal initialTotalCost;
     private Mass initialExpectedMass;
 
@@ -42,20 +45,22 @@ public class RemoveItemTest {
         // Initialize barcode and product
         barcode = new Barcode(new Numeral[]{Numeral.one, Numeral.two, Numeral.three});
         product = new BarcodedProduct(barcode, "Test Product", 1000, 100.0); // Example data
-        userSession.getTransaction().addItem(product); // Add the product to the transaction
+        item = userSession.getTransaction().addItem(product); // Add the product to the transaction
         
         // Save initial total cost and expected mass
         initialTotalCost = userSession.getTransaction().getTotalCost();
         initialExpectedMass = userSession.getTransaction().getExpectedMass();
+        
+        userSession.getHardware().getBaggingArea().addAnItem(new Item(initialExpectedMass) {});
     }
 
     @Test
     public void removeItemTest() {
         // Set initial state
-        userSession.setState(UserSessionState.READY_FOR_ITEM);
+        assertEquals(UserSessionState.READY_FOR_ITEM, userSession.getState());
 
         // Call the method under test
-        uiHandler.removeItemSelected(product);
+        uiHandler.removeItemSelected(item);
 
         // Assertions
         assertEquals(UserSessionState.WAITING_FOR_BAGGING, userSession.getState());

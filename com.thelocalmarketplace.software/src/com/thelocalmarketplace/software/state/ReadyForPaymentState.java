@@ -42,7 +42,7 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 		//Get current balance by creating a transaction instance
 		Transaction transaction = session.getTransaction(); 
 		
-		if (transaction.getBarcodedProducts().length == 0 && transaction.getPLUCodedProducts().length == 0) {
+		if (transaction.getItems().length == 0) {
 			//If item is at a 0, set state to ready for item
 	    	return UserSessionState.READY_FOR_ITEM;
 		} else if(transaction.getTotalCost().compareTo(BigDecimal.ZERO) <= 0) {
