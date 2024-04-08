@@ -28,6 +28,8 @@ package com.thelocalmarketplace.software.test;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Locale;
+
 import org.junit.Before;
 import org.junit.Test;
 

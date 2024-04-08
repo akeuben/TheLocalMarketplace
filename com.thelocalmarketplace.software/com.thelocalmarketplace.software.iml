@@ -9,5 +9,10 @@
     <orderEntry type="jdk" jdkName="19" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="com.thelocalmarketplace.hardware_0.3.3" />
+    <orderEntry type="jdk" jdkName="20" jdkType="JavaSDK" />
+    <orderEntry type="jdk" jdkName="19" jdkType="JavaSDK" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="com.thelocalmarketplace.hardware_0.3.3" exported="" />
+    <orderEntry type="module" module-name="com.thelocalmarketplace.hardware_0.3.3" />
   </component>
 </module>

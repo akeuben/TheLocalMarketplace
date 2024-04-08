@@ -46,12 +46,16 @@ import com.tdc.CashOverloadException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.hardware.PLUCodedProduct;
+import com.thelocalmarketplace.hardware.PriceLookUpCode;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
+
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.payment.CashPayment;
 import com.thelocalmarketplace.software.payment.IPayment;
 import com.thelocalmarketplace.software.payment.Transaction;
+import com.thelocalmarketplace.software.session.AttendantKeyboardHandler;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.test.stubs.TestableAttendantStation;
 import com.thelocalmarketplace.software.test.stubs.TestableSelfCheckoutStationGold;
@@ -67,6 +71,9 @@ public class TransactionTest {
 	private Numeral num;
 	private Barcode bc;
 	private BarcodedItem itemOne;
+	private AttendantKeyboardHandler akh;
+	private PLUCodedProduct pluProductOne;
+	private PLUCodedProduct pluProductTwo;
 	
     // simulate a payment by defining a payment stub
     private static class PaymentStub implements IPayment {
@@ -89,12 +96,15 @@ public class TransactionTest {
 		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
 		this.session = Software.getInstance().startNewSession(0);
 		this.transaction = session.getTransaction();
+		this.akh = new AttendantKeyboardHandler(session);
 		this.num = Numeral.eight;
 		this.bc= new Barcode(new Numeral[] {num});
 		this.productOne = new BarcodedProduct(bc, "test1", 100, 1);
 		this.productTwo = new BarcodedProduct(bc, "test2", 200, 2);
-		this.bulkyItem = new BarcodedProduct(bc,"bulky item", 50, 100);
+		this.bulkyItem = new BarcodedProduct(bc,"bulky item", 50, 100
 		this.itemOne = new BarcodedItem(bc,new Mass(BigDecimal.valueOf(1)));
+		this.pluProductOne = new PLUCodedProduct(new PriceLookUpCode("1357"), "plu1", 100);
+		this.pluProductTwo = new PLUCodedProduct(new PriceLookUpCode("2468"), "plu2", 200);
 	}
 	
 	@Test
@@ -119,6 +129,44 @@ public class TransactionTest {
 	}
 	
 	@Test
+	public void testInputOnKeyBoard() {
+		akh.aKeyHasBeenReleased("1");
+		Assert.assertEquals(akh.getInput(), "1");
+	}
+	
+	@Test
+	public void testBackSpaceOnKeyBoard() {
+		akh.aKeyHasBeenReleased("1");
+		akh.aKeyHasBeenReleased("2");
+		akh.aKeyHasBeenReleased("Backspace");
+		Assert.assertEquals(akh.getInput(), "1");
+	}
+	
+	
+	@Test
+	public void testAddBarcodedItemByKeyboard() {
+		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(bc, productOne);
+		akh.aKeyHasBeenReleased("t");
+		akh.aKeyHasBeenReleased("e");
+		akh.aKeyHasBeenReleased("Enter");
+		akh.aKeyHasBeenReleased("1");
+		akh.aKeyHasBeenReleased("Enter");
+		Assert.assertTrue(transaction.getBarcodedProducts().contains(productOne));
+	}
+	
+	@Test
+	public void testAddPLUItemByKeyboard() {
+		ProductDatabases.PLU_PRODUCT_DATABASE.put(new PriceLookUpCode("1357"), pluProductOne);
+		akh.aKeyHasBeenReleased("p");
+		akh.aKeyHasBeenReleased("l");
+		akh.aKeyHasBeenReleased("Enter");
+		akh.aKeyHasBeenReleased("1");
+		akh.aKeyHasBeenReleased("Enter");
+		Assert.assertEquals(transaction.getPLUCodedProducts().get(0).getPLUCodedProduct(),pluProductOne);
+	}
+	
+	
+	@Test
 	public void testAddOneItemWeight() {
 		transaction.addItem(productOne);
 		Mass productOneMass = new Mass(productOne.getExpectedWeight());
@@ -132,7 +180,7 @@ public class TransactionTest {
 		transaction.addItem(productTwo);
 		Mass productTwoMass = new Mass(productTwo.getExpectedWeight());
 		Mass combinedProductMass = productOneMass.sum(productTwoMass);
-		
+
 		Assert.assertTrue(combinedProductMass.compareTo(transaction.getExpectedMass()) == 0);
 	}
 	
@@ -141,6 +189,49 @@ public class TransactionTest {
 		transaction.addItem(productOne);
 		Assert.assertEquals(transaction.getTotalCost().compareTo(BigDecimal.valueOf(1.00)), 0);
 	}
+	
+	@Test
+	public void testOnePLUProductMass() {
+		//add 1kg of product
+		transaction.addItem(pluProductOne, new Mass (1000000000));
+		Assert.assertEquals(transaction.getExpectedMass(), new Mass(1000000000));
+	}
+	
+	@Test
+	public void testOnePLUProductPrice() {
+		//add 1kg of product
+		transaction.addItem(pluProductOne, new Mass (1000000000));
+		Assert.assertEquals(transaction.getTotalCost(), BigDecimal.valueOf(1));
+	}
+	
+	@Test
+	public void removePLUProductMass() {
+		//add 1kg of each product
+		transaction.addItem(pluProductOne, new Mass (2000000000));
+		transaction.addItem(pluProductTwo, new Mass (1000000000));
+		//remove item 1
+		transaction.removeItem(pluProductOne);
+		Assert.assertEquals(transaction.getExpectedMass(), new Mass(1000000000));
+	}
+	
+	@Test
+	public void removePLUProductPrice() {
+		//add 1kg of each product
+		transaction.addItem(pluProductOne, new Mass (1000000000));
+		transaction.addItem(pluProductTwo, new Mass (1000000000));
+		//remove item 1
+		transaction.removeItem(pluProductOne);
+		Assert.assertEquals(transaction.getTotalCost(), BigDecimal.valueOf(2));
+	}
+	
+	@Test
+	public void checkAddedItemTaggedWithPriceAndWeight() {
+		transaction.addItem(pluProductOne, new Mass (1000000000));
+		Assert.assertEquals(transaction.getPLUCodedProducts()[0].getMass(), new Mass(1000000000));
+		Assert.assertEquals(transaction.getPLUCodedProducts()[0].getTotalCost(), new BigDecimal(1));
+		Assert.assertEquals(transaction.getPLUCodedProducts()[0].getPLUCodedProduct().getDescription(), "PLU1");
+	}
+
 	
 	@Test
 	public void testAddMultipleItemsCost() {
@@ -197,7 +288,7 @@ public class TransactionTest {
 	@Test
     public void testAddItem() {
         transaction.addItem(productOne);
-        assertEquals(1, transaction.getProducts().length);
+        assertEquals(1, transaction.getBarcodedProducts().length);
     }
 	
 	@Test
