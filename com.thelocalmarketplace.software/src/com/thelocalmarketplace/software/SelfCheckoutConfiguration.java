@@ -30,6 +30,9 @@ import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.Locale;
 
+import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
+import com.thelocalmarketplace.hardware.AttendantStation;
+
 public class SelfCheckoutConfiguration {
 	
 	public Currency currency;
@@ -42,10 +45,12 @@ public class SelfCheckoutConfiguration {
 	public int banknoteStorageCapacity;
 	public int reusableBagDispenserCapacity;
 	
-	public MachineRating rating;
+	public Class<? extends AbstractSelfCheckoutStation> machineType;
+	public Class<? extends AttendantStation> attendantType;
 	
-	public SelfCheckoutConfiguration(MachineRating rating, Currency currency, int coinDispenserCapacity, int coinStorageUnitCapacity, int coinTrayCapacity, BigDecimal[] coinDenominations, BigDecimal[] banknoteDenominations, int banknoteStorageCapacity, int reusableBagDispenserCapacity) {
-		this.rating = rating;
+	public SelfCheckoutConfiguration(Class<? extends AbstractSelfCheckoutStation> machineType, Class<? extends AttendantStation> attendantType, Currency currency, int coinDispenserCapacity, int coinStorageUnitCapacity, int coinTrayCapacity, BigDecimal[] coinDenominations, BigDecimal[] banknoteDenominations, int banknoteStorageCapacity, int reusableBagDispenserCapacity) {
+		this.machineType = machineType;
+		this.attendantType = attendantType;
 		this.coinDenominations = coinDenominations;
 		this.currency = currency;
 		this.coinDispenserCapacity = coinDispenserCapacity;
@@ -56,9 +61,10 @@ public class SelfCheckoutConfiguration {
 		this.reusableBagDispenserCapacity = reusableBagDispenserCapacity;
 	}
 	
-	public SelfCheckoutConfiguration() {
+	public SelfCheckoutConfiguration(Class<? extends AbstractSelfCheckoutStation> machineType, Class<? extends AttendantStation> attendantType) {
 		this(
-			MachineRating.BRONZE, 
+			machineType,
+			attendantType,
 			Currency.getInstance(Locale.CANADA), 
 			100, 
 			1000, 
@@ -69,27 +75,4 @@ public class SelfCheckoutConfiguration {
 		);
 	}
 
-	public Currency getCurrency() {
-		return currency;
-	}
-
-	public int getCoinDispenserCapacity() {
-		return coinDispenserCapacity;
-	}
-
-	public int getCoinStorageUnitCapacity() {
-		return coinStorageUnitCapacity;
-	}
-
-	public int getCoinTrayCapacity() {
-		return coinTrayCapacity;
-	}
-
-	public BigDecimal[] getCoinDenominations() {
-		return coinDenominations.clone();
-	}
-	
-	public static enum MachineRating {
-		GOLD, SILVER, BRONZE
-	}
 }

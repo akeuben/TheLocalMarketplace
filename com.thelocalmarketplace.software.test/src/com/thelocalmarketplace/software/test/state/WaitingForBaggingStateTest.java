@@ -37,10 +37,14 @@ import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
-import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
+import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.state.UserSessionState;
+import com.thelocalmarketplace.software.test.stubs.TestableAttendantStation;
+import com.thelocalmarketplace.software.test.stubs.TestableSelfCheckoutStationGold;
+
+import powerutility.PowerGrid;
 
 public class WaitingForBaggingStateTest {
 	
@@ -48,16 +52,17 @@ public class WaitingForBaggingStateTest {
 	
 	@Before
 	public void setup() {
-		SelfCheckout.uninitialize();
-		SelfCheckout.initialize(new SelfCheckoutConfiguration());
-		session = SelfCheckout.getInstance().startNewSession();
+		PowerGrid.engageUninterruptiblePowerSource();
+		Software.uninitialize();
+		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		session = Software.getInstance().startNewSession(0);
 	}
 	
 	@Test
 	public void testCoinSlotDisabled() {
 		session.setState(UserSessionState.WAITING_FOR_BAGGING);
 		// The coin slot should be disabled.
-		assertTrue(SelfCheckout.getInstance().getHardware().getCoinSlot().isDisabled());
+		assertTrue(Software.getInstance().getHardware(0).getCoinSlot().isDisabled());
 	}
 	
 	@Test
@@ -70,16 +75,15 @@ public class WaitingForBaggingStateTest {
 	
 	@Test
 	public void testOnStateSetOverloadWeight() {
-		SelfCheckout.getInstance().getHardware().getBaggingArea().addAnItem(new BarcodedItem(new Barcode(new Numeral[] {Numeral.five}), new Mass(9999999999999999999999999999999999999999999.0)));
+		Software.getInstance().getHardware(0).getBaggingArea().addAnItem(new BarcodedItem(new Barcode(new Numeral[] {Numeral.five}), new Mass(9999999999999999999999999999999999999999999.0)));
 		session.setState(UserSessionState.WAITING_FOR_BAGGING);
 		
-		// The coin slot should be disabled.
-		assertTrue(session.getState().equals(UserSessionState.WAITING_FOR_BAGGING));
+		assertTrue(session.getState().equals(UserSessionState.WAITING_FOR_ATTENDANT));
 	}
 	
 	@Test
 	public void testOnStateSetTooMuchWeight() {
-		SelfCheckout.getInstance().getHardware().getBaggingArea().addAnItem(new BarcodedItem(new Barcode(new Numeral[] {Numeral.five}), new Mass(9999.0)));
+		Software.getInstance().getHardware(0).getBaggingArea().addAnItem(new BarcodedItem(new Barcode(new Numeral[] {Numeral.five}), new Mass(9999.0)));
 		session.setState(UserSessionState.WAITING_FOR_BAGGING);
 		
 		// The coin slot should be disabled.
@@ -92,7 +96,7 @@ public class WaitingForBaggingStateTest {
 		session.setState(UserSessionState.WAITING_FOR_BAGGING);
 		
 		// The state should not change
-		UserSessionState newState = UserSessionState.WAITING_FOR_BAGGING.onScanBarcode(null);
+		UserSessionState newState = UserSessionState.WAITING_FOR_BAGGING.onScanBarcode(session, null);
 		
 		assertEquals(newState, null);
 	}
@@ -103,7 +107,7 @@ public class WaitingForBaggingStateTest {
 		session.setState(UserSessionState.WAITING_FOR_BAGGING);
 		
 		// The state should not change
-		UserSessionState newState = UserSessionState.WAITING_FOR_BAGGING.onCoinInserted(null);
+		UserSessionState newState = UserSessionState.WAITING_FOR_BAGGING.onCoinInserted(session, null);
 		
 		assertEquals(newState, null);
 	}
@@ -114,7 +118,7 @@ public class WaitingForBaggingStateTest {
 		session.setState(UserSessionState.WAITING_FOR_BAGGING);
 		
 		// The state should not change
-		UserSessionState newState = UserSessionState.WAITING_FOR_BAGGING.onWeightChanged(new Mass(50.0));
+		UserSessionState newState = UserSessionState.WAITING_FOR_BAGGING.onWeightChanged(session, new Mass(50.0));
 
 		assertEquals(null, newState);
 	}
@@ -125,7 +129,7 @@ public class WaitingForBaggingStateTest {
 		session.setState(UserSessionState.WAITING_FOR_BAGGING);
 		
 		// The state should not change
-		UserSessionState newState = UserSessionState.WAITING_FOR_BAGGING.onWeightChanged(new Mass(2000.0));
+		UserSessionState newState = UserSessionState.WAITING_FOR_BAGGING.onWeightChanged(session, new Mass(2000.0));
 
 		assertEquals(null, newState);
 	}
@@ -136,7 +140,7 @@ public class WaitingForBaggingStateTest {
 		session.setState(UserSessionState.WAITING_FOR_BAGGING);
 		
 		// The returned state should be item
-		UserSessionState newState = UserSessionState.WAITING_FOR_BAGGING.onWeightChanged(new Mass(100.0));
+		UserSessionState newState = UserSessionState.WAITING_FOR_BAGGING.onWeightChanged(session, new Mass(100.0));
 
 		assertEquals(UserSessionState.READY_FOR_ITEM, newState);
 	}
@@ -147,7 +151,7 @@ public class WaitingForBaggingStateTest {
 		session.setState(UserSessionState.WAITING_FOR_BAGGING);
 		
 		// The state should not change
-		UserSessionState newState = UserSessionState.WAITING_FOR_BAGGING.onWeightChanged(new Mass(101.0));
+		UserSessionState newState = UserSessionState.WAITING_FOR_BAGGING.onWeightChanged(session, new Mass(101.0));
 		
 		assertEquals(UserSessionState.READY_FOR_ITEM, newState);
 	}

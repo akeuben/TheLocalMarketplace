@@ -33,13 +33,15 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.Mass.MassDifference;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
-import com.jjjwelectronics.Mass.MassDifference;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.Product;
-import com.thelocalmarketplace.software.SelfCheckout;
+import com.thelocalmarketplace.software.Software;
+import com.thelocalmarketplace.software.membership.Membership;
+import com.thelocalmarketplace.software.session.UserSession;
 
 public class Transaction {
 
@@ -53,6 +55,14 @@ public class Transaction {
     private BigDecimal totalCost = BigDecimal.ZERO;
 
     private final HashMap<UUID, IPayment> payments = new HashMap<>();
+
+    private UserSession session;
+
+    private long transactionMembershipID;
+    
+    public Transaction(UserSession session) {
+    	this.session = session;
+    }
     
 
     /**
@@ -66,27 +76,6 @@ public class Transaction {
             products.add(product);
             totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
             expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM))));
-        }
-        else {
-            throw new NullPointerException("product");
-        }
-    }
-
-    /**
-     * Removes weight of bulky item from transaction
-     * @param product item being added to transaction/products
-     */
-    public void skipBagging(BarcodedProduct product)
-    {
-    	if (product != null) {
-    		Mass bulkyItemMass = new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM)));
-			MassDifference massDiff = expectedMass.difference(bulkyItemMass);
-			
-			if (massDiff.compareTo(Mass.ZERO) < 0) {
-				expectedMass = Mass.ZERO;
-			} else {
-				expectedMass = massDiff.abs(); // Use the absolute value to ensure it's positive.
-			}
         }
         else {
             throw new NullPointerException("product");
@@ -171,9 +160,9 @@ public class Transaction {
 
     public void calculateChange() throws Exception  {
         if (totalCost.compareTo(BigDecimal.ZERO) < 0) {
-            SelfCheckout instance = SelfCheckout.getInstance();
+            Software instance = Software.getInstance();
             BigDecimal change = totalCost.negate();
-            BigDecimal[] banknoteDenominations =instance.getConfiguration().banknoteDenominations;
+            BigDecimal[] banknoteDenominations = instance.getConfiguration().banknoteDenominations;
             BigDecimal[] coinDenominations = instance.getConfiguration().coinDenominations;
             
             final int BANKNOTE = 0;
@@ -184,13 +173,13 @@ public class Transaction {
 	                int dispense = -1;
 	                BigDecimal value = BigDecimal.valueOf(-1);
 	                for (BigDecimal banknote : banknoteDenominations) {
-	                    if (change.compareTo(banknote) >= 0 && banknote.compareTo(value) > 0 && instance.getHardware().getBanknoteDispensers().get(banknote).size() > 0) {
+	                    if (change.compareTo(banknote) >= 0 && banknote.compareTo(value) > 0 && session.getHardware().getBanknoteDispensers().get(banknote).size() > 0) {
 	                        value = banknote;
 	                        dispense = BANKNOTE;
 	                    }
 	                }
 	                for (BigDecimal coin : coinDenominations) {
-	                    if (change.compareTo(coin) >= 0 && coin.compareTo(value) > 0 && instance.getHardware().getCoinDispensers().get(coin).size() > 0) {
+	                    if (change.compareTo(coin) >= 0 && coin.compareTo(value) > 0 && session.getHardware().getCoinDispensers().get(coin).size() > 0) {
 	                        value = coin;
 	                        dispense = COIN;
 	                    }
@@ -201,10 +190,10 @@ public class Transaction {
 	                    change = change.subtract(value);
 	                    if (dispense == COIN) {
 	                        // Coin Dispensation
-	                        instance.getHardware().getCoinDispensers().get(value).emit();
+	                        session.getHardware().getCoinDispensers().get(value).emit();
 	                    } else {
 	                        // Banknote Dispensation
-	                        instance.getHardware().getBanknoteDispensers().get(value).emit();
+	                        session.getHardware().getBanknoteDispensers().get(value).emit();
 	                    }
 	                }
 	            }
@@ -214,7 +203,15 @@ public class Transaction {
                 // Rethrow the exception to be handled by the caller
                 throw e;
             }
-            SelfCheckout.getInstance().getHardware().getBanknoteOutput().dispense();
+            session.getHardware().getBanknoteOutput().dispense();
         }
+    }
+
+    public long getTransactionMembershipID() {
+        return transactionMembershipID;
+    }
+
+    public void setTransactionMembershipID(long transactionMembershipID) {
+        this.transactionMembershipID = transactionMembershipID;
     }
 }
