@@ -26,6 +26,7 @@ package com.thelocalmarketplace.software.UI;
  * Winston Wang - 30185321
  */
 
+import com.jjjwelectronics.Item;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 
 public interface UIObserver {
@@ -44,5 +45,9 @@ public interface UIObserver {
 	 * announces when user selects option to skip bagging the current product
 	 */
 	void skipBaggingSelected(BarcodedProduct product);
-	
+
+	/**
+	 * announces when user selects option to finish adding a bag to the current product
+	 */
+	void doneAddingBagsSelected();
 }

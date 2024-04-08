@@ -78,8 +78,7 @@ public class WaitingForBaggingStateTest {
 		Software.getInstance().getHardware(0).getBaggingArea().addAnItem(new BarcodedItem(new Barcode(new Numeral[] {Numeral.five}), new Mass(9999999999999999999999999999999999999999999.0)));
 		session.setState(UserSessionState.WAITING_FOR_BAGGING);
 		
-		// The coin slot should be disabled.
-		assertTrue(session.getState().equals(UserSessionState.WAITING_FOR_BAGGING));
+		assertTrue(session.getState().equals(UserSessionState.WAITING_FOR_ATTENDANT));
 	}
 	
 	@Test
