@@ -1,8 +1,5 @@
 package com.thelocalmarketplace.software.session;
 
-import com.jjjwelectronics.Mass;
-import com.jjjwelectronics.scanner.BarcodedItem;
-import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PriceLookUpCode;
 import com.thelocalmarketplace.software.UI.UIObserver;
 import com.thelocalmarketplace.software.payment.TransactionItem;
@@ -26,6 +23,15 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 		super.getUserSession().getTransaction().removeItem(product);
 		super.getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
 		//Program will wait until bagging is corrected and state is changed back to ready.
+	}
+	
+	@Override
+	public void purchasingBagsSelected() {
+		try {
+			super.getUserSession().getTransaction().purchaseBags();
+		} catch (Exception e) {
+			getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
+		}
 	}
 
 	@Override

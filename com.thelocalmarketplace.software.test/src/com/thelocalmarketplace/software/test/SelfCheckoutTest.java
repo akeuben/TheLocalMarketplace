@@ -71,7 +71,8 @@ public class SelfCheckoutTest {
 			25, 
 			new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 
 			100, 
-			100
+			100,
+			BigDecimal.valueOf(1.99)
 		), 1);
 		assertNotNull(Software.getInstance());
 		Software.uninitialize();
@@ -88,7 +89,8 @@ public class SelfCheckoutTest {
 			25, 
 			new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 
 			100, 
-			100
+			100,
+			BigDecimal.valueOf(1.99)
 		), 1);
 		assertNotNull(Software.getInstance());
 	}
@@ -104,7 +106,8 @@ public class SelfCheckoutTest {
 			25, 
 			new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 
 			100, 
-			100
+			100,
+			BigDecimal.valueOf(1.99)
 		), 1);
 		assertNotNull(Software.getInstance());
 	}
@@ -157,7 +160,8 @@ public class SelfCheckoutTest {
 				coinDenominationsTest,
 				banknoteDenominationsTest,
 				100,
-				100
+				100,
+				BigDecimal.valueOf(1.99)
 				);
 
 		Software check = Software.initialize(config, 1);

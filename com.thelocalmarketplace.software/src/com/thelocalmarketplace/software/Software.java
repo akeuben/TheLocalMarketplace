@@ -212,6 +212,7 @@ public class Software {
 		selfCheckoutStations[machineID].getPrinter().deregister(currentSession[machineID].getReceiptPrinterHandler());
 		selfCheckoutStations[machineID].getBanknoteValidator().detach(currentSession[machineID].getBanknoteValidatorHandler());
 		
+		currentSession[machineID].startPredictIssueEngine(); // Start issue prediction
 		currentSession[machineID] = null;
 		return true;
 	}
