@@ -33,6 +33,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import java.util.Scanner;
+import com.jjjwelectronics.bag.ReusableBag;
+import com.jjjwelectronics.scanner.Barcode;
+import com.jjjwelectronics.bag.AbstractReusableBagDispenser;
+
+import com.jjjwelectronics.EmptyDevice;
+import com.jjjwelectronics.Numeral;
+
+
+
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Mass.MassDifference;
 import com.tdc.CashOverloadException;
@@ -45,6 +55,9 @@ import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.session.UserSession;
 
 public class Transaction {
+	//To be removed after further implementation:
+		private static Numeral[] barcodeDigitsForResuableBag = { Numeral.one, Numeral.two, Numeral.three}; 
+		private static Barcode barcodeInstance = new Barcode(barcodeDigitsForResuableBag);
 
     /**
      * Items contained in an instance of transaction TODO Create constructor
@@ -128,6 +141,22 @@ public class Transaction {
 		expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf(5_000_000)));
     }
 
+    public void purchaseBags (int numberOfBags) throws Exception {
+    	for (int i = 0; i < numberOfBags; i++) {
+    		ReusableBag reusableBag = new ReusableBag();
+    		Mass idealMassOfResuableBag = ReusableBag.idealMass; 
+        	BigDecimal massInGrams = idealMassOfResuableBag.inGrams(); 
+        	double massAsDouble = massInGrams.doubleValue(); 
+    		//this.addBag(ReusableBag.idealMass);
+    		this.addItem(new BarcodedProduct(barcodeInstance, "Reusable Bag", 1, massAsDouble));
+    		try {
+    			session.getHardware().getReusableBagDispenser().dispense();
+    		} catch (EmptyDevice e) {
+    			throw new Exception("Bag Dispenser is empty");
+    		}
+    	}
+    }
+  
     /**
      *
      * Adds a payment to the transaction by storing in HashMap payments

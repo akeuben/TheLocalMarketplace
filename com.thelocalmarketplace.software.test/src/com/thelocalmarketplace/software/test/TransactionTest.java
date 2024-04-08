@@ -31,6 +31,7 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Currency;
 import java.util.List;
@@ -482,6 +483,29 @@ public class TransactionTest {
         assertEquals(1, collectedBanknotes.size());
         assertEquals(0, collectedBanknotes.get(0).getDenomination().compareTo(BigDecimal.valueOf(10)));
     }
+    
+    @Test
+    public void testPurchaseBags() {
+    	int BagsToPurchase = 5;
+    	BigInteger massOfOneBag = BigInteger.valueOf(5_000_000);
+    	BigInteger massOfFiveBags = massOfOneBag.multiply(BigInteger.valueOf(5));
+    	Mass expectedMassAfterPurchase = new Mass(massOfFiveBags);
+    	long expectedCostAfterPurchaseLong = 5; 
+    	BigDecimal expectedCostAfterPurchase = BigDecimal.valueOf(expectedCostAfterPurchaseLong);
+    	
+    		try {
+				transaction.purchaseBags(BagsToPurchase);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	
+		Mass actualMass = session.getTransaction().getExpectedMass();
+		   BigDecimal actualCost = session.getTransaction().getTotalCost();
+		   assertEquals(expectedMassAfterPurchase.compareTo(actualMass), 0);
+		   assertEquals(expectedCostAfterPurchase.compareTo(actualCost), 0);
+    }
+
         
 }
 

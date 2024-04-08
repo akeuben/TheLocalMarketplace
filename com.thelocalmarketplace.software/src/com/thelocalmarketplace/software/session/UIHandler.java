@@ -27,6 +27,11 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 		super.getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
 		//Program will wait until bagging is corrected and state is changed back to ready.
 	}
+	
+	@Override
+	public void purchasingBagsSelected (int numberofBags) {
+		super.getUserSession().getTransaction().purchaseBags(numberofBags);
+	}
 
 	@Override
 	public void skipBaggingSelected() {
