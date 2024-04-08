@@ -61,11 +61,12 @@ public class AttendantKeyboardHandler extends AbstractUserSessionHandler impleme
 	public void aKeyHasBeenReleased(String label) {
 		
 		//if attendant selects enter and there no database check has been done, a database check is done to find elements containing keyword
-		if (label=="Enter"&&matchingItems==null) {
+		if (label=="Enter"&&matchingItems.isEmpty()) {
 			//checks barcoded item database to see if any items match object description
 			for (Map.Entry<Barcode, BarcodedProduct> entry :ProductDatabases.BARCODED_PRODUCT_DATABASE.entrySet()) {
 			BarcodedProduct itemToCheck = entry.getValue();
 			if (itemToCheck.getDescription().contains(input)) {
+				
 				//if item is found, item is added to potential items array list
 				matchingItems.add(itemToCheck);
 	
@@ -80,11 +81,11 @@ public class AttendantKeyboardHandler extends AbstractUserSessionHandler impleme
 				matchingItems.add(itemToCheck);
 				}
 			}
-			input = null;
+			input = "";
 		}
 		
 		//if attendant selects enter after a database check has been done, input is used to make a selection from the choices and add item to transaction
-		else if (label=="Enter"&& matchingItems!=null) {
+		else if (label=="Enter"&& !matchingItems.isEmpty()) {	
 			try {
 			Integer i = Integer.parseInt(input);
 			if (matchingItems.get(i-1) instanceof BarcodedProduct) {

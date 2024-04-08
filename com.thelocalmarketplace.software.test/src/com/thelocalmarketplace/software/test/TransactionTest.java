@@ -93,13 +93,14 @@ public class TransactionTest {
 		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
 		this.session = Software.getInstance().startNewSession(0);
 		this.transaction = session.getTransaction();
+		this.akh = new AttendantKeyboardHandler(session);
 		this.num = Numeral.eight;
 		this.bc= new Barcode(new Numeral[] {num});
 		this.productOne = new BarcodedProduct(bc, "test1", 100, 1);
 		this.productTwo = new BarcodedProduct(bc, "test2", 200, 2);
 		this.bulkyItem = new BarcodedProduct(bc,"bulky item", 50, 100);
-		this.pluProductOne = new PLUCodedProduct(new PriceLookUpCode("1"), "plu1", 1);
-		this.pluProductTwo = new PLUCodedProduct(new PriceLookUpCode("2"), "plu2", 2);
+		this.pluProductOne = new PLUCodedProduct(new PriceLookUpCode("1357"), "plu1", 100);
+		this.pluProductTwo = new PLUCodedProduct(new PriceLookUpCode("2468"), "plu2", 200);
 	}
 	
 	@Test
@@ -151,7 +152,7 @@ public class TransactionTest {
 	
 	@Test
 	public void testAddPLUItemByKeyboard() {
-		ProductDatabases.PLU_PRODUCT_DATABASE.put(new PriceLookUpCode("1"), pluProductOne);
+		ProductDatabases.PLU_PRODUCT_DATABASE.put(new PriceLookUpCode("1357"), pluProductOne);
 		akh.aKeyHasBeenReleased("p");
 		akh.aKeyHasBeenReleased("l");
 		akh.aKeyHasBeenReleased("Enter");
