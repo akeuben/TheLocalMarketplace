@@ -30,13 +30,11 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Map;
 
-
 import com.tdc.banknote.BanknoteStorageUnit;
 import com.tdc.banknote.IBanknoteDispenser;
 import com.tdc.coin.CoinStorageUnit;
 import com.tdc.coin.ICoinDispenser;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
-import com.thelocalmarketplace.software.state.UserSessionState;
 
 /**
  * Use cases predict low ink/paper were not implemented as the hardware already signals if current levels are <= 10% of the threshold
