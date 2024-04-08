@@ -74,6 +74,7 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
         		totalCharsToPrint += payment.toString().length();
         	}
         }
+
         //because the printer can know how many more chars and lines it has left we can probably
         //use totalCharToPrint to see if the receipt is even printable
         //assuming it is then move on to the rest
@@ -112,6 +113,7 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
             String strippedString = workingString.replaceAll("\\s", "");
             totalCharsToPrint += strippedString.length();
         }
+        
         for (PLUCodedProductAdded product : finalTransactionRecord.getPLUCodedProducts()){
             workingString = product.getPLUCodedProduct().getPLUCode().toString();
             workingString += " : $";
@@ -120,7 +122,7 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
             String strippedString = workingString.replaceAll("\\s", "");
             totalCharsToPrint += strippedString.length();
         }
-        
+
     	return totalCharsToPrint; 
     }
     

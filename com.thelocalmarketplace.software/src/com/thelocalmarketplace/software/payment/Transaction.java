@@ -30,7 +30,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
+
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Mass.MassDifference;
 import com.tdc.CashOverloadException;
@@ -40,7 +42,6 @@ import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.Software;
-import com.thelocalmarketplace.software.membership.Membership;
 import com.thelocalmarketplace.software.session.UserSession;
 
 public class Transaction {
@@ -63,10 +64,12 @@ public class Transaction {
 
     private long transactionMembershipID;
     
+    private List<TransactionObserver> observers;
     private String attendantInput;
     
     public Transaction(UserSession session) {
     	this.session = session;
+    	this.observers = new ArrayList<TransactionObserver>();
     }
     
 
@@ -81,8 +84,11 @@ public class Transaction {
             barcodedProducts.add(product);
             totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
             expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM))));
-        }
-        else {
+            
+            for(TransactionObserver obs : this.observers) {
+            	obs.barcodedProductAdded(product);
+            }
+        } else {
             throw new NullPointerException("product");
         }
     }
@@ -102,7 +108,7 @@ public class Transaction {
             totalCost = totalCost.add(itemCost);
             // TODO determine how to handle expected weight for PLU coded products
             expectedMass = expectedMass.sum(mass);
-            pluProducts.add(new PLUCodedProductAdded(product, totalCost, new Mass(massInKilo)));
+            pluProducts.add(new PLUCodedProductAdded(product, totalCost, mass));
         }
         else {
             throw new NullPointerException("product");
@@ -156,12 +162,9 @@ public class Transaction {
             throw new NullPointerException("product");
         }
     }
-
-    /**
-     * updates transaction weight to include bag weight
-     */
-    public void addBag(Mass bagMass) {
-		expectedMass = expectedMass.sum(bagMass);
+    
+    public void addOwnBag() {
+		expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf(5_000_000)));
     }
 
 
@@ -174,6 +177,10 @@ public class Transaction {
     	UUID transactionId = UUID.randomUUID(); // Generate a unique ID for this transaction/payment
     	payments.put(transactionId, payment); // Add payment to HashMap
     	totalCost = totalCost.subtract(payment.getAmountPaid());
+    	
+    	for(TransactionObserver obs : this.observers) {
+        	obs.paymentAdded(payment);
+        }
     }
 
     /**
@@ -184,6 +191,10 @@ public class Transaction {
     	barcodedProducts.remove(product);
     	totalCost = totalCost.subtract(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
     	expectedMass = expectedMass.difference(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight()*Mass.MICROGRAMS_PER_GRAM)))).abs();
+        
+        for(TransactionObserver obs : this.observers) {
+        	obs.barcodedProductRemoved(product);
+        }
     }
     
     
@@ -218,20 +229,14 @@ public class Transaction {
     	return totalCost;
     }
 
-
-	public Product[] getProducts() {
-		Product[] products = new Product[0];
-		products = this.barcodedProducts.toArray(products);
-		products = this.pluProducts.toArray(products);
-		return products;
-	}
-
-    public ArrayList<BarcodedProduct> getBarcodedProducts(){
-        return barcodedProducts;
+    public BarcodedProduct[] getBarcodedProducts(){
+    	BarcodedProduct[] list = new BarcodedProduct[0];
+        return this.barcodedProducts.toArray(list);
     }
     
-    public ArrayList<PLUCodedProductAdded> getPLUCodedProducts() {
-    	return pluProducts;
+    public PLUCodedProductAdded[] getPLUCodedProducts() {
+    	PLUCodedProductAdded[] list = new PLUCodedProductAdded[0];
+        return this.pluProducts.toArray(list);
     }
 
 
@@ -297,4 +302,27 @@ public class Transaction {
     public void setTransactionMembershipID(long transactionMembershipID) {
         this.transactionMembershipID = transactionMembershipID;
     }
+	
+	/**
+	 * Registers a listener for this user session
+	 * @param observer The observer to register
+	 */
+	public void register(TransactionObserver observer) {
+		this.observers.add(observer);
+	}
+	
+	/**
+	 * Deregister a listener for this user session
+	 * @param observer The observer to deregister
+	 */
+	public void deregister(TransactionObserver observer) {
+		this.observers.remove(observer);
+	}
+	
+	/**
+	 * Degregister all listeners for this user session
+	 */
+	public void deregisterAll() {
+		this.observers.removeAll(this.observers);
+	}
 }

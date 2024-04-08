@@ -59,6 +59,7 @@ public class UIHardwareSimulation extends JFrame {
 		add(stationSelector);
 		pack();
 		setVisible(true);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 
 	public static void startHardwareSimulationUI(int machineCount) {

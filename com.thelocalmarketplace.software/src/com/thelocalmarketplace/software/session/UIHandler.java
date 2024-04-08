@@ -1,31 +1,7 @@
 package com.thelocalmarketplace.software.session;
 
-/**
- * SENG 300 Project - Group 1:
- * 
- * Avery Keuben - 30170731
- * Moiz Siddiqui - 30150291
- * Ammaar Melethil - 30141956
- * Joey Fisher - 30105628
- * Ethan Pangilinan - 30179143
- * Joshua Kraft - 30171525
- * Nathan Vaters - 30121908
- * Max Butcher - 30149202
- * Neeraj Ghansela - 30157473
- * Ansel Sulejmani - 30178521
- * Suleman Basit - 30132816
- * Jacob Boyden - 30193220
- * Cheshta Sharma - 30064538
- * Callum Bates - 30188601
- * Armughan Mustafa - 30154601
- * Connor Ell - 30073291
- * Saif Farag - 30195046
- * Ivan Agalakov - 30172107
- * Samuel Turner - 10064857
- * Stephanie Sevilla - 30176781
- * Winston Wang - ????????
- */
-
+import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.scanner.BarcodedItem;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.software.UI.UIObserver;
 import com.thelocalmarketplace.software.state.UserSessionState;
@@ -38,31 +14,26 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 
 	@Override
 	public void addBagSelected() {
-		//sets state to add bag state
-		getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
-		//new state changed back to waiting for item after add bag completed
-		UserSessionState newState = getUserSession().getState().onStateSet(getUserSession());
-		if (newState!=null) {
-			getUserSession().setState(newState);
-		}
+		super.getUserSession().getTransaction().addOwnBag();
+		super.getUserSession().setState(UserSessionState.ADDING_BAGS_STATE);
+		//Program will wait until bagging is corrected and state is changed back to ready.
 	}
 
 	@Override
 	public void removeItemSelected(BarcodedProduct product) {
-		super.getUserSession().getTransaction().removeItem(product);
 		super.getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
-		// Waits for user to remove item from bagging area
-		//TODO Not sure how this should be implemented. Is there a way to get the current mass of the scale???
-		//if (super.getUserSession().getTransaction().getExpectedMass() != super.getUserSession().getTransaction().getExpectedMass() + product.getExpectedWeight()) {
-			// Changes state back to READY_FOR_ITEM when item is removed
-			//super.getUserSession().setState(UserSessionState.READY_FOR_ITEM);
-		//}
-
-
+		BarcodedItem item = new BarcodedItem(product.getBarcode(), new Mass(product.getExpectedWeight()));
+		super.getUserSession().getTransaction().removeItem(product);
+		//Program will wait until bagging is corrected and state is changed back to ready.
 	}
+
 	@Override
 	public void skipBaggingSelected(BarcodedProduct product) {
 		super.getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
 	}
 
+	@Override
+	public void doneAddingBagsSelected() {
+		super.getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
+	}
 }

@@ -91,5 +91,8 @@ public class Simulation {
 		UIHardwareSimulation.startHardwareSimulationUI(1);
 		
 		Software.getInstance().getHardware(0).getScreen().getFrame().add(new MainUserPanel(0));
+		Software.getInstance().getHardware(0).getScreen().setVisible(true);
+		Software.getInstance().getHardware(0).getScreen().getFrame().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		test.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 }
