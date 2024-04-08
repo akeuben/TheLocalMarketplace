@@ -1,22 +1,25 @@
 package com.thelocalmarketplace.software.test;
 
-import com.thelocalmarketplace.hardware.BarcodedProduct;
-import com.thelocalmarketplace.software.SelfCheckout;
-import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
-import com.thelocalmarketplace.software.session.UIHandler;
-import com.thelocalmarketplace.software.session.UserSession;
-import com.thelocalmarketplace.software.state.UserSessionState;
-import com.jjjwelectronics.scanner.Barcode;
-import com.jjjwelectronics.Numeral;
-import com.jjjwelectronics.Mass;
-import org.junit.Before;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Currency;
-import java.util.Locale;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.Numeral;
+import com.jjjwelectronics.scanner.Barcode;
+import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
+import com.thelocalmarketplace.software.Software;
+import com.thelocalmarketplace.software.session.UIHandler;
+import com.thelocalmarketplace.software.session.UserSession;
+import com.thelocalmarketplace.software.state.UserSessionState;
+import com.thelocalmarketplace.software.test.stubs.TestableAttendantStation;
+import com.thelocalmarketplace.software.test.stubs.TestableSelfCheckoutStationGold;
 
 public class RemoveItemTest {
 
@@ -31,10 +34,9 @@ public class RemoveItemTest {
     @Before
     public void setup() {
         // Initialize necessary objects
-    	SelfCheckout.uninitialize();
-		SelfCheckout.initialize(new SelfCheckoutConfiguration());
-		SelfCheckout.getInstance().startNewSession();
-        userSession = new UserSession();
+    	Software.uninitialize();
+    	Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
+		userSession = Software.getInstance().startNewSession(0);
         uiHandler = new UIHandler(userSession);
 
         // Initialize barcode and product

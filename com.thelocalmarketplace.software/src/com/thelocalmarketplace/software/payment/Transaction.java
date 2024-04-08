@@ -229,20 +229,14 @@ public class Transaction {
     	return totalCost;
     }
 
-
-	public Product[] getProducts() {
-		Product[] products = new Product[0];
-		products = this.barcodedProducts.toArray(products);
-		products = this.pluProducts.toArray(products);
-		return products;
-	}
-
-    public ArrayList<BarcodedProduct> getBarcodedProducts(){
-        return barcodedProducts;
+    public BarcodedProduct[] getBarcodedProducts(){
+    	BarcodedProduct[] list = new BarcodedProduct[0];
+        return this.barcodedProducts.toArray(list);
     }
     
-    public ArrayList<PLUCodedProductAdded> getPLUCodedProducts() {
-    	return pluProducts;
+    public PLUCodedProductAdded[] getPLUCodedProducts() {
+    	PLUCodedProductAdded[] list = new PLUCodedProductAdded[0];
+        return this.pluProducts.toArray(list);
     }
 
 

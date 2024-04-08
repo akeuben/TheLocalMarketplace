@@ -10,6 +10,9 @@ public class AddingBagsState implements IUserSessionState<UserSessionState> {
         // is not in the correct state
     	session.getHardware().getCoinSlot().disable();
     	session.getHardware().getBanknoteInput().disable();
+    	
+    	
+    	
         return null;
     }
 
