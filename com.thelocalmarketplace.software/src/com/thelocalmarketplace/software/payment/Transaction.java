@@ -120,7 +120,7 @@ public class Transaction {
     public void purchaseBags (int numberOfBags) throws Exception{
 //    	if (session.)
     	for (int i = 0; i < numberOfBags; i++) {
-    		ReusableBag resuableBag = new ReusableBag();
+    		ReusableBag reusableBag = new ReusableBag();
     		this.addBag(reusableBag.idealMass);
     		this.addItem(new BarcodedProduct(bc, "Reusable Bag", 0, reusableBag.idealMass));
     		try {
