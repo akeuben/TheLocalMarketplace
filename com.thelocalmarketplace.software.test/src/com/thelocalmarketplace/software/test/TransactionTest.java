@@ -28,8 +28,10 @@ package com.thelocalmarketplace.software.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
@@ -49,12 +51,12 @@ import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.hardware.PriceLookUpCode;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
-
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.payment.CashPayment;
 import com.thelocalmarketplace.software.payment.IPayment;
 import com.thelocalmarketplace.software.payment.Transaction;
+import com.thelocalmarketplace.software.payment.TransactionItem;
 import com.thelocalmarketplace.software.session.AttendantKeyboardHandler;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.test.stubs.TestableAttendantStation;
@@ -101,7 +103,7 @@ public class TransactionTest {
 		this.bc= new Barcode(new Numeral[] {num});
 		this.productOne = new BarcodedProduct(bc, "test1", 100, 1);
 		this.productTwo = new BarcodedProduct(bc, "test2", 200, 2);
-		this.bulkyItem = new BarcodedProduct(bc,"bulky item", 50, 100
+		this.bulkyItem = new BarcodedProduct(bc,"bulky item", 50, 100);
 		this.itemOne = new BarcodedItem(bc,new Mass(BigDecimal.valueOf(1)));
 		this.pluProductOne = new PLUCodedProduct(new PriceLookUpCode("1357"), "plu1", 100);
 		this.pluProductTwo = new PLUCodedProduct(new PriceLookUpCode("2468"), "plu2", 200);
@@ -109,7 +111,9 @@ public class TransactionTest {
 	
 	@Test
 	public void testNullItemProduct() {
-		assertThrows(NullPointerException.class, () -> transaction.addItem(null));
+		assertThrows(NullPointerException.class, () -> transaction.addItem((TransactionItem) null));
+		assertThrows(NullPointerException.class, () -> transaction.addItem((PLUCodedProduct) null, Mass.ZERO));
+		assertThrows(NullPointerException.class, () -> transaction.addItem((BarcodedProduct) null));
 	}
 	
 	@Test
@@ -151,7 +155,14 @@ public class TransactionTest {
 		akh.aKeyHasBeenReleased("Enter");
 		akh.aKeyHasBeenReleased("1");
 		akh.aKeyHasBeenReleased("Enter");
-		Assert.assertTrue(transaction.getBarcodedProducts().contains(productOne));
+		boolean found = false;
+		for(TransactionItem item : transaction.getItems()) {
+			if(item.getBarcodedProduct() == productOne) {
+				found = true;
+				break;
+			}
+		}
+		assertTrue(found);
 	}
 	
 	@Test
@@ -162,7 +173,7 @@ public class TransactionTest {
 		akh.aKeyHasBeenReleased("Enter");
 		akh.aKeyHasBeenReleased("1");
 		akh.aKeyHasBeenReleased("Enter");
-		Assert.assertEquals(transaction.getPLUCodedProducts().get(0).getPLUCodedProduct(),pluProductOne);
+		Assert.assertEquals(transaction.getItems()[0].getPluProduct(), pluProductOne);
 	}
 	
 	
@@ -207,29 +218,29 @@ public class TransactionTest {
 	@Test
 	public void removePLUProductMass() {
 		//add 1kg of each product
-		transaction.addItem(pluProductOne, new Mass (2000000000));
-		transaction.addItem(pluProductTwo, new Mass (1000000000));
+		TransactionItem item1 = transaction.addItem(pluProductOne, new Mass (2000000000));
+		TransactionItem item2 = transaction.addItem(pluProductTwo, new Mass (1000000000));
 		//remove item 1
-		transaction.removeItem(pluProductOne);
+		transaction.removeItem(item1);
 		Assert.assertEquals(transaction.getExpectedMass(), new Mass(1000000000));
 	}
 	
 	@Test
 	public void removePLUProductPrice() {
 		//add 1kg of each product
-		transaction.addItem(pluProductOne, new Mass (1_000_000_000));
-		transaction.addItem(pluProductTwo, new Mass (1_000_000_000));
+		TransactionItem item1 = transaction.addItem(pluProductOne, new Mass (1_000_000_000));
+		TransactionItem item2 = transaction.addItem(pluProductTwo, new Mass (1_000_000_000));
 		//remove item 1
-		transaction.removeItem(pluProductOne);
+		transaction.removeItem(item1);
 		Assert.assertEquals(transaction.getTotalCost(), BigDecimal.valueOf(2));
 	}
 	
 	@Test
 	public void checkAddedItemTaggedWithPriceAndWeight() {
 		transaction.addItem(pluProductOne, new Mass (1000000000));
-		Assert.assertEquals(transaction.getPLUCodedProducts()[0].getMass(), new Mass(1000000000));
-		Assert.assertEquals(transaction.getPLUCodedProducts()[0].getCost(), new BigDecimal(1));
-		Assert.assertEquals(transaction.getPLUCodedProducts()[0].getPLUCodedProduct().getDescription(), "PLU1");
+		Assert.assertEquals(transaction.getItems()[0].getMass(), new Mass(1000000000));
+		Assert.assertEquals(transaction.getItems()[0].getPrice(), new BigDecimal(1));
+		Assert.assertEquals(transaction.getItems()[0].getDescription(), "plu1");
 	}
 
 	
@@ -243,8 +254,8 @@ public class TransactionTest {
 	@Test
 	public void testRemoveItemWeight() {
 		transaction.addItem(productOne);
-		transaction.addItem(productTwo);
-		session.getUIHandler().removeItemSelected(productTwo);
+		TransactionItem item = transaction.addItem(productTwo);
+		session.getUIHandler().removeItemSelected(item);
 		Mass productOneMass = new Mass(productOne.getExpectedWeight());
 		Assert.assertTrue(productOneMass.compareTo(transaction.getExpectedMass()) == 0);
 	}
@@ -252,22 +263,22 @@ public class TransactionTest {
 	@Test
 	public void testRemoveItemCost() {
 		transaction.addItem(productOne);
-		transaction.addItem(productTwo);
-		session.getUIHandler().removeItemSelected(productTwo);
+		TransactionItem item = transaction.addItem(productTwo);
+		session.getUIHandler().removeItemSelected(item);
 		BigDecimal productOneCost = BigDecimal.valueOf(productOne.getPrice()).divide(BigDecimal.valueOf(100));
 		Assert.assertTrue(productOneCost.compareTo(transaction.getTotalCost())==0);
 	}
 	
 	@Test
 	public void testAddBulkyItemWeight() {
-		session.getUIHandler().skipBaggingSelected(bulkyItem);
+		session.getUIHandler().skipBaggingSelected();
 		Assert.assertTrue(transaction.getExpectedMass().compareTo(new Mass(0))==0);
 	}
 	
 	@Test
 	public void testAddBulkyItemCost() {
 		session.getTransaction().addItem(bulkyItem);
-		session.getUIHandler().skipBaggingSelected(bulkyItem);
+		session.getUIHandler().skipBaggingSelected();
 		Assert.assertTrue(transaction.getTotalCost().compareTo(BigDecimal.valueOf(bulkyItem.getPrice()).divide(BigDecimal.valueOf(100)))==0);
 	}
 	
@@ -288,14 +299,21 @@ public class TransactionTest {
 	@Test
     public void testAddItem() {
         transaction.addItem(productOne);
-        assertEquals(1, transaction.getBarcodedProducts().length);
+        assertEquals(1, transaction.getItems().length);
     }
 	
 	@Test
 	public void testAddItemByHandheldScanner() {
 		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(bc, productOne);
-		session.getHardware().getHandheldScanner().scan(itemOne);
-		Assert.assertTrue(session.getTransaction().getBarcodedProducts().contains(productOne));
+		for(int i = 0; i < 100; i++) session.getHardware().getHandheldScanner().scan(itemOne);
+		boolean found = false;
+		for(TransactionItem item : transaction.getItems()) {
+			if(item.getBarcodedProduct() == productOne) {
+				found = true;
+				break;
+			}
+		}
+		assertTrue(found);
 	}
 
 	@Test

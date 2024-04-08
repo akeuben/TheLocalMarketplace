@@ -12,37 +12,32 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.border.TitledBorder;
 
+import com.jjjwelectronics.Mass;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.hardware.PriceLookUpCode;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.UI.components.TransactionView;
 import com.thelocalmarketplace.software.UI.user.components.StatusBarComponent;
+import com.thelocalmarketplace.software.payment.IPayment;
+import com.thelocalmarketplace.software.payment.Transaction;
+import com.thelocalmarketplace.software.payment.TransactionItem;
+import com.thelocalmarketplace.software.payment.TransactionObserver;
 import com.thelocalmarketplace.software.session.UIHandler;
 import com.thelocalmarketplace.software.state.UserSessionState;
 
-public class ReadyForItemScreen extends AbstractUserScreen {
+public class ReadyForItemScreen extends AbstractMainScreen {
 
 	private static final long serialVersionUID = 6147707410164322045L;
-	
-	TransactionView view;
-	StatusBarComponent statusbar;
 	
 	private JLabel pluView;
 	
 	private char state = 0;
 	
 	public ReadyForItemScreen(int machineID) {
-		super(machineID);
-		view = new TransactionView(machineID);
-		statusbar = new StatusBarComponent(this::onSelectAddItem);
+		super(machineID, true);
 		statusbar.setNormalStatus();
-
-		setLayout(new GridBagLayout());
-		
-		view.connect(Software.getInstance().getCurrentSession(machineID).getTransaction());
 		
 		pluView = new JLabel();
 		pluView.setBackground(Color.WHITE);
@@ -118,30 +113,6 @@ public class ReadyForItemScreen extends AbstractUserScreen {
 		
 		add(backButton, gbc);
 	}
-	
-	public void drawMain() {
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.anchor = GridBagConstraints.NORTH;
-		JScrollPane pane = new JScrollPane(view);
-		add(pane, gbc);
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.anchor = GridBagConstraints.SOUTH;
-		add(statusbar, gbc);
-		
-		JPanel buttonPanel = new JPanel();
-		JButton helpButton = new JButton("Help");
-		JButton addBagsButton = new JButton("Add Own Bags");
-		JButton purchaseBagsButton = new JButton("Purchase Bags");
-	}
 
 	@Override
 	public void redraw() {
@@ -154,27 +125,14 @@ public class ReadyForItemScreen extends AbstractUserScreen {
 		repaint();
 	}
 	
-	@Override
-	public void onScreenRemoved() {
-		view.disconnect(Software.getInstance().getCurrentSession(machineID).getTransaction());
-	}
-	
-	private void onSelectAddItem(ActionEvent e) {
-		state = 1;
-		redraw();
-	}
-	
-	private void getHelp() {
-		Software.getInstance().getCurrentSession(machineID).setState(UserSessionState.WAITING_FOR_ATTENDANT);
-	}
-	
-	private void addBags() {
+	private void addBags(ActionEvent e) {
 		UIHandler handler = Software.getInstance().getCurrentSession(machineID).getUIHandler();
 		handler.addBagSelected();
 	}
 	
-	private void purchaseBags() {
+	private void purchaseBags(ActionEvent e) {
 		UIHandler handler = Software.getInstance().getCurrentSession(machineID).getUIHandler();
+		//TODO buy bags
 	}
 	
 	private void onSelectBack(ActionEvent e) {
@@ -209,5 +167,23 @@ public class ReadyForItemScreen extends AbstractUserScreen {
 		if(current.length() <= 0) return;
 		current.substring(0, current.length() - 2);
 		pluView.setText(current);
+	}
+
+	@Override
+	public JButton[] getActionButtons() {
+		// TODO Auto-generated method stub
+		JButton addBagsButton = new JButton("Add Own Bags");
+		addBagsButton.addActionListener(this::addBags);
+		JButton purchaseBagsButton = new JButton("Purchase Bags");
+		purchaseBagsButton.addActionListener(this::purchaseBags);
+		return new JButton[] {
+				addBagsButton, purchaseBagsButton
+		};
+	}
+
+	@Override
+	public void onSelectAddItemManually(ActionEvent e) {
+		state = 1;
+		redraw();
 	}
 }

@@ -40,6 +40,7 @@ import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
+import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.session.UserSession;
 
@@ -48,10 +49,7 @@ public class Transaction {
     /**
      * Items contained in an instance of transaction TODO Create constructor
      */
-    //private final ArrayList<BarcodedProduct> products = new ArrayList<>();
-	private final ArrayList<BarcodedProduct> barcodedProducts = new ArrayList<>();
-	
-	private final ArrayList<PLUCodedProductAdded> pluProducts = new ArrayList<>();
+	private final ArrayList<TransactionItem> items = new ArrayList<>();
     
     private Mass expectedMass = Mass.ZERO;
     
@@ -71,6 +69,23 @@ public class Transaction {
     	this.observers = new ArrayList<TransactionObserver>();
     }
     
+    /**
+     * Adds a product into the current transaction
+     * Adds weight to total expected weight
+     * Adds cost of item to total cost
+     * @param product item being added to transaction/products
+     */
+    public void addItem(TransactionItem item) {
+    	if(item == null) throw new NullPointerException("item");
+    	
+    	items.add(item);
+    	totalCost = totalCost.add(item.getPrice());
+        expectedMass = expectedMass.sum(item.getMass());
+        
+        for(TransactionObserver obs : this.observers) {
+        	obs.itemAdded(item);
+        }
+    }
 
     /**
      * Adds a product into the current transaction
@@ -78,18 +93,14 @@ public class Transaction {
      * Adds cost of item to total cost
      * @param product item being added to transaction/products
      */
-    public void addItem(BarcodedProduct product) {
-        if (product != null) {
-            barcodedProducts.add(product);
-            totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
-            expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM))));
-            
-            for(TransactionObserver obs : this.observers) {
-            	obs.barcodedProductAdded(product);
-            }
-        } else {
-            throw new NullPointerException("product");
-        }
+    public TransactionItem addItem(BarcodedProduct product) {
+    	if(product == null) throw new NullPointerException("product");
+    	
+    	TransactionItem item = TransactionItem.from(product);
+        
+    	addItem(item);
+    	
+    	return item;
     }
 
     /**
@@ -98,79 +109,24 @@ public class Transaction {
      * @param product
      * @param mass on scale
      */
-    public void addItem(PLUCodedProduct product, Mass mass) {
-        if (product != null) {
-            //convert mass to kilograms
-            BigDecimal massInKilo = new BigDecimal(mass.inMicrograms().divide(BigInteger.valueOf(1000000000)));
-            BigDecimal pricePerKilo = BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100));
-            BigDecimal itemCost = massInKilo.multiply(pricePerKilo);
-            totalCost = totalCost.add(itemCost);
-            // TODO determine how to handle expected weight for PLU coded products
-            expectedMass = expectedMass.sum(mass);
-            PLUCodedProductAdded added = new PLUCodedProductAdded(product, itemCost, mass);
-            pluProducts.add(added);
-            
-            for(TransactionObserver obs : this.observers) {
-            	obs.plucodedProductAdded(added, mass);
-            }
-        }
-        else {
-            throw new NullPointerException("product");
-        }
-    }
-    
-    /**
-     * class that instantiates PLU coded product with the cost that is added to the transaction and the mass in kg
-     */
-    public class PLUCodedProductAdded {
-    	private PLUCodedProduct product;
-    	private BigDecimal cost;
-    	private Mass massAdded;
+    public TransactionItem addItem(PLUCodedProduct product, Mass mass) {
+    	if(product == null) throw new NullPointerException("product");
     	
-    	public PLUCodedProductAdded(PLUCodedProduct product, BigDecimal cost, Mass massAdded) {
-    		this.product = product;
-    		this.cost = cost;
-    		this.massAdded = massAdded;
-    	}
-    	
-    	public PLUCodedProduct getPLUCodedProduct() {
-    		return product;
-    	}
-    	
-    	public BigDecimal getCost() {
-    		return cost;
-    	}
-    	
-    	public Mass getMass() {
-    		return massAdded;
-    	}
-    }
-
-    /**
-     * Removes weight of bulky item from transaction
-     * @param product item being added to transaction/products
-     */
-    public void skipBagging(BarcodedProduct product)
-    {
-    	if (product != null) {
-    		Mass bulkyItemMass = new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM)));
-			MassDifference massDiff = expectedMass.difference(bulkyItemMass);
-			
-			if (massDiff.compareTo(Mass.ZERO) < 0) {
-				expectedMass = Mass.ZERO;
-			} else {
-				expectedMass = massDiff.abs(); // Use the absolute value to ensure it's positive.
-			}
-        }
-        else {
-            throw new NullPointerException("product");
-        }
+        //convert mass to kilograms
+        BigDecimal massInKilo = new BigDecimal(mass.inMicrograms().divide(BigInteger.valueOf(1000000000)));
+        BigDecimal pricePerKilo = BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100));
+        BigDecimal itemCost = massInKilo.multiply(pricePerKilo);
+        
+        TransactionItem item = TransactionItem.from(product, mass, itemCost);
+        
+        addItem(item);
+        
+        return item;
     }
     
     public void addOwnBag() {
 		expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf(5_000_000)));
     }
-
 
     /**
      *
@@ -191,35 +147,15 @@ public class Transaction {
      * Removes an item from the transaction
      * @param product item being removed from transaction/products
      */
-    public void removeItem(BarcodedProduct product) {
-    	barcodedProducts.remove(product);
-    	totalCost = totalCost.subtract(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
-    	expectedMass = expectedMass.difference(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight()*Mass.MICROGRAMS_PER_GRAM)))).abs();
+    public void removeItem(TransactionItem item) {
+    	items.remove(item);
+    	totalCost = totalCost.subtract(item.getPrice());
+    	expectedMass = expectedMass.difference(item.getMass()).abs();
         
         for(TransactionObserver obs : this.observers) {
-        	obs.barcodedProductRemoved(product);
+        	obs.itemRemoved(item);
         }
     }
-    
-    
-    /**
-     * removes PLU item from the transaction
-     * @param product to be removed
-     */
-    public void removeItem(PLUCodedProduct product) {
-    	for (PLUCodedProductAdded testProduct : pluProducts) {
-    		if (testProduct.getPLUCodedProduct() == product) {
-    			totalCost = totalCost.subtract(testProduct.getCost());
-    			expectedMass = expectedMass.difference(testProduct.getMass()).abs();
-    			pluProducts.remove(testProduct);
-    			for(TransactionObserver obs : this.observers) {
-                	obs.plucodedProductRemoved(testProduct, testProduct.getMass());
-                }
-    		}
-    		break;
-    	}
-    }
-    
 
     /**
      * Getter method for expected weight
@@ -230,6 +166,14 @@ public class Transaction {
     }
     
     /**
+     * Sets the expected mass for this transaction
+     * @param mass
+     */
+    public void setExpectedMass(Mass mass) {
+    	this.expectedMass = mass;
+    }
+    
+    /**
      * Getter method for total cost
      * @return totalCost
      */
@@ -237,21 +181,14 @@ public class Transaction {
     	return totalCost;
     }
 
-    public BarcodedProduct[] getBarcodedProducts(){
-    	BarcodedProduct[] list = new BarcodedProduct[0];
-        return this.barcodedProducts.toArray(list);
+    public TransactionItem[] getItems() {
+    	TransactionItem[] items = new TransactionItem[0];
+    	return this.items.toArray(items);
     }
-    
-    public PLUCodedProductAdded[] getPLUCodedProducts() {
-    	PLUCodedProductAdded[] list = new PLUCodedProductAdded[0];
-        return this.pluProducts.toArray(list);
-    }
-
 
 	public IPayment[] getPayments() {
 		IPayment[] payments = new IPayment[0];
-		payments = this.payments.values().toArray(payments);
-		return payments;
+		return this.payments.values().toArray(payments);
 	}
 
     public void calculateChange() throws Exception  {

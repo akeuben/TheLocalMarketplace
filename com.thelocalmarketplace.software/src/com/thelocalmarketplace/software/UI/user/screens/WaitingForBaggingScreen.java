@@ -1,33 +1,22 @@
 package com.thelocalmarketplace.software.UI.user.screens;
 
-import java.awt.Color;
-import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.ScrollPane;
+import java.awt.event.ActionEvent;
 
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import javax.swing.JButton;
 
 import com.thelocalmarketplace.software.Software;
-import com.thelocalmarketplace.software.UI.components.TransactionView;
-import com.thelocalmarketplace.software.UI.user.components.StatusBarComponent;
+import com.thelocalmarketplace.software.session.UIHandler;
 
-public class WaitingForBaggingScreen extends AbstractUserScreen {
+public class WaitingForBaggingScreen extends AbstractMainScreen {
 
 	private static final long serialVersionUID = 6147707410164322045L;
 	
-	TransactionView view;
-	StatusBarComponent statusbar;
-	
 	public WaitingForBaggingScreen(int machineID) {
-		super(machineID);
+		super(machineID, false);
 
 		setLayout(new GridBagLayout());
 
-		view = new TransactionView(machineID);
-		view.connect(Software.getInstance().getCurrentSession(machineID).getTransaction());
-		statusbar = new StatusBarComponent((e) -> {});
 		statusbar.setInfoStatus("Place item in the bagging area.");
 
 		redraw();
@@ -37,22 +26,7 @@ public class WaitingForBaggingScreen extends AbstractUserScreen {
 	public void redraw() {
 		removeAll();
 		
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridx = 0;
-		gbc.gridy = 0;
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-		gbc.fill = GridBagConstraints.BOTH;
-		gbc.anchor = GridBagConstraints.NORTH;
-		JScrollPane pane = new JScrollPane(view);
-		add(pane, gbc);
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.weightx = 1;
-		gbc.weighty = 1;
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-		gbc.anchor = GridBagConstraints.SOUTH;
-		add(statusbar, gbc);
+		drawMain();
 		
 		revalidate();
 		repaint();
@@ -61,5 +35,23 @@ public class WaitingForBaggingScreen extends AbstractUserScreen {
 	@Override
 	public void onScreenRemoved() {
 		view.disconnect(Software.getInstance().getCurrentSession(machineID).getTransaction());
+	}
+
+	@Override
+	public JButton[] getActionButtons() {
+		// TODO Auto-generated method stub
+		JButton skipBaggingButton = new JButton("Skip Bagging");
+		skipBaggingButton.addActionListener(this::skipBagging);
+		return new JButton[] {
+				skipBaggingButton
+		};
+	}
+
+	@Override
+	public void onSelectAddItemManually(ActionEvent e) {}
+	
+	public void skipBagging(ActionEvent e) {
+		UIHandler handler = Software.getInstance().getCurrentSession(machineID).getUIHandler();
+		handler.skipBaggingSelected();
 	}
 }
