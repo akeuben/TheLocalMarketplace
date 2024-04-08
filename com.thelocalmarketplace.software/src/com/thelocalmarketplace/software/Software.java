@@ -213,6 +213,7 @@ public class Software {
 		selfCheckoutStations[machineID].getBanknoteValidator().detach(currentSession[machineID].getBanknoteValidatorHandler());
 		
 		currentSession[machineID] = null;
+		currentSession[machineID].startPredictIssueEngine(); // Start issue prediction
 		return true;
 	}
 
