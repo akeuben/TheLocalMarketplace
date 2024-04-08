@@ -65,8 +65,8 @@ public class ReadyForPaymentStateTest {
 
 		IReceiptPrinter printer = Software.getInstance().getHardware(0).getPrinter();
 		try {
-			printer.addInk(1<<5);
-			printer.addPaper(1<<5);
+			printer.addInk(1<<20);
+			printer.addPaper(1024);
 		} catch (OverloadedDevice e) {
 			e.printStackTrace();
 		}
@@ -132,7 +132,7 @@ public class ReadyForPaymentStateTest {
 		session.setState(UserSessionState.READY_FOR_PAYMENT);
 		UserSessionState newState = UserSessionState.READY_FOR_PAYMENT.onCoinInserted(session, new BigDecimal(1));
 		assertEquals(newState, null);
-		assertEquals(session.getTransaction().getTotalCost(), BigDecimal.valueOf(1));
+		assertEquals(0, session.getTransaction().getTotalCost().compareTo(BigDecimal.valueOf(1)));
 		UserSessionState.READY_FOR_PAYMENT.onCoinInserted(session, new BigDecimal(1));
 		assertNull(Software.getInstance().getCurrentSession(0));
 	}

@@ -1,6 +1,9 @@
 package com.thelocalmarketplace.software;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * SENG 300 Project - Group 1:
@@ -31,6 +34,7 @@ import java.lang.reflect.InvocationTargetException;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.AttendantStation;
 import com.thelocalmarketplace.software.session.UserSession;
+import com.thelocalmarketplace.software.state.PrintReceiptState;
 import com.thelocalmarketplace.software.state.UserSessionState;
 
 import powerutility.PowerGrid;
@@ -51,6 +55,8 @@ public class Software {
 
 	public boolean attendantStationFlagged; //placeholder for any case where the attendant station may be flagged
 	
+	private List<List<SoftwareObserver>> observers;
+	
 	private Software(SelfCheckoutConfiguration configuration, int stationCount) {
 		this.configuration = configuration;
 		currentSession = new UserSession[stationCount];
@@ -59,6 +65,8 @@ public class Software {
 		disableStationQueued = new boolean[stationCount];
 		try {
 			attendantStation = configuration.attendantType.getConstructor().newInstance();
+			attendantStation.plugIn(PowerGrid.instance());
+			attendantStation.turnOn();
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
 				| NoSuchMethodException | SecurityException e) {
 			System.out.println("Failed to create the attendant station. The given class does not have a constructor with no formal parameters.");
@@ -80,6 +88,11 @@ public class Software {
 			station.turnOn();
 			selfCheckoutStations[i] = station;
 			attendantStation.add(station);
+		}
+		
+		this.observers = new LinkedList<List<SoftwareObserver>>();
+		for(int i = 0; i < stationCount; i++) {
+			this.observers.add(new ArrayList<SoftwareObserver>());
 		}
 	}
 	
@@ -115,6 +128,7 @@ public class Software {
 		AbstractSelfCheckoutStation.configureCoinTrayCapacity(configuration.coinTrayCapacity);
 		instance = new Software(configuration, selfCheckoutCount);
 		
+		PrintReceiptState.machinePointers = new ArrayList<Integer[]>(); 
 		return instance;
 	}
 	
@@ -156,19 +170,21 @@ public class Software {
     	
 		currentSession[machineID].setState(UserSessionState.READY_FOR_ITEM);
 		
-		// Remove old listeners
-		selfCheckoutStations[machineID].getMainScanner().deregisterAll();
-		selfCheckoutStations[machineID].getBaggingArea().deregisterAll();
-		selfCheckoutStations[machineID].getCoinValidator().detachAll();
-		selfCheckoutStations[machineID].getPrinter().deregisterAll();
+		for(SoftwareObserver obs : this.observers.get(machineID)) {
+			obs.onSessionStart();
+		}
 		
 		// Register new listeners
 		selfCheckoutStations[machineID].getMainScanner().register(currentSession[machineID].getBarcodeHandler());
+		selfCheckoutStations[machineID].getHandheldScanner().register(currentSession[machineID].getBarcodeHandler());
 		selfCheckoutStations[machineID].getBaggingArea().register(currentSession[machineID].getElectronicScaleHandler());
 		selfCheckoutStations[machineID].getCardReader().register(currentSession[machineID].getCardReaderHandler());
 		selfCheckoutStations[machineID].getCoinValidator().attach(currentSession[machineID].getCoinValidatorHandler());
 		selfCheckoutStations[machineID].getPrinter().register(currentSession[machineID].getReceiptPrinterHandler());
 		selfCheckoutStations[machineID].getBanknoteValidator().attach(currentSession[machineID].getBanknoteValidatorHandler());
+		
+		// set machine pointer to 0 initially
+		PrintReceiptState.machinePointers.add(machineID, new Integer[] {0,0});
 		
 		return currentSession[machineID];
 	}
@@ -179,14 +195,26 @@ public class Software {
 	 * no active session
 	 */
 	public boolean endCurrentSession(int machineID) {
-		if(currentSession[machineID] != null) {
-			currentSession[machineID].startPredictIssueEngine(); // Start issue prediction
-			currentSession[machineID] = null;
-			return true;
+		if(currentSession[machineID] == null) return false;
+		
+		for(SoftwareObserver obs : this.observers.get(machineID)) {
+			obs.onSessionEnd();
 		}
 		
-		return false;
+		currentSession[machineID].deregisterAll();
 		
+		// Remove old listeners
+		selfCheckoutStations[machineID].getMainScanner().deregister(currentSession[machineID].getBarcodeHandler());
+		selfCheckoutStations[machineID].getHandheldScanner().deregister(currentSession[machineID].getBarcodeHandler());
+		selfCheckoutStations[machineID].getBaggingArea().deregister(currentSession[machineID].getElectronicScaleHandler());
+		selfCheckoutStations[machineID].getCardReader().deregister(currentSession[machineID].getCardReaderHandler());
+		selfCheckoutStations[machineID].getCoinValidator().detach(currentSession[machineID].getCoinValidatorHandler());
+		selfCheckoutStations[machineID].getPrinter().deregister(currentSession[machineID].getReceiptPrinterHandler());
+		selfCheckoutStations[machineID].getBanknoteValidator().detach(currentSession[machineID].getBanknoteValidatorHandler());
+		
+		currentSession[machineID] = null;
+		currentSession[machineID].startPredictIssueEngine(); // Start issue prediction
+		return true;
 	}
 
 	/**
@@ -227,5 +255,31 @@ public class Software {
 			disableStationQueued[machineId] = true;
 			return false;
 		}
+	}
+	
+	/**
+	 * Registers a observer for a particular machine
+	 * @param machineID The machine to observe
+	 * @param observer The observer
+	 */
+	public void register(int machineID, SoftwareObserver observer) {
+		this.observers.get(machineID).add(observer);
+	}
+	
+	/**
+	 * Deregisters an observer for a particular machine
+	 * @param machineID The machine to observe
+	 * @param observer The observer
+	 */
+	public void deregister(int machineID, SoftwareObserver observer) {
+		this.observers.get(machineID).remove(observer);
+	}
+	
+	/**
+	 * Deregisters all observer for a particular machine
+	 * @param machineID The machine to observe
+	 */
+	public void deregisterAll(int machineID) {
+		this.observers.get(machineID).removeAll(this.observers.get(machineID));
 	}
 }

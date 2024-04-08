@@ -32,10 +32,15 @@ import com.jjjwelectronics.scale.AbstractElectronicScale;
 import com.jjjwelectronics.scale.IElectronicScale;
 import com.jjjwelectronics.scanner.Barcode;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.hardware.PLUCodedProduct;
+import com.thelocalmarketplace.hardware.PriceLookUpCode;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.Globals;
+import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.payment.Transaction;
-import com.thelocalmarketplace.software.session.UserSession; 
+import com.thelocalmarketplace.software.session.UserSession;
+
+import powerutility.NoPowerException; 
 
 public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 
@@ -75,6 +80,25 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 		}
 		return null; 
 		
+	}
+	
+	@Override
+	public UserSessionState onPLUentered(UserSession session, PriceLookUpCode plu) {;
+		PLUCodedProduct product = ProductDatabases.PLU_PRODUCT_DATABASE.get(plu);
+
+		IElectronicScale scale = session.getHardware().getScanningArea();
+
+		Mass massOnScale = Mass.ZERO;
+		try {
+			massOnScale = ((AbstractElectronicScale) scale).getCurrentMassOnTheScale();
+		} catch (OverloadedDevice e) {
+			return UserSessionState.WAITING_FOR_ATTENDANT;
+		} catch(NoPowerException e) {}
+		if (product!=null && massOnScale.compareTo(Mass.ZERO) == 1) {
+			session.getTransaction().addItem(product, massOnScale);
+			return UserSessionState.WAITING_FOR_BAGGING;
+		}
+		return null;
 	}
  
 	@Override

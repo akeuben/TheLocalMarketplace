@@ -1,5 +1,8 @@
 package com.thelocalmarketplace.software.session;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.software.Software;
 
@@ -47,6 +50,8 @@ public class UserSession {
     private CardReaderHandler cardReaderHandler;
     private int machineID;
     
+    private List<SessionObserver> observers;
+    
     /**
      * Create a user session. This holds all data pertaining
      * to the user during a transaction at a self checkout machine.
@@ -63,6 +68,8 @@ public class UserSession {
     	this.uiHandler = new UIHandler(this);
     	this.cardReaderHandler = new CardReaderHandler(this);
     	this.machineID = machineID;
+    	
+    	this.observers = new ArrayList<>();
     }
     
     /**
@@ -78,6 +85,10 @@ public class UserSession {
     	newState = this.state.onStateSet(this);
     	if(newState != null) {
     		setState(newState);
+    	} else {
+    		for(SessionObserver obs : this.observers) {
+    			obs.onStateChanged(this.state);
+    		}
     	}
     }
     
@@ -171,11 +182,33 @@ public class UserSession {
 	 * Predicts issues with hardware
 	 */
 	public void startPredictIssueEngine() {
-		this.predictIssue = new PredictIssue(this);
-		this.predictIssue.predictAllIssues();
-		
-		if (this.predictIssue.hasIssue) {
-			// TODO: Signal the attendant, remove if listener can be attached
-		}
+      this.predictIssue = new PredictIssue(this);
+      this.predictIssue.predictAllIssues();
+
+      if (this.predictIssue.hasIssue) {
+          // TODO: Signal the attendant, remove if listener can be attached
+      }
+  }
+  /*
+	 * Registers a listener for this user session
+	 * @param observer The observer to register
+	 */
+	public void register(SessionObserver observer) {
+		this.observers.add(observer);
+	}
+	
+	/**
+	 * Deregister a listener for this user session
+	 * @param observer The observer to deregister
+	 */
+	public void deregister(SessionObserver observer) {
+		this.observers.remove(observer);
+	}
+	
+	/**
+	 * Degregister all listeners for this user session
+	 */
+	public void deregisterAll() {
+		this.observers.removeAll(this.observers);
 	}
 }

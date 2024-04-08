@@ -146,8 +146,8 @@ public class FullSystemTest {
 		
 		IReceiptPrinter printer = software.getHardware(0).getPrinter();
 		try {
-			printer.addInk(1<<5);
-			printer.addPaper(1<<5);
+			printer.addInk(1<<20);
+			printer.addPaper(1024);
 		} catch (OverloadedDevice e) {
 			e.printStackTrace();
 		}
@@ -218,7 +218,7 @@ public class FullSystemTest {
 		assertEquals(transaction.getExpectedMass().compareTo(new Mass(100.0)), 0);
 		
 		// Check there is 1 item in the transaction
-		assertEquals(transaction.getProducts().length, 1);
+		assertEquals(transaction.getItems().length, 1);
 		
 		// Place the item in the bagging area
 		baggingArea.addAnItem(new BarcodedItem(barcode1, new Mass(100.0)));
@@ -344,7 +344,7 @@ public class FullSystemTest {
 		assertEquals(transaction.getExpectedMass().compareTo(new Mass(300.0)), 0);
 		
 		// Check there is 1 item in the transaction
-		assertEquals(transaction.getProducts().length, 1);
+		assertEquals(transaction.getItems().length, 1);
 		
 		// Place the item in the bagging area
 		baggingArea.addAnItem(new BarcodedItem(barcode1, new Mass(300.0)));
@@ -397,7 +397,7 @@ public class FullSystemTest {
 		assertEquals(transaction.getExpectedMass().compareTo(new Mass(100.0)), 0);
 		
 		// Check there is 1 item in the transaction
-		assertEquals(transaction.getProducts().length, 1);
+		assertEquals(transaction.getItems().length, 1);
 		
 		// Place the item in the bagging areas
 		baggingArea.addAnItem(item1);

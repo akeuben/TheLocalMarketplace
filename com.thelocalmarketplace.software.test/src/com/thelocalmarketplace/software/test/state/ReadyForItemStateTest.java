@@ -111,7 +111,7 @@ public class ReadyForItemStateTest {
 		// The state should not change
 		UserSessionState newState = UserSessionState.READY_FOR_ITEM.onScanBarcode(session, barcode);
 
-		assertEquals(session.getTransaction().getProducts()[0], product);
+		assertEquals(session.getTransaction().getItems()[0].getDescription(), product.getDescription());
 		
 		assertEquals(newState, UserSessionState.WAITING_FOR_BAGGING);
 	}
@@ -125,7 +125,7 @@ public class ReadyForItemStateTest {
 		// The state should not change
 		UserSessionState newState = UserSessionState.READY_FOR_ITEM.onScanBarcode(session, barcode);
 
-		assertEquals(session.getTransaction().getProducts().length, 0);
+		assertEquals(session.getTransaction().getItems().length, 0);
 		
 		assertEquals(newState, null);
 	}
