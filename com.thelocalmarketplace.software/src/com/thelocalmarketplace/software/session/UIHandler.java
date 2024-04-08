@@ -1,8 +1,5 @@
 package com.thelocalmarketplace.software.session;
 
-import com.jjjwelectronics.Mass;
-import com.jjjwelectronics.scanner.BarcodedItem;
-import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PriceLookUpCode;
 import com.thelocalmarketplace.software.UI.UIObserver;
 import com.thelocalmarketplace.software.payment.TransactionItem;
@@ -29,8 +26,12 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 	}
 	
 	@Override
-	public void purchasingBagsSelected (int numberofBags) {
-		super.getUserSession().getTransaction().purchaseBags(numberofBags);
+	public void purchasingBagsSelected() {
+		try {
+			super.getUserSession().getTransaction().purchaseBags();
+		} catch (Exception e) {
+			getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
+		}
 	}
 
 	@Override
