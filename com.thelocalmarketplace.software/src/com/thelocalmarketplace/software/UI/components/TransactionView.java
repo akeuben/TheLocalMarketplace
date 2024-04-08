@@ -4,12 +4,14 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.math.BigDecimal;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.border.TitledBorder;
 
@@ -21,6 +23,7 @@ import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.UI.components.TransactionView.TransactionItem.Type;
 import com.thelocalmarketplace.software.payment.IPayment;
 import com.thelocalmarketplace.software.payment.Transaction;
+import com.thelocalmarketplace.software.payment.Transaction.PLUCodedProductAdded;
 import com.thelocalmarketplace.software.payment.TransactionObserver;
 import com.thelocalmarketplace.software.session.UserSession;
 
@@ -49,7 +52,7 @@ public class TransactionView extends JPanel implements TransactionObserver, List
 		
 		private static String formatPrice(long price) {
 			long dollars = price / 100;
-			long cents = price % 10;
+			long cents = price % 100;
 			
 			return "$" + dollars + "." + cents;
 		}
@@ -58,8 +61,12 @@ public class TransactionView extends JPanel implements TransactionObserver, List
 			return new TransactionItem(product, Type.BARCODED, product.getDescription(), formatPrice(product.getPrice()));
 		}
 		
-		public static TransactionItem from(PLUCodedProduct product) {
-			return new TransactionItem(product, Type.BARCODED, product.getDescription(), formatPrice(product.getPrice()));
+		public static TransactionItem from(PLUCodedProductAdded product) {
+			return new TransactionItem(product.getPLUCodedProduct(), 
+					Type.BARCODED, 
+					product.getPLUCodedProduct().getDescription(), 
+					formatPrice(product.getCost().multiply(BigDecimal.valueOf(100)).longValue())
+			);
 		}
 	}
 	
@@ -70,7 +77,6 @@ public class TransactionView extends JPanel implements TransactionObserver, List
 	
 	public TransactionView(int machineID) {
 		this.machineID = machineID;
-		
 		setLayout(new GridLayout(1, 1));
 		model = new DefaultListModel<TransactionView.TransactionItem>();
 		list = new JList<TransactionView.TransactionItem>(model);
@@ -86,6 +92,12 @@ public class TransactionView extends JPanel implements TransactionObserver, List
 		model.removeAllElements();
 		
 		for(BarcodedProduct product : transaction.getBarcodedProducts()) {
+			model.addElement(TransactionItem.from(product));
+		}
+		
+		System.out.println("Connected");
+		
+		for(PLUCodedProductAdded product : transaction.getPLUCodedProducts()) {
 			model.addElement(TransactionItem.from(product));
 		}
 	}
@@ -105,12 +117,12 @@ public class TransactionView extends JPanel implements TransactionObserver, List
 	}
 
 	@Override
-	public void plucodedProductAdded(PLUCodedProduct product, Mass weight) {
+	public void plucodedProductAdded(PLUCodedProductAdded product, Mass weight) {
 		model.addElement(TransactionItem.from(product));
 	}
 
 	@Override
-	public void plucodedProductRemoved(PLUCodedProduct product, Mass weight) {
+	public void plucodedProductRemoved(PLUCodedProductAdded product, Mass weight) {
 		model.removeElement(TransactionItem.from(product));
 	}
 

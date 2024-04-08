@@ -117,7 +117,7 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
         for (PLUCodedProductAdded product : finalTransactionRecord.getPLUCodedProducts()){
             workingString = product.getPLUCodedProduct().getPLUCode().toString();
             workingString += " : $";
-            workingString += String.valueOf(product.getTotalCost());
+            workingString += String.valueOf(product.getCost());
             itemizedTransaction.add(workingString);
             String strippedString = workingString.replaceAll("\\s", "");
             totalCharsToPrint += strippedString.length();

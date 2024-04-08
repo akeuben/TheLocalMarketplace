@@ -40,7 +40,6 @@ import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
-import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.session.UserSession;
 
@@ -108,7 +107,12 @@ public class Transaction {
             totalCost = totalCost.add(itemCost);
             // TODO determine how to handle expected weight for PLU coded products
             expectedMass = expectedMass.sum(mass);
-            pluProducts.add(new PLUCodedProductAdded(product, totalCost, mass));
+            PLUCodedProductAdded added = new PLUCodedProductAdded(product, itemCost, mass);
+            pluProducts.add(added);
+            
+            for(TransactionObserver obs : this.observers) {
+            	obs.plucodedProductAdded(added, mass);
+            }
         }
         else {
             throw new NullPointerException("product");
@@ -120,12 +124,12 @@ public class Transaction {
      */
     public class PLUCodedProductAdded {
     	private PLUCodedProduct product;
-    	private BigDecimal totalCost;
+    	private BigDecimal cost;
     	private Mass massAdded;
     	
-    	public PLUCodedProductAdded(PLUCodedProduct product, BigDecimal totalCost, Mass massAdded) {
+    	public PLUCodedProductAdded(PLUCodedProduct product, BigDecimal cost, Mass massAdded) {
     		this.product = product;
-    		this.totalCost = totalCost;
+    		this.cost = cost;
     		this.massAdded = massAdded;
     	}
     	
@@ -133,8 +137,8 @@ public class Transaction {
     		return product;
     	}
     	
-    	public BigDecimal getTotalCost() {
-    		return totalCost;
+    	public BigDecimal getCost() {
+    		return cost;
     	}
     	
     	public Mass getMass() {
@@ -205,10 +209,14 @@ public class Transaction {
     public void removeItem(PLUCodedProduct product) {
     	for (PLUCodedProductAdded testProduct : pluProducts) {
     		if (testProduct.getPLUCodedProduct() == product) {
-    			totalCost = totalCost.subtract(testProduct.getTotalCost());
+    			totalCost = totalCost.subtract(testProduct.getCost());
     			expectedMass = expectedMass.difference(testProduct.getMass()).abs();
     			pluProducts.remove(testProduct);
+    			for(TransactionObserver obs : this.observers) {
+                	obs.plucodedProductRemoved(testProduct, testProduct.getMass());
+                }
     		}
+    		break;
     	}
     }
     

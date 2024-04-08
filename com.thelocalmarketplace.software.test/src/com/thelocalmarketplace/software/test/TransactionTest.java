@@ -174,8 +174,8 @@ public class TransactionTest {
 	@Test
 	public void removePLUProductPrice() {
 		//add 1kg of each product
-		transaction.addItem(pluProductOne, new Mass (1000000000));
-		transaction.addItem(pluProductTwo, new Mass (1000000000));
+		transaction.addItem(pluProductOne, new Mass (1_000_000_000));
+		transaction.addItem(pluProductTwo, new Mass (1_000_000_000));
 		//remove item 1
 		transaction.removeItem(pluProductOne);
 		Assert.assertEquals(transaction.getTotalCost(), BigDecimal.valueOf(2));
@@ -185,7 +185,7 @@ public class TransactionTest {
 	public void checkAddedItemTaggedWithPriceAndWeight() {
 		transaction.addItem(pluProductOne, new Mass (1000000000));
 		Assert.assertEquals(transaction.getPLUCodedProducts()[0].getMass(), new Mass(1000000000));
-		Assert.assertEquals(transaction.getPLUCodedProducts()[0].getTotalCost(), new BigDecimal(1));
+		Assert.assertEquals(transaction.getPLUCodedProducts()[0].getCost(), new BigDecimal(1));
 		Assert.assertEquals(transaction.getPLUCodedProducts()[0].getPLUCodedProduct().getDescription(), "PLU1");
 	}
 
