@@ -124,9 +124,9 @@ public class Transaction {
     		this.addBag(reusableBag.idealMass);
     		this.addItem(new BarcodedProduct(bc, "Reusable Bag", 0, reusableBag.idealMass));
     		try {
-    			software.getInstance().getHardware().getReusableBagDispenser().dispense();
+    			Software.getInstance().getHardware().getReusableBagDispenser().dispense();
     		} catch (EmptyDevice e) {
-    			throw new EmptyDevice("Bag Dispenser is empty");
+    			throw new Exception("Bag Dispenser is empty");
     		}
     	}
     }
