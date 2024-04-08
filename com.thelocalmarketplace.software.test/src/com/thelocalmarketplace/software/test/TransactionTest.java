@@ -41,6 +41,7 @@ import org.junit.Test;
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
 import com.jjjwelectronics.scanner.Barcode;
+import com.jjjwelectronics.scanner.BarcodedItem;
 import com.tdc.CashOverloadException;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
@@ -69,6 +70,7 @@ public class TransactionTest {
 	private BarcodedProduct bulkyItem;
 	private Numeral num;
 	private Barcode bc;
+	private BarcodedItem itemOne;
 	private AttendantKeyboardHandler akh;
 	private PLUCodedProduct pluProductOne;
 	private PLUCodedProduct pluProductTwo;
@@ -99,7 +101,8 @@ public class TransactionTest {
 		this.bc= new Barcode(new Numeral[] {num});
 		this.productOne = new BarcodedProduct(bc, "test1", 100, 1);
 		this.productTwo = new BarcodedProduct(bc, "test2", 200, 2);
-		this.bulkyItem = new BarcodedProduct(bc,"bulky item", 50, 100);
+		this.bulkyItem = new BarcodedProduct(bc,"bulky item", 50, 100
+		this.itemOne = new BarcodedItem(bc,new Mass(BigDecimal.valueOf(1)));
 		this.pluProductOne = new PLUCodedProduct(new PriceLookUpCode("1357"), "plu1", 100);
 		this.pluProductTwo = new PLUCodedProduct(new PriceLookUpCode("2468"), "plu2", 200);
 	}
@@ -287,6 +290,13 @@ public class TransactionTest {
         transaction.addItem(productOne);
         assertEquals(1, transaction.getBarcodedProducts().length);
     }
+	
+	@Test
+	public void testAddItemByHandheldScanner() {
+		ProductDatabases.BARCODED_PRODUCT_DATABASE.put(bc, productOne);
+		session.getHardware().getHandheldScanner().scan(itemOne);
+		Assert.assertTrue(session.getTransaction().getBarcodedProducts().contains(productOne));
+	}
 
 	@Test
     public void testZeroTotalCostChange() throws Exception {
