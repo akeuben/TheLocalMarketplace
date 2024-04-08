@@ -34,7 +34,11 @@ import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.IBarcodeScanner;
 import com.tdc.banknote.Banknote;
 import com.tdc.coin.Coin;
+
+import com.thelocalmarketplace.hardware.PriceLookUpCode;
+
 import com.thelocalmarketplace.software.session.UserSession;
+
 
 public interface IUserSessionState<T> {
 	/**
@@ -93,4 +97,14 @@ public interface IUserSessionState<T> {
 	 * @return The state that should be transition to after the function executes, null if state is same. 
 	 */
 	default T onCardDataRead(UserSession session, CardData data) {return null;};
+
+	/**
+	 * Called when a PLU is entered by the user
+	 * @param session
+	 * @param plu code enetered by user
+	 * @return The state that should be transition to after the function executes, null if state is same. 
+	 */
+	default T onPLUentered(UserSession session, PriceLookUpCode plu ) {return null;};
+
+	
 }

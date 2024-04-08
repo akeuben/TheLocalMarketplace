@@ -30,6 +30,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import com.jjjwelectronics.Mass;
@@ -38,9 +39,9 @@ import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
+import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.Software;
-import com.thelocalmarketplace.software.membership.Membership;
 import com.thelocalmarketplace.software.session.UserSession;
 
 public class Transaction {
@@ -48,7 +49,7 @@ public class Transaction {
     /**
      * Items contained in an instance of transaction TODO Create constructor
      */
-    private final ArrayList<BarcodedProduct> products = new ArrayList<>();
+	private final ArrayList<TransactionItem> items = new ArrayList<>();
     
     private Mass expectedMass = Mass.ZERO;
     
@@ -60,10 +61,31 @@ public class Transaction {
 
     private long transactionMembershipID;
     
+    private List<TransactionObserver> observers;
+    private String attendantInput;
+    
     public Transaction(UserSession session) {
     	this.session = session;
+    	this.observers = new ArrayList<TransactionObserver>();
     }
     
+    /**
+     * Adds a product into the current transaction
+     * Adds weight to total expected weight
+     * Adds cost of item to total cost
+     * @param product item being added to transaction/products
+     */
+    public void addItem(TransactionItem item) {
+    	if(item == null) throw new NullPointerException("item");
+    	
+    	items.add(item);
+    	totalCost = totalCost.add(item.getPrice());
+        expectedMass = expectedMass.sum(item.getMass());
+        
+        for(TransactionObserver obs : this.observers) {
+        	obs.itemAdded(item);
+        }
+    }
 
     /**
      * Adds a product into the current transaction
@@ -71,24 +93,40 @@ public class Transaction {
      * Adds cost of item to total cost
      * @param product item being added to transaction/products
      */
-    public void addItem(BarcodedProduct product) {
-        if (product != null) {
-            products.add(product);
-            totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
-            expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM))));
-        }
-        else {
-            throw new NullPointerException("product");
-        }
-    }
-    
-    /**
-     * updates transaction weight to include bag weight
-     */
-    public void addBag(Mass bagMass) {
-		expectedMass = expectedMass.sum(bagMass);
+    public TransactionItem addItem(BarcodedProduct product) {
+    	if(product == null) throw new NullPointerException("product");
+    	
+    	TransactionItem item = TransactionItem.from(product);
+        
+    	addItem(item);
+    	
+    	return item;
     }
 
+    /**
+     * Adds a PLUcoded product to current transaction
+     * calculates cost based on weight on scale
+     * @param product
+     * @param mass on scale
+     */
+    public TransactionItem addItem(PLUCodedProduct product, Mass mass) {
+    	if(product == null) throw new NullPointerException("product");
+    	
+        //convert mass to kilograms
+        BigDecimal massInKilo = new BigDecimal(mass.inMicrograms().divide(BigInteger.valueOf(1000000000)));
+        BigDecimal pricePerKilo = BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100));
+        BigDecimal itemCost = massInKilo.multiply(pricePerKilo);
+        
+        TransactionItem item = TransactionItem.from(product, mass, itemCost);
+        
+        addItem(item);
+        
+        return item;
+    }
+    
+    public void addOwnBag() {
+		expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf(5_000_000)));
+    }
 
     /**
      *
@@ -99,37 +137,40 @@ public class Transaction {
     	UUID transactionId = UUID.randomUUID(); // Generate a unique ID for this transaction/payment
     	payments.put(transactionId, payment); // Add payment to HashMap
     	totalCost = totalCost.subtract(payment.getAmountPaid());
+    	
+    	for(TransactionObserver obs : this.observers) {
+        	obs.paymentAdded(payment);
+        }
     }
 
     /**
      * Removes an item from the transaction
      * @param product item being removed from transaction/products
      */
-    public void removeItem(BarcodedProduct product) {
-    	products.remove(product);
-    	totalCost = totalCost.subtract(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
-    	expectedMass = expectedMass.difference(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight()*Mass.MICROGRAMS_PER_GRAM)))).abs();
+    public void removeItem(TransactionItem item) {
+    	items.remove(item);
+    	totalCost = totalCost.subtract(item.getPrice());
+    	expectedMass = expectedMass.difference(item.getMass()).abs();
+        
+        for(TransactionObserver obs : this.observers) {
+        	obs.itemRemoved(item);
+        }
     }
-    
-    
-    /**
-     * Prints item descriptions and costs that have been added to transaction 
-     */
-    //public static void printReceipt() {
-    //	for (int i = 0; i < products.size(); i++ ) {
-    //		Product printProduct = products.get(i);
-    //		System.out.println(printProduct.getDescription()+"\t" + printProduct.getPrice());
-    //	}
-    //	System.out.println("Total cost: " + totalCost);
-    //}
 
-    
     /**
      * Getter method for expected weight
      * @return expectedWeight
      */
     public Mass getExpectedMass() {
 		return expectedMass;
+    }
+    
+    /**
+     * Sets the expected mass for this transaction
+     * @param mass
+     */
+    public void setExpectedMass(Mass mass) {
+    	this.expectedMass = mass;
     }
     
     /**
@@ -140,22 +181,14 @@ public class Transaction {
     	return totalCost;
     }
 
-
-	public Product[] getProducts() {
-		Product[] products = new Product[0];
-		products = this.products.toArray(products);
-		return products;
-	}
-
-    public ArrayList<BarcodedProduct> getBarcodedProducts(){
-        return products;
+    public TransactionItem[] getItems() {
+    	TransactionItem[] items = new TransactionItem[0];
+    	return this.items.toArray(items);
     }
-
 
 	public IPayment[] getPayments() {
 		IPayment[] payments = new IPayment[0];
-		payments = this.payments.values().toArray(payments);
-		return payments;
+		return this.payments.values().toArray(payments);
 	}
 
     public void calculateChange() throws Exception  {
@@ -214,4 +247,27 @@ public class Transaction {
     public void setTransactionMembershipID(long transactionMembershipID) {
         this.transactionMembershipID = transactionMembershipID;
     }
+	
+	/**
+	 * Registers a listener for this user session
+	 * @param observer The observer to register
+	 */
+	public void register(TransactionObserver observer) {
+		this.observers.add(observer);
+	}
+	
+	/**
+	 * Deregister a listener for this user session
+	 * @param observer The observer to deregister
+	 */
+	public void deregister(TransactionObserver observer) {
+		this.observers.remove(observer);
+	}
+	
+	/**
+	 * Degregister all listeners for this user session
+	 */
+	public void deregisterAll() {
+		this.observers.removeAll(this.observers);
+	}
 }

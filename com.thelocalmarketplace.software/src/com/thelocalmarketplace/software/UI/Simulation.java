@@ -48,8 +48,11 @@ import com.thelocalmarketplace.software.UI.hardwaresim.UIHardwareSimulation;
 import com.thelocalmarketplace.software.UI.user.MainUserPanel;
 import com.thelocalmarketplace.software.payment.BankDataBase;
 
+import powerutility.PowerGrid;
+
 public class Simulation {
 	public static void main(String[] args) {
+		PowerGrid.engageUninterruptiblePowerSource();
 		Software.initialize(new SelfCheckoutConfiguration(
 			SelfCheckoutStationGold.class,
 			AttendantStation.class,
@@ -87,5 +90,8 @@ public class Simulation {
 		UIHardwareSimulation.startHardwareSimulationUI(1);
 		
 		Software.getInstance().getHardware(0).getScreen().getFrame().add(new MainUserPanel(0));
+		Software.getInstance().getHardware(0).getScreen().setVisible(true);
+		Software.getInstance().getHardware(0).getScreen().getFrame().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		
 	}
 }

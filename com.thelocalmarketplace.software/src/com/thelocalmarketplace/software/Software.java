@@ -176,6 +176,7 @@ public class Software {
 		
 		// Register new listeners
 		selfCheckoutStations[machineID].getMainScanner().register(currentSession[machineID].getBarcodeHandler());
+		selfCheckoutStations[machineID].getHandheldScanner().register(currentSession[machineID].getBarcodeHandler());
 		selfCheckoutStations[machineID].getBaggingArea().register(currentSession[machineID].getElectronicScaleHandler());
 		selfCheckoutStations[machineID].getCardReader().register(currentSession[machineID].getCardReaderHandler());
 		selfCheckoutStations[machineID].getCoinValidator().attach(currentSession[machineID].getCoinValidatorHandler());
@@ -200,8 +201,11 @@ public class Software {
 			obs.onSessionEnd();
 		}
 		
+		currentSession[machineID].deregisterAll();
+		
 		// Remove old listeners
 		selfCheckoutStations[machineID].getMainScanner().deregister(currentSession[machineID].getBarcodeHandler());
+		selfCheckoutStations[machineID].getHandheldScanner().deregister(currentSession[machineID].getBarcodeHandler());
 		selfCheckoutStations[machineID].getBaggingArea().deregister(currentSession[machineID].getElectronicScaleHandler());
 		selfCheckoutStations[machineID].getCardReader().deregister(currentSession[machineID].getCardReaderHandler());
 		selfCheckoutStations[machineID].getCoinValidator().detach(currentSession[machineID].getCoinValidatorHandler());

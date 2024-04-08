@@ -218,7 +218,7 @@ public class FullSystemTest {
 		assertEquals(transaction.getExpectedMass().compareTo(new Mass(100.0)), 0);
 		
 		// Check there is 1 item in the transaction
-		assertEquals(transaction.getProducts().length, 1);
+		assertEquals(transaction.getItems().length, 1);
 		
 		// Place the item in the bagging area
 		baggingArea.addAnItem(new BarcodedItem(barcode1, new Mass(100.0)));
@@ -344,7 +344,7 @@ public class FullSystemTest {
 		assertEquals(transaction.getExpectedMass().compareTo(new Mass(300.0)), 0);
 		
 		// Check there is 1 item in the transaction
-		assertEquals(transaction.getProducts().length, 1);
+		assertEquals(transaction.getItems().length, 1);
 		
 		// Place the item in the bagging area
 		baggingArea.addAnItem(new BarcodedItem(barcode1, new Mass(300.0)));
@@ -397,7 +397,7 @@ public class FullSystemTest {
 		assertEquals(transaction.getExpectedMass().compareTo(new Mass(100.0)), 0);
 		
 		// Check there is 1 item in the transaction
-		assertEquals(transaction.getProducts().length, 1);
+		assertEquals(transaction.getItems().length, 1);
 		
 		// Place the item in the bagging areas
 		baggingArea.addAnItem(item1);
