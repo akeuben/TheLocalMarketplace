@@ -1,15 +1,18 @@
 package com.thelocalmarketplace.software.state;
 
-import com.thelocalmarketplace.software.SelfCheckout;
+import com.thelocalmarketplace.software.session.UserSession;
 
 public class AddingBagsState implements IUserSessionState<UserSessionState> {
 
     @Override
-    public UserSessionState onStateSet() {
+    public UserSessionState onStateSet(UserSession session) {
         // Disable the coin slot to prevent the user from inserting a coin while the software
         // is not in the correct state
-        SelfCheckout.getInstance().getHardware().getCoinSlot().disable();
-        SelfCheckout.getInstance().getHardware().getBanknoteInput().disable();
+    	session.getHardware().getCoinSlot().disable();
+    	session.getHardware().getBanknoteInput().disable();
+    	
+    	
+    	
         return null;
     }
 

@@ -52,7 +52,6 @@ import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.payment.CashPayment;
 import com.thelocalmarketplace.software.payment.IPayment;
 import com.thelocalmarketplace.software.payment.Transaction;
-import com.thelocalmarketplace.software.session.AttendantKeyboardHandler;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.test.stubs.TestableAttendantStation;
 import com.thelocalmarketplace.software.test.stubs.TestableSelfCheckoutStationGold;
@@ -185,9 +184,9 @@ public class TransactionTest {
 	@Test
 	public void checkAddedItemTaggedWithPriceAndWeight() {
 		transaction.addItem(pluProductOne, new Mass (1000000000));
-		Assert.assertEquals(transaction.getPLUCodedProducts().get(0).getMass(), new Mass(1000000));
-		Assert.assertEquals(transaction.getPLUCodedProducts().get(0).getTotalCost(), new BigDecimal(1));
-		Assert.assertEquals(transaction.getPLUCodedProducts().get(0).getPLUCodedProduct().getDescription(), "PLU1");
+		Assert.assertEquals(transaction.getPLUCodedProducts()[0].getMass(), new Mass(1000000000));
+		Assert.assertEquals(transaction.getPLUCodedProducts()[0].getTotalCost(), new BigDecimal(1));
+		Assert.assertEquals(transaction.getPLUCodedProducts()[0].getPLUCodedProduct().getDescription(), "PLU1");
 	}
 
 	
@@ -246,7 +245,7 @@ public class TransactionTest {
 	@Test
     public void testAddItem() {
         transaction.addItem(productOne);
-        assertEquals(1, transaction.getProducts().length);
+        assertEquals(1, transaction.getBarcodedProducts().length);
     }
 
 	@Test
