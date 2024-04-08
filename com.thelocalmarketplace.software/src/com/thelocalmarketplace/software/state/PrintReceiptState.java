@@ -31,13 +31,10 @@ import java.util.ArrayList;
 import com.jjjwelectronics.EmptyDevice;
 import com.jjjwelectronics.OverloadedDevice;
 import com.jjjwelectronics.printer.IReceiptPrinter;
-import com.jjjwelectronics.scanner.Barcode;
-import com.thelocalmarketplace.hardware.BarcodedProduct;
-import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.payment.IPayment;
 import com.thelocalmarketplace.software.payment.Transaction;
-import com.thelocalmarketplace.software.payment.Transaction.PLUCodedProductAdded;
+import com.thelocalmarketplace.software.payment.TransactionItem;
 import com.thelocalmarketplace.software.session.UserSession;
 
 public class PrintReceiptState implements IUserSessionState<UserSessionState> {
@@ -105,19 +102,10 @@ public class PrintReceiptState implements IUserSessionState<UserSessionState> {
         String workingString = "";
         int totalCharsToPrint = 0;
         
-        for (BarcodedProduct product : finalTransactionRecord.getBarcodedProducts()){ 
+        for (TransactionItem product : finalTransactionRecord.getItems()){ 
         	workingString = product.getDescription();
-            workingString += " : $";
-            workingString += String.valueOf((double)product.getPrice()/100);
-            itemizedTransaction.add(workingString);
-            String strippedString = workingString.replaceAll("\\s", "");
-            totalCharsToPrint += strippedString.length();
-        }
-        
-        for (PLUCodedProductAdded product : finalTransactionRecord.getPLUCodedProducts()){
-            workingString = product.getPLUCodedProduct().getPLUCode().toString();
-            workingString += " : $";
-            workingString += String.valueOf(product.getTotalCost());
+            workingString += " : ";
+            workingString += product.getFormattedPrice();
             itemizedTransaction.add(workingString);
             String strippedString = workingString.replaceAll("\\s", "");
             totalCharsToPrint += strippedString.length();

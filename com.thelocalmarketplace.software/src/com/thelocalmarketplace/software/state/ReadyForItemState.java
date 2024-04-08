@@ -38,7 +38,9 @@ import com.thelocalmarketplace.hardware.external.ProductDatabases;
 import com.thelocalmarketplace.software.Globals;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.payment.Transaction;
-import com.thelocalmarketplace.software.session.UserSession; 
+import com.thelocalmarketplace.software.session.UserSession;
+
+import powerutility.NoPowerException; 
 
 public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 
@@ -86,13 +88,13 @@ public class ReadyForItemState implements IUserSessionState<UserSessionState> {
 
 		IElectronicScale scale = session.getHardware().getScanningArea();
 
-		Mass massOnScale;
+		Mass massOnScale = Mass.ZERO;
 		try {
 			massOnScale = ((AbstractElectronicScale) scale).getCurrentMassOnTheScale();
 		} catch (OverloadedDevice e) {
-			throw new RuntimeException("The scale is currently overloaded.");
-		}
-		if (product!=null) {
+			return UserSessionState.WAITING_FOR_ATTENDANT;
+		} catch(NoPowerException e) {}
+		if (product!=null && massOnScale.compareTo(Mass.ZERO) == 1) {
 			session.getTransaction().addItem(product, massOnScale);
 			return UserSessionState.WAITING_FOR_BAGGING;
 		}

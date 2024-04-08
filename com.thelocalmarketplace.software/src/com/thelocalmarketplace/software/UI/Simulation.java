@@ -47,8 +47,11 @@ import com.thelocalmarketplace.software.UI.hardwaresim.UIHardwareSimulation;
 import com.thelocalmarketplace.software.UI.user.MainUserPanel;
 import com.thelocalmarketplace.software.payment.BankDataBase;
 
+import powerutility.PowerGrid;
+
 public class Simulation {
 	public static void main(String[] args) {
+		PowerGrid.engageUninterruptiblePowerSource();
 		Software.initialize(new SelfCheckoutConfiguration(
 			SelfCheckoutStationGold.class,
 			AttendantStation.class,

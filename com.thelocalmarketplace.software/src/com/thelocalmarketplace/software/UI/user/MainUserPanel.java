@@ -8,7 +8,11 @@ import javax.swing.border.TitledBorder;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.SoftwareObserver;
 import com.thelocalmarketplace.software.UI.user.screens.AbstractUserScreen;
+import com.thelocalmarketplace.software.UI.user.screens.PrintingScreen;
 import com.thelocalmarketplace.software.UI.user.screens.ReadyForItemScreen;
+import com.thelocalmarketplace.software.UI.user.screens.ReadyForPaymentScreen;
+import com.thelocalmarketplace.software.UI.user.screens.SystemErrorScreen;
+import com.thelocalmarketplace.software.UI.user.screens.WaitingForAttendantScreen;
 import com.thelocalmarketplace.software.UI.user.screens.WaitingForBaggingScreen;
 import com.thelocalmarketplace.software.UI.user.screens.WelcomeScreen;
 import com.thelocalmarketplace.software.session.SessionObserver;
@@ -49,15 +53,19 @@ public class MainUserPanel extends JPanel implements SessionObserver, SoftwareOb
 		
 		switch(this.state) {
 			case PRINTER_NEEDS_REFILL:
+				currentScreen = new SystemErrorScreen(machineID);
 				break;
 			case PRINT_RECEIPT:
+				currentScreen = new PrintingScreen(machineID);
 				break;
 			case READY_FOR_ITEM:
 				currentScreen = new ReadyForItemScreen(machineID);
 				break;
 			case READY_FOR_PAYMENT:
+				currentScreen = new ReadyForPaymentScreen(machineID);
 				break;
 			case WAITING_FOR_ATTENDANT:
+				currentScreen = new WaitingForAttendantScreen(machineID);
 				break;
 			case WAITING_FOR_BAGGING:
 				currentScreen = new WaitingForBaggingScreen(machineID);
