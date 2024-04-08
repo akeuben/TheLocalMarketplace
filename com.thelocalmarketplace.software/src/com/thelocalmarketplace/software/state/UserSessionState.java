@@ -64,8 +64,13 @@ public enum UserSessionState implements IUserSessionState<UserSessionState> {
 	 * This state is used when the system
 	 * is waiting for attendant to approve
 	 */
-	WAITING_FOR_ATTENDANT(new WaitingForAttendantState());
-	
+	WAITING_FOR_ATTENDANT(new WaitingForAttendantState()),
+	/**
+	 * This state is used when the customer
+	 * indicates they are adding their own bags
+	 */
+	ADDING_BAGS_STATE(new AddingBagsState());
+
 	private IUserSessionState<UserSessionState> state;
 	
 	private UserSessionState(IUserSessionState<UserSessionState> sessionState) {

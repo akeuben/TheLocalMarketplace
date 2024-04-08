@@ -2,7 +2,7 @@ package com.thelocalmarketplace.software.session;
 
 /**
  * SENG 300 Project - Group 1:
- * 
+ *
  * Avery Keuben - 30170731
  * Moiz Siddiqui - 30150291
  * Ammaar Melethil - 30141956
@@ -26,12 +26,17 @@ package com.thelocalmarketplace.software.session;
  * Winston Wang - ????????
  */
 
+import com.jjjwelectronics.Item;
 import com.jjjwelectronics.Mass;
+import com.jjjwelectronics.bag.ReusableBag;
+import com.jjjwelectronics.scale.AbstractElectronicScale;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.software.SelfCheckout;
 import com.thelocalmarketplace.software.UI.UIObserver;
 import com.thelocalmarketplace.software.state.UserSessionState;
+
+import java.math.BigInteger;
 
 public class UIHandler extends AbstractUserSessionHandler implements UIObserver {
 
@@ -41,23 +46,25 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 
 	@Override
 	public void addBagSelected() {
-		//sets state to add bag state
-		getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
-		//new state changed back to waiting for item after add bag completed
-		UserSessionState newState = getUserSession().getState().onStateSet(getUserSession());
-		if (newState!=null) {
-			getUserSession().setState(newState);
-		}
+		super.getUserSession().getTransaction().addOwnBag();
+		super.getUserSession().setState(UserSessionState.ADDING_BAGS_STATE);
+		//Program will wait until bagging is corrected and state is changed back to ready.
 	}
 
 	@Override
 	public void removeItemSelected(BarcodedProduct product) {
 		super.getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
+		BarcodedItem item = new BarcodedItem(product.getBarcode(), new Mass(product.getExpectedWeight()));
 		super.getUserSession().getTransaction().removeItem(product);
+		//Program will wait until bagging is corrected and state is changed back to ready.
 	}
 	@Override
 	public void skipBaggingSelected(BarcodedProduct product) {
 		super.getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
 	}
 
+	@Override
+	public void doneAddingBagsSelected() {
+		super.getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
+	}
 }

@@ -81,8 +81,7 @@ public class Transaction {
             barcodedProducts.add(product);
             totalCost = totalCost.add(BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100)));
             expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf((int) (product.getExpectedWeight() * Mass.MICROGRAMS_PER_GRAM))));
-        }
-        else {
+        } else {
             throw new NullPointerException("product");
         }
     }
@@ -160,8 +159,8 @@ public class Transaction {
     /**
      * updates transaction weight to include bag weight
      */
-    public void addBag(Mass bagMass) {
-		expectedMass = expectedMass.sum(bagMass);
+    public void addOwnBag() {
+		expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf(5_000_000)));
     }
 
 
