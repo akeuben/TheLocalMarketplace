@@ -9,6 +9,7 @@ import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.SoftwareObserver;
 import com.thelocalmarketplace.software.UI.user.screens.AbstractUserScreen;
 import com.thelocalmarketplace.software.UI.user.screens.AddingBagsScreen;
+import com.thelocalmarketplace.software.UI.user.screens.DisabledScreen;
 import com.thelocalmarketplace.software.UI.user.screens.PrintingScreen;
 import com.thelocalmarketplace.software.UI.user.screens.ReadyForItemScreen;
 import com.thelocalmarketplace.software.UI.user.screens.ReadyForPaymentScreen;
@@ -22,6 +23,7 @@ import com.thelocalmarketplace.software.state.UserSessionState;
 
 public class MainUserPanel extends JPanel implements SessionObserver, SoftwareObserver {
 	
+	private boolean disabled = false;
 	private UserSessionState state = null;
 	private int machineID;
 
@@ -44,7 +46,11 @@ public class MainUserPanel extends JPanel implements SessionObserver, SoftwareOb
 		removeAll();
 		
 		if(this.state == null) {
-			currentScreen = new WelcomeScreen(machineID);
+			if(disabled) {
+				currentScreen = new DisabledScreen(machineID);
+			} else {
+				currentScreen = new WelcomeScreen(machineID);
+			}
 			add(currentScreen);
 			
 			revalidate();
@@ -101,6 +107,16 @@ public class MainUserPanel extends JPanel implements SessionObserver, SoftwareOb
 	public void onSessionEnd() {
 		state = null;
 		redraw();
+	}
+
+	@Override
+	public void onMachineDisabled() {
+		disabled = true;
+	}
+
+	@Override
+	public void onMachineEnabled() {
+		disabled = false;
 	}
 	
 }
