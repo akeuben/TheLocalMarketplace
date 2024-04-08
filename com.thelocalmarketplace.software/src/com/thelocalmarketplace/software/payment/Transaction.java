@@ -34,7 +34,8 @@ import java.util.List;
 import java.util.UUID;
 
 import java.util.Scanner;
-import com.jjjwelectronics.bag.ResuableBag;
+import com.jjjwelectronics.bag.ReusableBag;
+import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.bag.AbstractReusableBagDispenser;
 
 import com.jjjwelectronics.EmptyDevice;
@@ -54,6 +55,9 @@ import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.session.UserSession;
 
 public class Transaction {
+	//To be removed after further implementation:
+		private static Numeral[] barcodeDigitsForResuableBag = { Numeral.one, Numeral.two, Numeral.three}; 
+		private static Barcode barcodeInstance = new Barcode(barcodeDigitsForResuableBag);
 
     /**
      * Items contained in an instance of transaction TODO Create constructor
@@ -179,17 +183,22 @@ public class Transaction {
     
     public void purchaseBags (int numberOfBags) throws Exception{
 //    	if (session.)
+    	
     	for (int i = 0; i < numberOfBags; i++) {
     		ReusableBag reusableBag = new ReusableBag();
-    		this.addBag(reusableBag.idealMass);
-    		this.addItem(new BarcodedProduct(bc, "Reusable Bag", 0, reusableBag.idealMass));
+    		Mass idealMassOfResuableBag = ReusableBag.idealMass; 
+        	BigDecimal massInGrams = idealMassOfResuableBag.inGrams(); 
+        	double massAsDouble = massInGrams.doubleValue(); 
+    		//this.addBag(ReusableBag.idealMass);
+    		this.addItem(new BarcodedProduct(barcodeInstance, "Reusable Bag", 1, massAsDouble));
     		try {
-    			Software.getInstance().getHardware().getReusableBagDispenser().dispense();
+    			session.getHardware().getReusableBagDispenser().dispense();
     		} catch (EmptyDevice e) {
     			throw new Exception("Bag Dispenser is empty");
     		}
     	}
     }
+
 
     /**
      *

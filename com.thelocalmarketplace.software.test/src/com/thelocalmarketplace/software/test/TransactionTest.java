@@ -30,6 +30,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
@@ -101,7 +102,7 @@ public class TransactionTest {
 		this.bc= new Barcode(new Numeral[] {num});
 		this.productOne = new BarcodedProduct(bc, "test1", 100, 1);
 		this.productTwo = new BarcodedProduct(bc, "test2", 200, 2);
-		this.bulkyItem = new BarcodedProduct(bc,"bulky item", 50, 100
+		this.bulkyItem = new BarcodedProduct(bc,"bulky item", 50, 100);
 		this.itemOne = new BarcodedItem(bc,new Mass(BigDecimal.valueOf(1)));
 		this.pluProductOne = new PLUCodedProduct(new PriceLookUpCode("1357"), "plu1", 100);
 		this.pluProductTwo = new PLUCodedProduct(new PriceLookUpCode("2468"), "plu2", 200);
@@ -464,6 +465,29 @@ public class TransactionTest {
         assertEquals(1, collectedBanknotes.size());
         assertEquals(0, collectedBanknotes.get(0).getDenomination().compareTo(BigDecimal.valueOf(10)));
     }
+    
+    @Test
+    public void testPurchaseBags() {
+    	int BagsToPurchase = 5;
+    	BigInteger massOfOneBag = BigInteger.valueOf(5_000_000);
+    	BigInteger massOfFiveBags = massOfOneBag.multiply(BigInteger.valueOf(5));
+    	Mass expectedMassAfterPurchase = new Mass(massOfFiveBags);
+    	long expectedCostAfterPurchaseLong = 5; 
+    	BigDecimal expectedCostAfterPurchase = BigDecimal.valueOf(expectedCostAfterPurchaseLong);
+    	
+    		try {
+				transaction.purchaseBags(BagsToPurchase);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	
+		Mass actualMass = session.getTransaction().getExpectedMass();
+		   BigDecimal actualCost = session.getTransaction().getTotalCost();
+		   assertEquals(expectedMassAfterPurchase.compareTo(actualMass), 0);
+		   assertEquals(expectedCostAfterPurchase.compareTo(actualCost), 0);
+    }
+
         
 }
 

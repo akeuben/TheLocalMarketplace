@@ -11,7 +11,7 @@ import com.jjjwelectronics.Mass;
  * @author JJJW Electronics LLP
  */
 public class ReusableBag extends Item {
-	private static final Mass idealMass = new Mass(BigInteger.valueOf(5_000_000));
+	public static final Mass idealMass = new Mass(BigInteger.valueOf(5_000_000));
 
 	/**
 	 * Default constructor.
