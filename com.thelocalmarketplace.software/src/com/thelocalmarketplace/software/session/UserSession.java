@@ -177,7 +177,7 @@ public class UserSession {
 		return Software.getInstance().getHardware(machineID);
 	}
 	
-	/**
+	/*
 	 * Registers a listener for this user session
 	 * @param observer The observer to register
 	 */

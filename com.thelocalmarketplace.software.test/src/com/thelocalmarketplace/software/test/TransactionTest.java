@@ -31,7 +31,7 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.math.BigInteger;
 import java.util.Currency;
 import java.util.List;
 import java.util.Locale;
@@ -42,6 +42,7 @@ import org.junit.Test;
 
 import com.jjjwelectronics.Mass;
 import com.jjjwelectronics.Numeral;
+import com.jjjwelectronics.bag.ReusableBag;
 import com.jjjwelectronics.scanner.Barcode;
 import com.jjjwelectronics.scanner.BarcodedItem;
 import com.tdc.CashOverloadException;
@@ -219,7 +220,7 @@ public class TransactionTest {
 	public void removePLUProductMass() {
 		//add 1kg of each product
 		TransactionItem item1 = transaction.addItem(pluProductOne, new Mass (2000000000));
-		TransactionItem item2 = transaction.addItem(pluProductTwo, new Mass (1000000000));
+		transaction.addItem(pluProductTwo, new Mass (1000000000));
 		//remove item 1
 		transaction.removeItem(item1);
 		Assert.assertEquals(transaction.getExpectedMass(), new Mass(1000000000));
@@ -229,7 +230,7 @@ public class TransactionTest {
 	public void removePLUProductPrice() {
 		//add 1kg of each product
 		TransactionItem item1 = transaction.addItem(pluProductOne, new Mass (1_000_000_000));
-		TransactionItem item2 = transaction.addItem(pluProductTwo, new Mass (1_000_000_000));
+		transaction.addItem(pluProductTwo, new Mass (1_000_000_000));
 		//remove item 1
 		transaction.removeItem(item1);
 		Assert.assertEquals(transaction.getTotalCost(), BigDecimal.valueOf(2));
@@ -414,7 +415,8 @@ public class TransactionTest {
     		new BigDecimal[] {BigDecimal.valueOf(2), BigDecimal.valueOf(1)}, 
     		new BigDecimal[] {BigDecimal.valueOf(10)},
     		100, 
-    		100
+			100,
+			BigDecimal.valueOf(1.99)
     	), 1);
     	session = Software.getInstance().startNewSession(0);
         transaction = session.getTransaction();
@@ -482,7 +484,27 @@ public class TransactionTest {
         assertEquals(1, collectedBanknotes.size());
         assertEquals(0, collectedBanknotes.get(0).getDenomination().compareTo(BigDecimal.valueOf(10)));
     }
-        
+    
+    @Test
+    public void testPurchaseBagsNoBags() throws Exception {
+		assertThrows(Exception.class, () -> transaction.purchaseBags());
+    }
+
+    @Test
+    public void testPurchaseBags() throws Exception {
+    	BigInteger massOfOneBag = BigInteger.valueOf(5_000_000);
+    	Mass expectedMassAfterPurchase = new Mass(massOfOneBag);
+    	BigDecimal expectedCostAfterPurchase = BigDecimal.valueOf(1.99);
+    	
+    	session.getHardware().getReusableBagDispenser().load(new ReusableBag());
+    	
+		transaction.purchaseBags();
+    	
+		Mass actualMass = session.getTransaction().getExpectedMass();
+		BigDecimal actualCost = session.getTransaction().getTotalCost();
+	   	assertEquals(expectedMassAfterPurchase.compareTo(actualMass), 0);
+	   	assertEquals(expectedCostAfterPurchase.compareTo(actualCost), 0);
+    }
 }
 
 	

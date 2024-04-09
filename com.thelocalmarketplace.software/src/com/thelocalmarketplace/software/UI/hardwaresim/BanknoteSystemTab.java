@@ -46,9 +46,12 @@ import javax.swing.border.TitledBorder;
 
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
+import com.tdc.IComponent;
+import com.tdc.IComponentObserver;
 import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
 import com.tdc.banknote.BanknoteDispensationSlot;
+import com.tdc.banknote.BanknoteDispenserObserver;
 import com.tdc.banknote.IBanknoteDispenser;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.UI.components.ErrorPopup;
@@ -56,7 +59,7 @@ import com.thelocalmarketplace.software.UI.components.ErrorPopup;
 import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
 import ca.ucalgary.seng300.simulation.SimulationException;
 
-public class BanknoteSystemTab extends AbstractHardwareSimTab {
+public class BanknoteSystemTab extends AbstractHardwareSimTab implements BanknoteDispenserObserver {
 	private static final long serialVersionUID = -7616750139837556826L;
 	
 	private DefaultListModel<Banknote> collectedBanknoteModel;
@@ -252,5 +255,49 @@ public class BanknoteSystemTab extends AbstractHardwareSimTab {
 	public void emptyStorageUnit() {
 		getHardware().getBanknoteStorage().unload();
 		updateStorageCount();
+	}
+
+	@Override
+	public void enabled(IComponent<? extends IComponentObserver> component) {
+	}
+
+	@Override
+	public void disabled(IComponent<? extends IComponentObserver> component) {
+	}
+
+	@Override
+	public void turnedOn(IComponent<? extends IComponentObserver> component) {
+	}
+
+	@Override
+	public void turnedOff(IComponent<? extends IComponentObserver> component) {
+	}
+
+	@Override
+	public void moneyFull(IBanknoteDispenser dispenser) {
+	}
+
+	@Override
+	public void banknotesEmpty(IBanknoteDispenser dispenser) {
+	}
+
+	@Override
+	public void banknoteAdded(IBanknoteDispenser dispenser, Banknote banknote) {
+		updateBanknoteDispensers();
+	}
+
+	@Override
+	public void banknoteRemoved(IBanknoteDispenser dispenser, Banknote banknote) {
+		updateBanknoteDispensers();
+	}
+
+	@Override
+	public void banknotesLoaded(IBanknoteDispenser dispenser, Banknote... banknotes) {
+		updateBanknoteDispensers();
+	}
+
+	@Override
+	public void banknotesUnloaded(IBanknoteDispenser dispenser, Banknote... banknotes) {
+		updateBanknoteDispensers();
 	}
 }

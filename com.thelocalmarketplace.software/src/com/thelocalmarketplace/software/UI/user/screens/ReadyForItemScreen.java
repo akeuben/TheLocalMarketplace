@@ -165,7 +165,7 @@ public class ReadyForItemScreen extends AbstractMainScreen {
 	private void removeNumeral(ActionEvent e) {
 		String current = pluView.getText();
 		if(current.length() <= 0) return;
-		current.substring(0, current.length() - 2);
+		current = current.substring(0, current.length() - 1);
 		pluView.setText(current);
 	}
 

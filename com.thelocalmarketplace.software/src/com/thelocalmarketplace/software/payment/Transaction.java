@@ -33,19 +33,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import com.jjjwelectronics.EmptyDevice;
 import com.jjjwelectronics.Mass;
-import com.jjjwelectronics.Mass.MassDifference;
+import com.jjjwelectronics.bag.ReusableBag;
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
 import com.tdc.NoCashAvailableException;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
-import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.session.UserSession;
 
 public class Transaction {
-
     /**
      * Items contained in an instance of transaction TODO Create constructor
      */
@@ -62,7 +61,6 @@ public class Transaction {
     private long transactionMembershipID;
     
     private List<TransactionObserver> observers;
-    private String attendantInput;
     
     public Transaction(UserSession session) {
     	this.session = session;
@@ -125,9 +123,18 @@ public class Transaction {
     }
     
     public void addOwnBag() {
-		expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf(5_000_000)));
+		expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf(15_000_000)));
     }
 
+    public void purchaseBags() throws Exception {
+		try {
+			ReusableBag bag = session.getHardware().getReusableBagDispenser().dispense();
+			addItem(new TransactionItem("Reusable Bag Charge", bag.getMass(), Software.getInstance().getConfiguration().reusableBagCost));
+		} catch (EmptyDevice e) {
+			throw new Exception("Bag Dispenser is empty");
+		}
+    }
+  
     /**
      *
      * Adds a payment to the transaction by storing in HashMap payments

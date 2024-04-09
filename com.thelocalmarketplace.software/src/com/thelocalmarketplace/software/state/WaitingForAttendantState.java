@@ -27,5 +27,5 @@ public class WaitingForAttendantState implements IUserSessionState<UserSessionSt
 		} catch (OverloadedDevice e) {
 		}
     }
-
 }
+

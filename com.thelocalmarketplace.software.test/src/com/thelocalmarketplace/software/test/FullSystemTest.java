@@ -92,7 +92,8 @@ public class FullSystemTest {
 			25, 
 			new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 
 			100, 
-			100
+			100,
+			BigDecimal.valueOf(1.99)
 		), 1);
 		
 		barcode1 = new Barcode(new Numeral[] {

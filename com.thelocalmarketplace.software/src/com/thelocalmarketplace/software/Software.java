@@ -163,6 +163,10 @@ public class Software {
 	 * @throws RuntimeException If there is already a session in progress
 	 */
 	public UserSession startNewSession(int machineID) throws RuntimeException {
+		if(!isStationEnabled[machineID]) {
+			throw new RuntimeException("The self checkout station is disabled");
+		}
+
 		if(currentSession[machineID] != null) {
 			throw new RuntimeException("There is already an active user session.");
 		}
@@ -197,6 +201,10 @@ public class Software {
 	public boolean endCurrentSession(int machineID) {
 		if(currentSession[machineID] == null) return false;
 		
+		if(disableStationQueued[machineID]) {
+			disableStation(machineID);
+		}
+		
 		for(SoftwareObserver obs : this.observers.get(machineID)) {
 			obs.onSessionEnd();
 		}
@@ -213,6 +221,10 @@ public class Software {
 		selfCheckoutStations[machineID].getBanknoteValidator().detach(currentSession[machineID].getBanknoteValidatorHandler());
 		
 		currentSession[machineID] = null;
+
+		if(PredictIssue.predictAllIssues(selfCheckoutStations[machineID])) {
+			disableStation(machineID);
+		}
 		return true;
 	}
 
@@ -239,6 +251,9 @@ public class Software {
 	public boolean enableStation(int machineId) {
 		boolean returnBool = !isStationEnabled[machineId];
 		isStationEnabled[machineId] = true;
+		for(SoftwareObserver obs : this.observers.get(machineId)) {
+			obs.onMachineEnabled();
+		}
 		return returnBool;
 	}
 
@@ -249,6 +264,10 @@ public class Software {
 	public boolean disableStation(int machineId) {
 		if(currentSession[machineId] == null) {
 			isStationEnabled[machineId] = false;
+			disableStationQueued[machineId] = false;
+			for(SoftwareObserver obs : this.observers.get(machineId)) {
+				obs.onMachineDisabled();
+			}
 			return true;
 		} else {
 			disableStationQueued[machineId] = true;

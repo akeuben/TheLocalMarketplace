@@ -16,7 +16,6 @@ import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.hardware.PriceLookUpCode;
 import com.thelocalmarketplace.hardware.Product;
 import com.thelocalmarketplace.hardware.external.ProductDatabases;
-import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.state.UserSessionState;
 
 public class AttendantKeyboardHandler extends AbstractUserSessionHandler implements KeyboardListener {

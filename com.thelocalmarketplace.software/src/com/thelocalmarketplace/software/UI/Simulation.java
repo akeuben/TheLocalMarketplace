@@ -75,7 +75,8 @@ public class Simulation {
 					BigDecimal.valueOf(100)
 			}, 
 			100, 
-			100
+			100,
+			BigDecimal.valueOf(1.99)
 		), 1);
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

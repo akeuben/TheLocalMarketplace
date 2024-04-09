@@ -44,11 +44,12 @@ public class SelfCheckoutConfiguration {
 	public int coinTrayCapacity;
 	public int banknoteStorageCapacity;
 	public int reusableBagDispenserCapacity;
+	public BigDecimal reusableBagCost;
 	
 	public Class<? extends AbstractSelfCheckoutStation> machineType;
 	public Class<? extends AttendantStation> attendantType;
 	
-	public SelfCheckoutConfiguration(Class<? extends AbstractSelfCheckoutStation> machineType, Class<? extends AttendantStation> attendantType, Currency currency, int coinDispenserCapacity, int coinStorageUnitCapacity, int coinTrayCapacity, BigDecimal[] coinDenominations, BigDecimal[] banknoteDenominations, int banknoteStorageCapacity, int reusableBagDispenserCapacity) {
+	public SelfCheckoutConfiguration(Class<? extends AbstractSelfCheckoutStation> machineType, Class<? extends AttendantStation> attendantType, Currency currency, int coinDispenserCapacity, int coinStorageUnitCapacity, int coinTrayCapacity, BigDecimal[] coinDenominations, BigDecimal[] banknoteDenominations, int banknoteStorageCapacity, int reusableBagDispenserCapacity, BigDecimal reusableBagCost) {
 		this.machineType = machineType;
 		this.attendantType = attendantType;
 		this.coinDenominations = coinDenominations;
@@ -59,6 +60,7 @@ public class SelfCheckoutConfiguration {
 		this.banknoteDenominations = banknoteDenominations;
 		this.banknoteStorageCapacity = banknoteStorageCapacity;
 		this.reusableBagDispenserCapacity = reusableBagDispenserCapacity;
+		this.reusableBagCost = reusableBagCost;
 	}
 	
 	public SelfCheckoutConfiguration(Class<? extends AbstractSelfCheckoutStation> machineType, Class<? extends AttendantStation> attendantType) {
@@ -71,7 +73,8 @@ public class SelfCheckoutConfiguration {
 			25, 
 			new BigDecimal[] {BigDecimal.ONE}, new BigDecimal[] {BigDecimal.valueOf(10)}, 
 			100, 
-			100
+			100,
+			BigDecimal.valueOf(1.99)
 		);
 	}
 

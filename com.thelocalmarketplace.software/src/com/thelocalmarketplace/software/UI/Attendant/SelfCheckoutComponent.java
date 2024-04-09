@@ -188,4 +188,22 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 	public JButton getAssistButton() {
 		return this.assistButton; 
 	}
+
+
+
+
+	@Override
+	public void onMachineDisabled() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+
+	@Override
+	public void onMachineEnabled() {
+		// TODO Auto-generated method stub
+		
+	}
 }
