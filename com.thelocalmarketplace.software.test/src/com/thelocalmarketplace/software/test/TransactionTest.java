@@ -94,6 +94,7 @@ public class TransactionTest {
     
 	@Before
 	public void setup() {
+		ProductDatabases.BARCODED_PRODUCT_DATABASE.clear();
 		PowerGrid.engageUninterruptiblePowerSource();
 		Software.uninitialize();
 		Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
