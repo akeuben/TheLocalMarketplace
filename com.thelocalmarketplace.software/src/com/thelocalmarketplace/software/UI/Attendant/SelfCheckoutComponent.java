@@ -42,7 +42,7 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 	// gonna have a bidirectional communication channel with the self checkout station 
 	// add a transaction viewer as a wrapped component as a JList
 	public TransactionView transactionViewer;
-	private JPanel alertButton; 
+	 
 	private JPanel statusField;
 	private JPanel closeBox;  
 	private JPanel assistButtonPanel; 
@@ -61,21 +61,8 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 		setLayout(new GridBagLayout());
 		setBackground(Color.GRAY);
 		
-		// add the alert button
-		alertButton = new JPanel();
-		JButton button = new JButton("Alert");
-		alertButton.setLayout(new GridLayout(1,1));
-		alertButton.setBackground(Color.GRAY);
-		button.setSize(75, 50);
-		button.addActionListener(new AlertButtonListener());
-		alertButton.add(button); 
-		alertButton.setPreferredSize(button.getSize());
 		GridBagConstraints c = new GridBagConstraints();
-		c.gridx = 0; 
-		c.gridy = 0;
-		c.weightx = 1; 
-		c.anchor = GridBagConstraints.NORTH; 
-		add(alertButton, c);
+	
 		
 		// add the status field
 		statusField = new JPanel();
@@ -196,8 +183,7 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 
 	@Override
 	public void onMachineDisabled() {
-		// TODO Auto-generated method stub
-		
+				
 	}
 
 
@@ -205,7 +191,7 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 
 	@Override
 	public void onMachineEnabled() {
-		// TODO Auto-generated method stub
+		
 		
 	}
 }
