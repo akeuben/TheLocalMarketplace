@@ -41,7 +41,7 @@ import com.thelocalmarketplace.software.state.UserSessionState;
 public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, SessionObserver {
 	// gonna have a bidirectional communication channel with the self checkout station 
 	// add a transaction viewer as a wrapped component as a JList
-	private TransactionView transactionViewer;
+	public TransactionView transactionViewer;
 	private JPanel alertButton; 
 	private JPanel statusField;
 	private JPanel closeBox;  
@@ -128,7 +128,7 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 
 		
 		
-		transactionViewer = new TransactionView(machineID);
+		transactionViewer = new TransactionView(machineID);// need to connect the transaction to a session after it's started
 		transactionViewer.setBorder(BorderFactory.createEmptyBorder(0,0 ,100,0));
 		JScrollPane scroll = new JScrollPane(transactionViewer);
 		c = new GridBagConstraints();
@@ -175,6 +175,8 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 		UserSession currentSession = Software.getInstance().getCurrentSession(machineID); 
 		// remember that this is also a listener
 		currentSession.register(this);
+		transactionViewer.connect(Software.getInstance().getCurrentSession(machineID).getTransaction());
+		
 		// we also want to set the state to be whatever the state current session is in
 		state = currentSession.getState(); 
 	}

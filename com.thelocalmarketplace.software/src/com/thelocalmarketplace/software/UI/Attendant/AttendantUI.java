@@ -54,12 +54,16 @@ public class AttendantUI {
 	
 	public void redraw() {
 		this.frame.getContentPane().removeAll(); 
+		this.frame.getContentPane().setLayout(new GridLayout(0,2));
 		componentList  = new SelfCheckoutComponent[Software.getInstance().getAttendantStation().supervisedStationCount()];
 		// add self checkout components 
 		for(int i = 0; i < componentList.length ; i++) {
 			componentList[i] = new SelfCheckoutComponent(i);
 			componentList[i].getAssistButton().addActionListener(new AssistButtonListener(this, i));
 			componentList[i].setBorder(BorderFactory.createLineBorder(Color.BLACK));
+			if(Software.getInstance().getCurrentSession(i) != null) {
+				componentList[i].transactionViewer.connect(Software.getInstance().getCurrentSession(i).getTransaction());	
+			}
 			this.frame.getContentPane().add(componentList[i]);
 			this.frame.getContentPane().revalidate();
 		}

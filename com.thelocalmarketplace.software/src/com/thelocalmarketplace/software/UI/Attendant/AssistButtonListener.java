@@ -8,6 +8,9 @@ import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import com.thelocalmarketplace.software.Software;
+import com.thelocalmarketplace.software.UI.components.TransactionView;
+
 public class AssistButtonListener implements ActionListener {
 	private int machineID; 
 	private AttendantUI ui; 
@@ -32,7 +35,17 @@ public class AssistButtonListener implements ActionListener {
 		GridBagConstraints c = new GridBagConstraints(); 
 		
 		// begin adding transaction viewer(don't have access to that yet)
-		
+		TransactionView view = new TransactionView(machineID);
+		if(Software.getInstance().getCurrentSession(machineID) != null) {
+			view.connect(Software.getInstance().getCurrentSession(machineID).getTransaction());
+		}
+		c.gridx = 0; 
+		c.gridy = 0; 
+		c.weightx = 1; 
+		c.weighty = 1;
+		c.gridheight = 2; 
+		c.fill = GridBagConstraints.BOTH; 
+		ui.getFrame().getContentPane().add(view, c);
 		
 		// add a button that can be used to set the screen back to what it was before
 		JPanel buttonPanel = new JPanel(); 
@@ -44,8 +57,8 @@ public class AssistButtonListener implements ActionListener {
 		c = new GridBagConstraints(); 
 		c.gridx = 1; 
 		c.gridy = 0; 
-		c.weighty = 1;
-		c.weightx = 1; 
+		c.weighty = 0.8;
+		c.weightx = 0.8; 
 		c.anchor = GridBagConstraints.SOUTHEAST; 
 		ui.getFrame().getContentPane().add(button, c); 
 		ui.getFrame().validate(); 
