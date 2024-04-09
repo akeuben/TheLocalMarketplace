@@ -46,9 +46,12 @@ import javax.swing.border.TitledBorder;
 
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
+import com.tdc.IComponent;
+import com.tdc.IComponentObserver;
 import com.tdc.NoCashAvailableException;
 import com.tdc.banknote.Banknote;
 import com.tdc.banknote.BanknoteDispensationSlot;
+import com.tdc.banknote.BanknoteDispenserObserver;
 import com.tdc.banknote.IBanknoteDispenser;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.UI.components.ErrorPopup;
@@ -56,7 +59,7 @@ import com.thelocalmarketplace.software.UI.components.ErrorPopup;
 import ca.ucalgary.seng300.simulation.NullPointerSimulationException;
 import ca.ucalgary.seng300.simulation.SimulationException;
 
-public class BanknoteSystemTab extends AbstractHardwareSimTab {
+public class BanknoteSystemTab extends AbstractHardwareSimTab implements BanknoteDispenserObserver {
 	private static final long serialVersionUID = -7616750139837556826L;
 	
 	private DefaultListModel<Banknote> collectedBanknoteModel;
@@ -89,6 +92,8 @@ public class BanknoteSystemTab extends AbstractHardwareSimTab {
 		banknoteDispenserScrollPane.setBorder(new TitledBorder("Banknote Dispensers"));
 		
 		for(BigDecimal denomination : Software.getInstance().getConfiguration().banknoteDenominations) {
+			getHardware().getBanknoteDispensers().get(denomination).attach(this);
+			
 			JButton btn = new JButton("$" + denomination.toPlainString());
 			btn.addActionListener((e) -> this.insertBanknote(denomination));
 			banknoteInputPanel.add(btn);
@@ -168,11 +173,11 @@ public class BanknoteSystemTab extends AbstractHardwareSimTab {
 		Banknote banknote = new Banknote(currency, denomination);
 		try {
 			getHardware().getBanknoteInput().receive(banknote);
-		} catch (DisabledException | RuntimeException e) {
+		} catch (DisabledException e) {
 			ErrorPopup.showError("Failed to insert banknote", "The banknote input is disabled.");
 		} catch(CashOverloadException e) {
 			ErrorPopup.showError("Failed to insert banknote", "The banknote input is overloaded.");
-		}
+		} catch(RuntimeException e) {}
 		updateStorageCount();
 		updateInputDanglingStatus();
 	}
@@ -204,7 +209,11 @@ public class BanknoteSystemTab extends AbstractHardwareSimTab {
 	
 	public void releaseBanknoteOutput(ActionEvent e) {
 		BanknoteDispensationSlot slot = getHardware().getBanknoteOutput();
-		slot.dispense();
+		try {
+			slot.dispense();
+		} catch(Exception e1) {
+			ErrorPopup.showError("Failed to release", "Please collect the dangling banknotes first!");
+		}
 	}
 	
 	public void reloadDispenser(BigDecimal denomination) {
@@ -252,5 +261,49 @@ public class BanknoteSystemTab extends AbstractHardwareSimTab {
 	public void emptyStorageUnit() {
 		getHardware().getBanknoteStorage().unload();
 		updateStorageCount();
+	}
+
+	@Override
+	public void enabled(IComponent<? extends IComponentObserver> component) {
+	}
+
+	@Override
+	public void disabled(IComponent<? extends IComponentObserver> component) {
+	}
+
+	@Override
+	public void turnedOn(IComponent<? extends IComponentObserver> component) {
+	}
+
+	@Override
+	public void turnedOff(IComponent<? extends IComponentObserver> component) {
+	}
+
+	@Override
+	public void moneyFull(IBanknoteDispenser dispenser) {
+	}
+
+	@Override
+	public void banknotesEmpty(IBanknoteDispenser dispenser) {
+	}
+
+	@Override
+	public void banknoteAdded(IBanknoteDispenser dispenser, Banknote banknote) {
+		updateBanknoteDispensers();
+	}
+
+	@Override
+	public void banknoteRemoved(IBanknoteDispenser dispenser, Banknote banknote) {
+		updateBanknoteDispensers();
+	}
+
+	@Override
+	public void banknotesLoaded(IBanknoteDispenser dispenser, Banknote... banknotes) {
+		updateBanknoteDispensers();
+	}
+
+	@Override
+	public void banknotesUnloaded(IBanknoteDispenser dispenser, Banknote... banknotes) {
+		updateBanknoteDispensers();
 	}
 }

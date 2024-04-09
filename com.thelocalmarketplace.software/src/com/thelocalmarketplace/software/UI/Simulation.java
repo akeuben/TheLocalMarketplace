@@ -42,6 +42,7 @@ import com.thelocalmarketplace.hardware.SelfCheckoutStationGold;
 import com.thelocalmarketplace.hardware.external.CardIssuer;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.Software;
+import com.thelocalmarketplace.software.UI.Attendant.AttendantUI;
 import com.thelocalmarketplace.software.UI.Attendant.SelfCheckoutComponent;
 import com.thelocalmarketplace.software.UI.hardwaresim.UIHardwareSimulation;
 import com.thelocalmarketplace.software.UI.user.MainUserPanel;
@@ -58,7 +59,7 @@ public class Simulation {
 			Currency.getInstance(Locale.CANADA), 
 			100, 
 			1000, 
-			25, 
+			1000, // Bypass bug in hardware.
 			new BigDecimal[] {
 					BigDecimal.valueOf(0.05),
 					BigDecimal.valueOf(0.10),
@@ -85,18 +86,12 @@ public class Simulation {
 			e.printStackTrace();
 		}
 		
-		JFrame test = new JFrame();
-		test.setSize(475, 600);
-		test.setLayout(new GridLayout(1,1));
-		test.add(new SelfCheckoutComponent());
-		test.setVisible(true);
-		
+		new AttendantUI(); 
 		BankDataBase.initialize(new HashMap<String, CardIssuer>());
 		UIHardwareSimulation.startHardwareSimulationUI(1);
 		
 		Software.getInstance().getHardware(0).getScreen().getFrame().add(new MainUserPanel(0));
 		Software.getInstance().getHardware(0).getScreen().setVisible(true);
 		Software.getInstance().getHardware(0).getScreen().getFrame().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		test.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 }

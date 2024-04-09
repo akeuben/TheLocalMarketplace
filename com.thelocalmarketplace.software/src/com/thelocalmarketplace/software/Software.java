@@ -33,6 +33,7 @@ import java.util.List;
 
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.AttendantStation;
+import com.thelocalmarketplace.software.membership.MembershipDatabase;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.state.PrintReceiptState;
 import com.thelocalmarketplace.software.state.UserSessionState;
@@ -116,7 +117,7 @@ public class Software {
 	 */
 	public static Software initialize(SelfCheckoutConfiguration configuration, int selfCheckoutCount) throws RuntimeException {
 		if(instance != null) throw new RuntimeException("There is already a self checkout initialized!");
-		
+		MembershipDatabase.initialize();
 		// Initialize the hardware
 		AbstractSelfCheckoutStation.configureCurrency(configuration.currency);
 		AbstractSelfCheckoutStation.configureBanknoteDenominations(configuration.banknoteDenominations);
@@ -136,6 +137,7 @@ public class Software {
 	 * Uninitializes the self checkout machine.
 	 */
 	public static void uninitialize() {
+		MembershipDatabase.uninitialize();
 		if(instance == null) return;
 		
 		for(int i = 0; i < instance.currentSession.length; i++) {
@@ -163,6 +165,10 @@ public class Software {
 	 * @throws RuntimeException If there is already a session in progress
 	 */
 	public UserSession startNewSession(int machineID) throws RuntimeException {
+		if(!isStationEnabled[machineID]) {
+			throw new RuntimeException("The self checkout station is disabled");
+		}
+
 		if(currentSession[machineID] != null) {
 			throw new RuntimeException("There is already an active user session.");
 		}
@@ -197,11 +203,17 @@ public class Software {
 	public boolean endCurrentSession(int machineID) {
 		if(currentSession[machineID] == null) return false;
 		
+		if(disableStationQueued[machineID]) {
+			disableStation(machineID);
+		}
+		
 		for(SoftwareObserver obs : this.observers.get(machineID)) {
 			obs.onSessionEnd();
 		}
 		
 		currentSession[machineID].deregisterAll();
+		
+		currentSession[machineID].getTransaction().applyPoints();
 		
 		// Remove old listeners
 		selfCheckoutStations[machineID].getMainScanner().deregister(currentSession[machineID].getBarcodeHandler());
@@ -212,8 +224,11 @@ public class Software {
 		selfCheckoutStations[machineID].getPrinter().deregister(currentSession[machineID].getReceiptPrinterHandler());
 		selfCheckoutStations[machineID].getBanknoteValidator().detach(currentSession[machineID].getBanknoteValidatorHandler());
 		
-		currentSession[machineID].startPredictIssueEngine(); // Start issue prediction
 		currentSession[machineID] = null;
+
+		if(PredictIssue.predictAllIssues(selfCheckoutStations[machineID])) {
+			disableStation(machineID);
+		}
 		return true;
 	}
 
@@ -240,6 +255,9 @@ public class Software {
 	public boolean enableStation(int machineId) {
 		boolean returnBool = !isStationEnabled[machineId];
 		isStationEnabled[machineId] = true;
+		for(SoftwareObserver obs : this.observers.get(machineId)) {
+			obs.onMachineEnabled();
+		}
 		return returnBool;
 	}
 
@@ -250,6 +268,10 @@ public class Software {
 	public boolean disableStation(int machineId) {
 		if(currentSession[machineId] == null) {
 			isStationEnabled[machineId] = false;
+			disableStationQueued[machineId] = false;
+			for(SoftwareObserver obs : this.observers.get(machineId)) {
+				obs.onMachineDisabled();
+			}
 			return true;
 		} else {
 			disableStationQueued[machineId] = true;
@@ -282,4 +304,15 @@ public class Software {
 	public void deregisterAll(int machineID) {
 		this.observers.get(machineID).removeAll(this.observers.get(machineID));
 	}
+	/**
+	 * Provides Access to the instance of attendant station
+	 * @return Attendant station that corresponds to the software
+	 */
+	public AttendantStation getAttendantStation() {
+		return attendantStation; 
+	}
+	
+	
+	
+	
 }

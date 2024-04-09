@@ -29,6 +29,8 @@ package com.thelocalmarketplace.software.UI.hardwaresim;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -41,16 +43,15 @@ import javax.swing.border.TitledBorder;
 
 import com.jjjwelectronics.card.Card;
 import com.thelocalmarketplace.software.UI.components.ErrorPopup;
+import com.thelocalmarketplace.software.payment.BankDataBase;
 
 public class CardTab extends AbstractHardwareSimTab {
 	
-	private enum CardKind {
-		VISA, MASTERCARD, AMEX, DEBIT
-	}
-
 	private static final long serialVersionUID = 1881179373704340614L;
+	
+	private static List<CardTab> instances = new ArrayList<CardTab>();
 
-	JComboBox<CardKind> cardKindField; 
+	JComboBox<String> cardKindField; 
 	JTextField cardNumberField; 
 	JTextField cardholderField; 
 	JTextField ccvField; 
@@ -61,10 +62,13 @@ public class CardTab extends AbstractHardwareSimTab {
 	public CardTab(int machineId) {
 		super(machineId, 1);
 		
+		instances.add(this);
+		
 		JPanel cardInputPanel = new JPanel();
 		cardInputPanel.setBorder(new TitledBorder("Card Details"));
 		cardInputPanel.setLayout(new GridLayout(0, 2));
-		cardKindField = new JComboBox<CardTab.CardKind>(CardKind.values());
+		cardKindField = new JComboBox<String>();
+		updateCardKind();
 		cardNumberField = new JTextField(10);
 		cardholderField = new JTextField(10);
 		ccvField = new JTextField(3);
@@ -102,15 +106,25 @@ public class CardTab extends AbstractHardwareSimTab {
 		add(cardPayPanel);
 	}
 	
+	public static void updateCardKind() {
+		for(CardTab tab : instances) {
+			tab.cardKindField.removeAllItems();
+			for(String issuer : BankDataBase.getInstance().getDataBase().keySet()) {
+				tab.cardKindField.addItem(issuer);
+			}
+		}
+	}
+	
 	private Card getEnteredCard() {
-		CardKind kind = (CardKind) cardKindField.getSelectedItem();
+		String kind = (String) cardKindField.getSelectedItem();
+		kind = kind.toLowerCase();
 		String cardholder = cardholderField.getText();
 		String number = cardNumberField.getText();
 		String ccv = ccvField.getText();
 		String pin = pinField.getText();
 		boolean tap = tapEnabledField.isSelected();
 		boolean chip = hasChipField.isSelected();
-		Card card = new Card(kind.toString(), cardholder, number, ccv, pin, tap, chip);
+		Card card = new Card(kind, number, cardholder, ccv, pin, tap, chip);
 		return card;
 	}
 	

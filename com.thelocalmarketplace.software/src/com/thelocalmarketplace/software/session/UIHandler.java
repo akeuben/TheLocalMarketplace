@@ -29,6 +29,7 @@ public class UIHandler extends AbstractUserSessionHandler implements UIObserver 
 	public void purchasingBagsSelected() {
 		try {
 			super.getUserSession().getTransaction().purchaseBags();
+			getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
 		} catch (Exception e) {
 			getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
 		}

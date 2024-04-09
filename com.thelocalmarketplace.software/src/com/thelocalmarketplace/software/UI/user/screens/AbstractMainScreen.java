@@ -1,7 +1,9 @@
 package com.thelocalmarketplace.software.UI.user.screens;
 
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JButton;
@@ -40,7 +42,7 @@ public abstract class AbstractMainScreen extends AbstractUserScreen implements T
 
 		Transaction transaction = Software.getInstance().getCurrentSession(machineID).getTransaction();
 		view.connect(transaction);
-		transaction.deregister(this);
+		transaction.register(this);
 		redrawPayButton();
 	}
 	
@@ -65,13 +67,14 @@ public abstract class AbstractMainScreen extends AbstractUserScreen implements T
 		add(statusbar, gbc);
 		
 		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new GridLayout(0, 2));
 		
 		JButton helpButton = new JButton("Help");
 		helpButton.addActionListener(this::getHelp);
 		buttonPanel.add(helpButton);
 		
-		JButton[] actionButtons = getActionButtons();
-		for(JButton button : actionButtons) {
+		Component[] actionButtons = getActionButtons();
+		for(Component button : actionButtons) {
 			buttonPanel.add(button);
 		}
 		
@@ -93,7 +96,7 @@ public abstract class AbstractMainScreen extends AbstractUserScreen implements T
 		add(payButton, gbc);
 	}
 	
-	public abstract JButton[] getActionButtons();
+	public abstract Component[] getActionButtons();
 	
 	public abstract void onSelectAddItemManually(ActionEvent e);
 	

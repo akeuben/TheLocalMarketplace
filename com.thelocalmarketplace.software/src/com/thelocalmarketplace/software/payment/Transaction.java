@@ -42,6 +42,7 @@ import com.tdc.NoCashAvailableException;
 import com.thelocalmarketplace.hardware.BarcodedProduct;
 import com.thelocalmarketplace.hardware.PLUCodedProduct;
 import com.thelocalmarketplace.software.Software;
+import com.thelocalmarketplace.software.membership.MembershipDatabase;
 import com.thelocalmarketplace.software.session.UserSession;
 
 public class Transaction {
@@ -65,6 +66,7 @@ public class Transaction {
     public Transaction(UserSession session) {
     	this.session = session;
     	this.observers = new ArrayList<TransactionObserver>();
+    	transactionMembershipID = -1;
     }
     
     /**
@@ -123,7 +125,7 @@ public class Transaction {
     }
     
     public void addOwnBag() {
-		expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf(5_000_000)));
+		expectedMass = expectedMass.sum(new Mass(BigInteger.valueOf(15_000_000)));
     }
 
     public void purchaseBags() throws Exception {
@@ -209,7 +211,7 @@ public class Transaction {
             final int COIN = 1;
             
             try {
-	            while (change.compareTo(BigDecimal.ZERO) > 0) {
+	            while (change.compareTo(BigDecimal.valueOf(0.05)) >= 0) {
 	                int dispense = -1;
 	                BigDecimal value = BigDecimal.valueOf(-1);
 	                for (BigDecimal banknote : banknoteDenominations) {
@@ -276,5 +278,16 @@ public class Transaction {
 	 */
 	public void deregisterAll() {
 		this.observers.removeAll(this.observers);
+	}
+	
+	public void applyPoints() {
+		if(transactionMembershipID == -1) return;
+		BigDecimal amountPaid = BigDecimal.ZERO;
+		for(IPayment payment : payments.values()) {
+			amountPaid = amountPaid.add(payment.getAmountPaid());
+		}
+		amountPaid = amountPaid.add(totalCost); // Remove change
+		long points = amountPaid.multiply(BigDecimal.valueOf(100)).longValue();
+		MembershipDatabase.getInstance().adjustMemberPoints(transactionMembershipID, points);
 	}
 }

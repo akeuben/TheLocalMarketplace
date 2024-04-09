@@ -36,7 +36,7 @@ public class AddBagsTest {
 		
 		session.getUIHandler().doneAddingBagsSelected();
 		
-		assertEquals(UserSessionState.READY_FOR_ITEM, session.getState());
+		assertEquals(UserSessionState.WAITING_FOR_BAGGING, session.getState());
 	}
 	
 	@Test
@@ -45,7 +45,7 @@ public class AddBagsTest {
 		
 		assertEquals(UserSessionState.ADDING_BAGS_STATE, session.getState());
 		
-		session.getHardware().getBaggingArea().addAnItem(new Item(new Mass(5d)) {}); // add expected 5g bag
+		session.getHardware().getBaggingArea().addAnItem(new Item(new Mass(15d)) {}); // add expected 15g bag
 		
 		session.getUIHandler().doneAddingBagsSelected();
 		
@@ -71,7 +71,7 @@ public class AddBagsTest {
 		
 		assertEquals(UserSessionState.ADDING_BAGS_STATE, session.getState());
 		
-		session.getHardware().getBaggingArea().addAnItem(new Item(new Mass(15d)) {}); // add within range 9g bag
+		session.getHardware().getBaggingArea().addAnItem(new Item(new Mass(35d)) {}); // add within range 9g bag
 		
 		session.getUIHandler().doneAddingBagsSelected();
 		

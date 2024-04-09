@@ -45,16 +45,18 @@ public class UIHardwareSimulation extends JFrame {
 			hardwareSelector.addTab("Card", new CardTab(i));
 			hardwareSelector.addTab("Scales", new ScaleTab(i));
 			hardwareSelector.addTab("Printer", new PrinterTab(i));
+			hardwareSelector.addTab("Bag Dispenser", new BagDispenserTab(i));
 			
 			stationSelector.add("Checkout " + i, hardwareSelector);
 		}
 		
-		JTabbedPane attendantPane = new JTabbedPane();
+		JTabbedPane databasePane = new JTabbedPane();
 		
-		attendantPane.add("Product Database", new ProductDatabaseTab());
-		attendantPane.add("Card Database", new CardIssuerTab());
+		databasePane.add("Product Database", new ProductDatabaseTab());
+		databasePane.add("Card Database", new CardIssuerTab());
+		databasePane.add("Membership Database", new MembershipDatabaseTab());
 		
-		stationSelector.add("Attendant Station", attendantPane);
+		stationSelector.add("Databases", databasePane);
 		
 		add(stationSelector);
 		pack();

@@ -25,6 +25,8 @@
  */
 package com.thelocalmarketplace.software.membership;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -34,25 +36,27 @@ public class MembershipDatabase {
 
     private static MembershipDatabase instance;
 
-    private TreeMap<Long, Membership> memberIDDatabase;//Long represents user id
-    private TreeMap<String, Membership> memberNameDatabase;
+    private Map<Long, Membership> memberIDDatabase;//Long represents user id
+    private Map<String, Membership> memberNameDatabase;
     public static MembershipDatabase getInstance() {
         return instance;
     }
 
-    private MembershipDatabase(TreeMap<Long, Membership> memberIDDatabase) {
-        this.memberIDDatabase = memberIDDatabase;
-        for (Membership m : memberIDDatabase.values()){
-            memberNameDatabase.put(m.getMemberName(), m);
-        }
+    private MembershipDatabase() {
+    	memberIDDatabase = new HashMap<>();
+    	memberNameDatabase = new HashMap<>();
     }
 
-    public static void initialize(TreeMap<Long, Membership> memberIDDatabase) throws RuntimeException {
+    public static void initialize() throws RuntimeException {
         if(instance != null){
             throw new RuntimeException("Database already exists");
         }
 
-        instance = new MembershipDatabase(memberIDDatabase);
+        instance = new MembershipDatabase();
+    }
+    
+    public static void uninitialize() throws RuntimeException {
+        instance = null;
     }
 
     /**
@@ -92,23 +96,28 @@ public class MembershipDatabase {
     /**
      * Add a new membership to the database
      * @param memberName The name of the member
-     * @param ignoreSameName In the case of a member sharing a name with someone else.
-     *                       Setting this to true will create a new membership
-     *                       in the database. Even if there already exists someone with the
-     *                       same name. This member will be assigned a new ID
      * @return The id assigned to the new member. Will return -1 if member with same name
-     * already exists and ignoreSameName is false;
      */
-    public long addNewMembership(String memberName, boolean ignoreSameName){
-        if(memberNameDatabase.containsKey(memberName) && !ignoreSameName){
+    public long addNewMembership(String memberName){
+        if(memberNameDatabase.containsKey(memberName)){
             return -1;
         }
-        long newid = memberIDDatabase.lastKey();
-        newid += 1;
+        long newid = memberIDDatabase.size();
         Membership newMember = new Membership(memberName, newid, 0);
         memberIDDatabase.put(newid, newMember);
         memberNameDatabase.put(memberName, newMember);
         return newid;
-
+    }
+    
+    /**
+     * Gets a member name from the member ID. Returns null
+     * if there is no such member.
+     * @param id
+     * @return
+     */
+    public String getMemberName(long id) {
+    	if(!validateMembership(id)) return null;
+    	
+    	return memberIDDatabase.get(id).getMemberName();
     }
 }

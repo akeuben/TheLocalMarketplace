@@ -46,8 +46,11 @@ import javax.swing.border.TitledBorder;
 
 import com.tdc.CashOverloadException;
 import com.tdc.DisabledException;
+import com.tdc.IComponent;
+import com.tdc.IComponentObserver;
 import com.tdc.NoCashAvailableException;
 import com.tdc.coin.Coin;
+import com.tdc.coin.CoinDispenserObserver;
 import com.tdc.coin.ICoinDispenser;
 import com.thelocalmarketplace.hardware.CoinTray;
 import com.thelocalmarketplace.software.Software;
@@ -55,7 +58,7 @@ import com.thelocalmarketplace.software.UI.components.ErrorPopup;
 
 import ca.ucalgary.seng300.simulation.SimulationException;
 
-public class CoinSystemTab extends AbstractHardwareSimTab {
+public class CoinSystemTab extends AbstractHardwareSimTab implements CoinDispenserObserver {
 	private static final long serialVersionUID = -7616750139837556826L;
 	
 	private DefaultListModel<Coin> collectedCoinModel;
@@ -85,6 +88,7 @@ public class CoinSystemTab extends AbstractHardwareSimTab {
 		coinDispenserScrollPane.setBorder(new TitledBorder("Coin Dispensers"));
 		
 		for(BigDecimal denomination : Software.getInstance().getConfiguration().coinDenominations) {
+			getHardware().getCoinDispensers().get(denomination).attach(this);
 			JButton btn = new JButton("$" + denomination.toPlainString());
 			btn.addActionListener((e) -> this.insertCoin(denomination));
 			coinSlotPanel.add(btn);
@@ -143,11 +147,11 @@ public class CoinSystemTab extends AbstractHardwareSimTab {
 		Coin coin = new Coin(currency, denomination);
 		try {
 			getHardware().getCoinSlot().receive(coin);
-		} catch (DisabledException | RuntimeException e) {
+		} catch (DisabledException e) {
 			ErrorPopup.showError("Failed to insert coin", "The coin slot is disabled.");
 		} catch(CashOverloadException e) {
 			ErrorPopup.showError("Failed to insert coin", "The coin slot is overloaded.");
-		}
+		} catch(RuntimeException e) {}
 		updateStorageCount();
 		updateCoinDispensers();
 	}
@@ -204,5 +208,43 @@ public class CoinSystemTab extends AbstractHardwareSimTab {
 	public void emptyStorageUnit() {
 		getHardware().getCoinStorage().unload();
 		updateStorageCount();
+	}
+
+	@Override
+	public void enabled(IComponent<? extends IComponentObserver> component) {}
+
+	@Override
+	public void disabled(IComponent<? extends IComponentObserver> component) {}
+
+	@Override
+	public void turnedOn(IComponent<? extends IComponentObserver> component) {}
+
+	@Override
+	public void turnedOff(IComponent<? extends IComponentObserver> component) {}
+
+	@Override
+	public void coinsFull(ICoinDispenser dispenser) {}
+
+	@Override
+	public void coinsEmpty(ICoinDispenser dispenser) {}
+
+	@Override
+	public void coinAdded(ICoinDispenser dispenser, Coin coin) {
+		updateCoinDispensers();
+	}
+
+	@Override
+	public void coinRemoved(ICoinDispenser dispenser, Coin coin) {
+		updateCoinDispensers();
+	}
+
+	@Override
+	public void coinsLoaded(ICoinDispenser dispenser, Coin... coins) {
+		updateCoinDispensers();
+	}
+
+	@Override
+	public void coinsUnloaded(ICoinDispenser dispenser, Coin... coins) {
+		updateCoinDispensers();
 	}
 }
