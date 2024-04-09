@@ -92,6 +92,8 @@ public class BanknoteSystemTab extends AbstractHardwareSimTab implements Banknot
 		banknoteDispenserScrollPane.setBorder(new TitledBorder("Banknote Dispensers"));
 		
 		for(BigDecimal denomination : Software.getInstance().getConfiguration().banknoteDenominations) {
+			getHardware().getBanknoteDispensers().get(denomination).attach(this);
+			
 			JButton btn = new JButton("$" + denomination.toPlainString());
 			btn.addActionListener((e) -> this.insertBanknote(denomination));
 			banknoteInputPanel.add(btn);
@@ -171,11 +173,11 @@ public class BanknoteSystemTab extends AbstractHardwareSimTab implements Banknot
 		Banknote banknote = new Banknote(currency, denomination);
 		try {
 			getHardware().getBanknoteInput().receive(banknote);
-		} catch (DisabledException | RuntimeException e) {
+		} catch (DisabledException e) {
 			ErrorPopup.showError("Failed to insert banknote", "The banknote input is disabled.");
 		} catch(CashOverloadException e) {
 			ErrorPopup.showError("Failed to insert banknote", "The banknote input is overloaded.");
-		}
+		} catch(RuntimeException e) {}
 		updateStorageCount();
 		updateInputDanglingStatus();
 	}
@@ -207,7 +209,11 @@ public class BanknoteSystemTab extends AbstractHardwareSimTab implements Banknot
 	
 	public void releaseBanknoteOutput(ActionEvent e) {
 		BanknoteDispensationSlot slot = getHardware().getBanknoteOutput();
-		slot.dispense();
+		try {
+			slot.dispense();
+		} catch(Exception e1) {
+			ErrorPopup.showError("Failed to release", "Please collect the dangling banknotes first!");
+		}
 	}
 	
 	public void reloadDispenser(BigDecimal denomination) {

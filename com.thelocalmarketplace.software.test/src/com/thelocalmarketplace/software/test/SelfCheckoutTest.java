@@ -120,6 +120,7 @@ public class SelfCheckoutTest {
 	
 	@Test
 	public void testDoubleSessions() {
+		Software.uninitialize();
 		Software check = Software.initialize(new SelfCheckoutConfiguration(TestableSelfCheckoutStationGold.class, TestableAttendantStation.class), 1);
 		check.startNewSession(0);
 		assertThrows(RuntimeException.class, () -> check.startNewSession(0));

@@ -59,7 +59,7 @@ public class Simulation {
 			Currency.getInstance(Locale.CANADA), 
 			100, 
 			1000, 
-			25, 
+			1000, // Bypass bug in hardware.
 			new BigDecimal[] {
 					BigDecimal.valueOf(0.05),
 					BigDecimal.valueOf(0.10),
@@ -86,7 +86,7 @@ public class Simulation {
 			e.printStackTrace();
 		}
 		
-		AttendantUI ui = new AttendantUI(); 
+		new AttendantUI(); 
 		BankDataBase.initialize(new HashMap<String, CardIssuer>());
 		UIHardwareSimulation.startHardwareSimulationUI(1);
 		
@@ -95,6 +95,5 @@ public class Simulation {
 		Software.getInstance().getHardware(0).getScreen().getFrame().setSize(400, 400);
 		Software.getInstance().getHardware(0).getScreen().setVisible(true);
 		Software.getInstance().getHardware(0).getScreen().getFrame().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
 	}
 }

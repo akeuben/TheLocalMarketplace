@@ -3,6 +3,7 @@ package com.thelocalmarketplace.software.UI.user.screens;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ActionEvent;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -16,6 +17,7 @@ import com.thelocalmarketplace.software.payment.IPayment;
 import com.thelocalmarketplace.software.payment.Transaction;
 import com.thelocalmarketplace.software.payment.TransactionItem;
 import com.thelocalmarketplace.software.payment.TransactionObserver;
+import com.thelocalmarketplace.software.state.UserSessionState;
 
 public class ReadyForPaymentScreen extends AbstractUserScreen implements TransactionObserver {
 	private static final long serialVersionUID = -3858453260247291799L;
@@ -85,6 +87,7 @@ public class ReadyForPaymentScreen extends AbstractUserScreen implements Transac
 		add(infoPanel, gbc);
 		
 		JButton backButton = new JButton("Back");
+		backButton.addActionListener(this::back);
 		gbc.gridx = 0;
 		gbc.gridy = 1;
 		gbc.weightx = 1;
@@ -139,5 +142,9 @@ public class ReadyForPaymentScreen extends AbstractUserScreen implements Transac
 	@Override
 	public void bagAdded(Mass bagMass) {
 		updateRemainingBalance();
+	}
+	
+	private void back(ActionEvent e) {
+		Software.getInstance().getCurrentSession(machineID).setState(UserSessionState.READY_FOR_ITEM);
 	}
 }

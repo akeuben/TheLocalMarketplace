@@ -33,6 +33,7 @@ import java.util.List;
 
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.AttendantStation;
+import com.thelocalmarketplace.software.membership.MembershipDatabase;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.state.PrintReceiptState;
 import com.thelocalmarketplace.software.state.UserSessionState;
@@ -116,7 +117,7 @@ public class Software {
 	 */
 	public static Software initialize(SelfCheckoutConfiguration configuration, int selfCheckoutCount) throws RuntimeException {
 		if(instance != null) throw new RuntimeException("There is already a self checkout initialized!");
-		
+		MembershipDatabase.initialize();
 		// Initialize the hardware
 		AbstractSelfCheckoutStation.configureCurrency(configuration.currency);
 		AbstractSelfCheckoutStation.configureBanknoteDenominations(configuration.banknoteDenominations);
@@ -136,6 +137,7 @@ public class Software {
 	 * Uninitializes the self checkout machine.
 	 */
 	public static void uninitialize() {
+		MembershipDatabase.uninitialize();
 		if(instance == null) return;
 		
 		for(int i = 0; i < instance.currentSession.length; i++) {
@@ -210,6 +212,8 @@ public class Software {
 		}
 		
 		currentSession[machineID].deregisterAll();
+		
+		currentSession[machineID].getTransaction().applyPoints();
 		
 		// Remove old listeners
 		selfCheckoutStations[machineID].getMainScanner().deregister(currentSession[machineID].getBarcodeHandler());

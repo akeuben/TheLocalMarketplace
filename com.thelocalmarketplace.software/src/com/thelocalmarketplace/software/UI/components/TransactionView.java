@@ -75,6 +75,11 @@ public class TransactionView extends JPanel implements TransactionObserver, List
 	public Component getListCellRendererComponent(JList<? extends TransactionItem> list, TransactionItem value,
 			int index, boolean isSelected, boolean cellHasFocus) {
 		JPanel panel = new JPanel();
+		if(isSelected) {
+			panel.setBackground(list.getSelectionBackground());
+		} else {
+			panel.setBackground(list.getBackground());
+		}
 		panel.setLayout(new GridBagLayout());
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridx = 0;

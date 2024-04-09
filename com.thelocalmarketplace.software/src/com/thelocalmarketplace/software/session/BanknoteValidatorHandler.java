@@ -33,6 +33,7 @@ import com.tdc.IComponent;
 import com.tdc.IComponentObserver;
 import com.tdc.banknote.BanknoteValidator;
 import com.tdc.banknote.BanknoteValidatorObserver;
+import com.thelocalmarketplace.software.state.UserSessionState;
 
 public class BanknoteValidatorHandler extends AbstractUserSessionHandler implements BanknoteValidatorObserver {
 
@@ -58,7 +59,10 @@ public class BanknoteValidatorHandler extends AbstractUserSessionHandler impleme
 
 	@Override
 	public void goodBanknote(BanknoteValidator validator, Currency currency, BigDecimal denomination) {
-		getUserSession().getState().onBanknoteInserted(getUserSession(), denomination);
+		UserSessionState newState = getUserSession().getState().onBanknoteInserted(getUserSession(), denomination);
+		if(newState != null) {
+			getUserSession().setState(newState); 
+		}
 	}
 
 	@Override
