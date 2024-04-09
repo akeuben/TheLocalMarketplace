@@ -12,9 +12,11 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -153,7 +155,35 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 	
 	@Override
 	public void onStateChanged(UserSessionState newState) {
-		this.state = newState; 
+		if(newState.equals(UserSessionState.WAITING_FOR_ATTENDANT)) {
+			// if waiting for the attendant alert that the station is waiting
+			JFrame alertFrame = new JFrame("Alert!");
+			alertFrame.setSize(300, 200);
+			alertFrame.getContentPane().setLayout(new GridLayout(2,1));
+			alertFrame.getContentPane().add(new JLabel("Station " + machineID + " needs assistance."));
+			
+			JButton alertButton = new JButton("Resolved");
+			alertButton.setSize(100, 50);
+			alertButton.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					// set the state of the machine to be ready for item state by default 
+					state = UserSessionState.READY_FOR_ITEM; 
+					Software.getInstance().getCurrentSession(machineID).setState(UserSessionState.READY_FOR_ITEM);
+					// then need to delete the alert frame 
+					alertFrame.dispose();
+				}
+				
+			});
+			alertFrame.getContentPane().add(alertButton); 
+			alertFrame.setVisible(true);
+			
+		}else {
+			this.state = newState; 
+		}
+		
+		
 		
 	}
 
