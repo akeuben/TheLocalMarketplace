@@ -23,18 +23,23 @@ public class AssistButtonListener implements ActionListener {
 	// want to create a new screen for the attendant UI
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		JButton source = (JButton)e.getSource(); 
+		// check source of the event, will always be a button
+		if(source.getText().equals("Assist")) {
 		// clear ui screen
 		ui.getFrame().getContentPane().removeAll(); 
 		ui.getFrame().getContentPane().setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints(); 
 		
 		// begin adding transaction viewer(don't have access to that yet)
+		
+		
 		// add a button that can be used to set the screen back to what it was before
 		JPanel buttonPanel = new JPanel(); 
 		JButton button = new JButton("Close");
 		button.setSize(75,50);
 		buttonPanel.setPreferredSize(button.getSize());
-		button.addActionListener(new CloseButtonListener(ui));
+		button.addActionListener(new AssistButtonListener(ui, machineID));
 		buttonPanel.add(button); 
 		c = new GridBagConstraints(); 
 		c.gridx = 1; 
@@ -45,6 +50,10 @@ public class AssistButtonListener implements ActionListener {
 		ui.getFrame().getContentPane().add(button, c); 
 		ui.getFrame().validate(); 
 		
+		}
+		else {
+			ui.redraw(); 
+		}
 	}
 
 }

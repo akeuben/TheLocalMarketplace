@@ -18,10 +18,12 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.SoftwareObserver;
+import com.thelocalmarketplace.software.UI.components.TransactionView;
 import com.thelocalmarketplace.software.UI.components.WrappedJComponent;
 import com.thelocalmarketplace.software.session.SessionObserver;
 import com.thelocalmarketplace.software.session.UserSession;
@@ -39,9 +41,7 @@ import com.thelocalmarketplace.software.state.UserSessionState;
 public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, SessionObserver {
 	// gonna have a bidirectional communication channel with the self checkout station 
 	// add a transaction viewer as a wrapped component as a JList
-	private JPanel transactionViewer;
-	private JList<String> transactionList; 
-	private DefaultListModel<String> transactionListModel; 
+	private TransactionView transactionViewer;
 	private JPanel alertButton; 
 	private JPanel statusField;
 	private JPanel closeBox;  
@@ -80,7 +80,7 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 		// add the status field
 		statusField = new JPanel();
 		statusField.setLayout(new GridLayout(1,1));
-		JLabel label = new JLabel("Status: Ready For Payment");
+		JLabel label = new JLabel("Station: " + this.machineID);
 		label.setSize(300, 90);
 		statusField.setBackground(Color.GRAY);
 		label.setFont(new Font("regular", Font.BOLD, 22));
@@ -91,7 +91,7 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 		c.gridy = 0; 
 		c.weightx = 1; 
 		c.weighty = 0; 
-		c.anchor = GridBagConstraints.NORTH;
+		c.anchor = GridBagConstraints.CENTER;
 		add(statusField, c);
 		
 		// add the close checkbox, when checked the machine is disabled
@@ -125,16 +125,12 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 		c.weightx = 0;
 		c.anchor = GridBagConstraints.NORTH; 
 		add(closeBox, c);
+
 		
-		// now add the transaction viewer as a JList using default model
-		transactionListModel = new DefaultListModel<String>();
-		transactionViewer = new JPanel();
-		transactionList = new JList<String>(transactionListModel);
-		JScrollPane scroller = new JScrollPane(transactionList);
-		transactionViewer.setLayout(new GridLayout(1,1));
-		transactionViewer.add(scroller);
-		transactionViewer.setBackground(Color.GRAY); 
+		
+		transactionViewer = new TransactionView(machineID);
 		transactionViewer.setBorder(BorderFactory.createEmptyBorder(0,0 ,100,0));
+		JScrollPane scroll = new JScrollPane(transactionViewer);
 		c = new GridBagConstraints();
 		c.gridx = 1; 
 		c.gridy = 1; 
@@ -142,7 +138,7 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 		c.weighty  = 1; 
 		c.gridheight = 2; 
 		c.fill = GridBagConstraints.BOTH; 
-		add(transactionViewer, c);
+		add(scroll, c);
 		
 		// add the assist button
 		assistButtonPanel = new JPanel();
