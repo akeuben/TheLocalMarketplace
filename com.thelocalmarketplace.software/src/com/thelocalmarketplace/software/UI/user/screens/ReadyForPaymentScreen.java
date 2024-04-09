@@ -98,6 +98,19 @@ public class ReadyForPaymentScreen extends AbstractUserScreen implements Transac
 		add(backButton, gbc);
 	}
 	
+	
+	/**
+	 * Accessor for the attendant station mainly
+	 * @return transaction view of the checkoutstation
+	 */
+	public TransactionView getView() {
+		return this.view; 
+	}
+	
+	
+	
+	
+	
 	@Override
 	public void onScreenRemoved() {
 		Transaction transaction = Software.getInstance().getCurrentSession(machineID).getTransaction();
