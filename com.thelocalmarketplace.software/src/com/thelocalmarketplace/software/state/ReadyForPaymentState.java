@@ -98,9 +98,9 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 			try {
 				transaction.calculateChange();
 			} catch (Exception e) {
-				e.printStackTrace();
+				return UserSessionState.WAITING_FOR_ATTENDANT;
 			}
-	        session.setState(UserSessionState.PRINT_RECEIPT);
+	        return UserSessionState.PRINT_RECEIPT;
 	    }
 	    
 	    return null;
@@ -119,9 +119,9 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 			try {
 				transaction.calculateChange();
 			} catch (Exception e) {
-				e.printStackTrace();
+				return UserSessionState.WAITING_FOR_ATTENDANT;
 			}
-	        session.setState(UserSessionState.PRINT_RECEIPT);
+	        return UserSessionState.PRINT_RECEIPT;
 	    }
 	    
 	    return null;
@@ -129,7 +129,6 @@ public class ReadyForPaymentState implements IUserSessionState<UserSessionState>
 	
 	@Override 
 	public UserSessionState onCardDataRead(UserSession session, CardData data) {
-		// create a card payment instance, for now it will be debit but I might refactor those two classes into one
 		CardPayment payment = new CardPayment(data);
 		Transaction transaction = session.getTransaction();; 
 		payment.makePayment(transaction.getTotalCost()); 

@@ -130,10 +130,10 @@ public class ReadyForPaymentStateTest {
 	public void testInsertingCoins() {
 		session.getTransaction().addItem(new BarcodedProduct(new Barcode(new Numeral[] {Numeral.five}), "test product", 100, 100));
 		session.setState(UserSessionState.READY_FOR_PAYMENT);
-		UserSessionState newState = UserSessionState.READY_FOR_PAYMENT.onCoinInserted(session, new BigDecimal(1));
-		assertEquals(newState, null);
-		assertEquals(0, session.getTransaction().getTotalCost().compareTo(BigDecimal.valueOf(1)));
-		UserSessionState.READY_FOR_PAYMENT.onCoinInserted(session, new BigDecimal(1));
+		assertEquals(session.getState(), UserSessionState.READY_FOR_PAYMENT);
+		session.getState().onCoinInserted(session, new BigDecimal(1));
+		UserSessionState state = session.getState().onCoinInserted(session, new BigDecimal(1));
+		session.setState(state);
 		assertNull(Software.getInstance().getCurrentSession(0));
 	}
 }

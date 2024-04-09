@@ -3,7 +3,6 @@ package com.thelocalmarketplace.software.UI.user;
 import java.awt.GridLayout;
 
 import javax.swing.JPanel;
-import javax.swing.border.TitledBorder;
 
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.SoftwareObserver;

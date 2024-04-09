@@ -45,7 +45,7 @@ import com.thelocalmarketplace.software.UI.components.WrappedJComponent;
 import com.thelocalmarketplace.software.UI.hardwaresim.components.CardIssuerTabDetails;
 import com.thelocalmarketplace.software.payment.BankDataBase;
 
-public class CardIssuerTab extends AbstractAttendantTab {
+public class CardIssuerTab2 extends AbstractAttendantTab {
 
 	private static final long serialVersionUID = -5221044028265491112L;
 	
@@ -57,7 +57,7 @@ public class CardIssuerTab extends AbstractAttendantTab {
 	private WrappedJComponent<JButton> addBtn;
 	private WrappedJComponent<JButton> removeBtn;
 
-	public CardIssuerTab() {
+	public CardIssuerTab2() {
 		super(1);
 		
 		tabs = new JTabbedPane();

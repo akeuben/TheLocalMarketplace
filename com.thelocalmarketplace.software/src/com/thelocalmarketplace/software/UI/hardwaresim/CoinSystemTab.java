@@ -88,6 +88,7 @@ public class CoinSystemTab extends AbstractHardwareSimTab implements CoinDispens
 		coinDispenserScrollPane.setBorder(new TitledBorder("Coin Dispensers"));
 		
 		for(BigDecimal denomination : Software.getInstance().getConfiguration().coinDenominations) {
+			getHardware().getCoinDispensers().get(denomination).attach(this);
 			JButton btn = new JButton("$" + denomination.toPlainString());
 			btn.addActionListener((e) -> this.insertCoin(denomination));
 			coinSlotPanel.add(btn);
@@ -146,11 +147,11 @@ public class CoinSystemTab extends AbstractHardwareSimTab implements CoinDispens
 		Coin coin = new Coin(currency, denomination);
 		try {
 			getHardware().getCoinSlot().receive(coin);
-		} catch (DisabledException | RuntimeException e) {
+		} catch (DisabledException e) {
 			ErrorPopup.showError("Failed to insert coin", "The coin slot is disabled.");
 		} catch(CashOverloadException e) {
 			ErrorPopup.showError("Failed to insert coin", "The coin slot is overloaded.");
-		}
+		} catch(RuntimeException e) {}
 		updateStorageCount();
 		updateCoinDispensers();
 	}
