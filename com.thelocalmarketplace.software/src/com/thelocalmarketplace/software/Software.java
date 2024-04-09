@@ -195,25 +195,28 @@ public class Software {
 	 * no active session
 	 */
 	public boolean endCurrentSession(int machineID) {
-		if(currentSession[machineID] == null) return false;
-		
-		for(SoftwareObserver obs : this.observers.get(machineID)) {
+		if (currentSession[machineID] == null)
+			return false;
+	
+		for (SoftwareObserver obs : this.observers.get(machineID)) {
 			obs.onSessionEnd();
 		}
-		
-		currentSession[machineID].deregisterAll();
-		
-		// Remove old listeners
-		selfCheckoutStations[machineID].getMainScanner().deregister(currentSession[machineID].getBarcodeHandler());
-		selfCheckoutStations[machineID].getHandheldScanner().deregister(currentSession[machineID].getBarcodeHandler());
-		selfCheckoutStations[machineID].getBaggingArea().deregister(currentSession[machineID].getElectronicScaleHandler());
-		selfCheckoutStations[machineID].getCardReader().deregister(currentSession[machineID].getCardReaderHandler());
-		selfCheckoutStations[machineID].getCoinValidator().detach(currentSession[machineID].getCoinValidatorHandler());
-		selfCheckoutStations[machineID].getPrinter().deregister(currentSession[machineID].getReceiptPrinterHandler());
-		selfCheckoutStations[machineID].getBanknoteValidator().detach(currentSession[machineID].getBanknoteValidatorHandler());
-		
-		currentSession[machineID] = null;
-		currentSession[machineID].startPredictIssueEngine(); // Start issue prediction
+	
+		UserSession endedSession = currentSession[machineID];
+	
+		endedSession.deregisterAll(); // Remove old listeners
+		selfCheckoutStations[machineID].getMainScanner().deregister(endedSession.getBarcodeHandler());
+		selfCheckoutStations[machineID].getHandheldScanner().deregister(endedSession.getBarcodeHandler());
+		selfCheckoutStations[machineID].getBaggingArea().deregister(endedSession.getElectronicScaleHandler());
+		selfCheckoutStations[machineID].getCardReader().deregister(endedSession.getCardReaderHandler());
+		selfCheckoutStations[machineID].getCoinValidator().detach(endedSession.getCoinValidatorHandler());
+		selfCheckoutStations[machineID].getPrinter().deregister(endedSession.getReceiptPrinterHandler());
+		selfCheckoutStations[machineID].getBanknoteValidator().detach(endedSession.getBanknoteValidatorHandler());
+	
+		endedSession.startPredictIssueEngine(); // Start issue prediction for the ended session
+	
+		currentSession[machineID] = null; // Set the session to null after starting issue prediction
+	
 		return true;
 	}
 
