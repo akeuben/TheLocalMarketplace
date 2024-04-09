@@ -28,6 +28,9 @@ public class WelcomeScreen extends AbstractUserScreen {
 		startButton.setAlignmentX(CENTER_ALIGNMENT);
 		startButton.addActionListener(this::onPressStart);
 		add(startButton);
+		
+		revalidate();
+		repaint();
 	}
 	
 }
