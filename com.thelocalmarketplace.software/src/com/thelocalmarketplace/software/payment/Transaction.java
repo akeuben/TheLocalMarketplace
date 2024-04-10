@@ -113,7 +113,7 @@ public class Transaction {
     	if(product == null) throw new NullPointerException("product");
     	
         //convert mass to kilograms
-        BigDecimal massInKilo = new BigDecimal(mass.inMicrograms().divide(BigInteger.valueOf(1000000000)));
+        BigDecimal massInKilo = new BigDecimal(mass.inGrams().longValue() / 1000.0);
         BigDecimal pricePerKilo = BigDecimal.valueOf(product.getPrice()).divide(BigDecimal.valueOf(100));
         BigDecimal itemCost = massInKilo.multiply(pricePerKilo);
         

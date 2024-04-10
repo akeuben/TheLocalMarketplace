@@ -59,58 +59,58 @@ public class AttendantKeyboardHandler extends AbstractUserSessionHandler impleme
 	@Override
 	public void aKeyHasBeenReleased(String label) {
 		
+		matchingItems.clear();
+		
 		//if attendant selects enter and there no database check has been done, a database check is done to find elements containing keyword
-		if (label=="Enter"&&matchingItems.isEmpty()) {
-			//checks barcoded item database to see if any items match object description
-			for (Map.Entry<Barcode, BarcodedProduct> entry :ProductDatabases.BARCODED_PRODUCT_DATABASE.entrySet()) {
+		//checks barcoded item database to see if any items match object description
+		for (Map.Entry<Barcode, BarcodedProduct> entry :ProductDatabases.BARCODED_PRODUCT_DATABASE.entrySet()) {
 			BarcodedProduct itemToCheck = entry.getValue();
-			if (itemToCheck.getDescription().contains(input)) {
+			if (itemToCheck.getDescription().toLowerCase().contains(input.toLowerCase())) {
 				
 				//if item is found, item is added to potential items array list
 				matchingItems.add(itemToCheck);
-	
+
 			}
-		}
-		
+		}	
 		//checks PLUcoded item database to see if any items match object description
 		for (Entry<PriceLookUpCode, PLUCodedProduct> entry :ProductDatabases.PLU_PRODUCT_DATABASE.entrySet()) {
 			PLUCodedProduct itemToCheck = entry.getValue();
-			if (itemToCheck.getDescription().contains(input)) {
+			if (itemToCheck.getDescription().toLowerCase().contains(input.toLowerCase())) {
 				//if item is found, item is added to potential items array list
 				matchingItems.add(itemToCheck);
-				}
 			}
-			input = "";
 		}
 		
 		//if attendant selects enter after a database check has been done, input is used to make a selection from the choices and add item to transaction
-		else if (label=="Enter"&& !matchingItems.isEmpty()) {	
+		if (label=="Enter"&& !matchingItems.isEmpty()) {	
 			try {
-			Integer i = Integer.parseInt(input);
-			if (matchingItems.get(i-1) instanceof BarcodedProduct) {
-				i = Integer.parseInt(input);
-				getUserSession().getTransaction().addItem((BarcodedProduct) matchingItems.get(i-1));
-			}
-			else {
-				Mass massOnScale = null;
-				try {
-					massOnScale = (((AbstractElectronicScale) getUserSession().getHardware().getScanningArea()).getCurrentMassOnTheScale());
-				} catch (OverloadedDevice e) {
-					getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
+				if (matchingItems.get(0) instanceof BarcodedProduct) {
+					getUserSession().getTransaction().addItem((BarcodedProduct) matchingItems.get(0));
+					getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
 				}
-				getUserSession().getTransaction().addItem((PLUCodedProduct) matchingItems.get(i-1), massOnScale);
-			}
+				else {
+					Mass massOnScale = null;
+					try {
+						massOnScale = (((AbstractElectronicScale) getUserSession().getHardware().getScanningArea()).getCurrentMassOnTheScale());
+					} catch (OverloadedDevice e) {
+						getUserSession().setState(UserSessionState.WAITING_FOR_ATTENDANT);
+					}
+					getUserSession().getTransaction().addItem((PLUCodedProduct) matchingItems.get(0), massOnScale);
+					getUserSession().setState(UserSessionState.WAITING_FOR_BAGGING);
+				}
 			}
 			catch (NumberFormatException e) {
 				input=null;
 			}
 			input=null;
-			matchingItems = null;
+			matchingItems.clear();
+
 		}
 		
 		//if backspace chosen, last element from input string removed
 		else if (label=="Backspace") {
-			input = input.substring(0, input.length()-1);
+			if(input.length() != 0)
+				input = input.substring(0, input.length()-1);
 		}
 		
 		//concatonates label to end of input string

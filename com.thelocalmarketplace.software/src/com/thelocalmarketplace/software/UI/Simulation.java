@@ -1,7 +1,5 @@
 package com.thelocalmarketplace.software.UI;
 
-import java.awt.GridLayout;
-
 /**
  * SENG 300 Project - Group 1:
  * 
@@ -43,7 +41,6 @@ import com.thelocalmarketplace.hardware.external.CardIssuer;
 import com.thelocalmarketplace.software.SelfCheckoutConfiguration;
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.UI.Attendant.AttendantUI;
-import com.thelocalmarketplace.software.UI.Attendant.SelfCheckoutComponent;
 import com.thelocalmarketplace.software.UI.hardwaresim.UIHardwareSimulation;
 import com.thelocalmarketplace.software.UI.user.MainUserPanel;
 import com.thelocalmarketplace.software.payment.BankDataBase;
@@ -51,6 +48,9 @@ import com.thelocalmarketplace.software.payment.BankDataBase;
 import powerutility.PowerGrid;
 
 public class Simulation {
+	
+	private static int MACHINE_COUNT = 1;
+	
 	public static void main(String[] args) {
 		PowerGrid.engageUninterruptiblePowerSource();
 		Software.initialize(new SelfCheckoutConfiguration(
@@ -77,7 +77,7 @@ public class Simulation {
 			100, 
 			100,
 			BigDecimal.valueOf(1.99)
-		), 1);
+		), MACHINE_COUNT);
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
@@ -90,8 +90,10 @@ public class Simulation {
 		BankDataBase.initialize(new HashMap<String, CardIssuer>());
 		UIHardwareSimulation.startHardwareSimulationUI(1);
 		
-		Software.getInstance().getHardware(0).getScreen().getFrame().add(new MainUserPanel(0));
-		Software.getInstance().getHardware(0).getScreen().setVisible(true);
-		Software.getInstance().getHardware(0).getScreen().getFrame().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		for(int i = 0; i < MACHINE_COUNT; i++) {
+			Software.getInstance().getHardware(i).getScreen().getFrame().add(new MainUserPanel(0));
+			Software.getInstance().getHardware(i).getScreen().setVisible(true);
+			Software.getInstance().getHardware(i).getScreen().getFrame().setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		}
 	}
 }
