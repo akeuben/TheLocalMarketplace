@@ -155,8 +155,6 @@ public class TransactionTest {
 		akh.aKeyHasBeenReleased("t");
 		akh.aKeyHasBeenReleased("e");
 		akh.aKeyHasBeenReleased("Enter");
-		akh.aKeyHasBeenReleased("1");
-		akh.aKeyHasBeenReleased("Enter");
 		boolean found = false;
 		for(TransactionItem item : transaction.getItems()) {
 			if(item.getBarcodedProduct() == productOne) {
@@ -172,8 +170,6 @@ public class TransactionTest {
 		ProductDatabases.PLU_PRODUCT_DATABASE.put(new PriceLookUpCode("1357"), pluProductOne);
 		akh.aKeyHasBeenReleased("p");
 		akh.aKeyHasBeenReleased("l");
-		akh.aKeyHasBeenReleased("Enter");
-		akh.aKeyHasBeenReleased("1");
 		akh.aKeyHasBeenReleased("Enter");
 		Assert.assertEquals(transaction.getItems()[0].getPluProduct(), pluProductOne);
 	}
