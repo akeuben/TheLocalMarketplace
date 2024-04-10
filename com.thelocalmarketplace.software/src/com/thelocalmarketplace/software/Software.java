@@ -253,6 +253,7 @@ public class Software {
 	 * @return false if the station was already enabled; true if the station was changed from disabled to enabled.
 	 */
 	public boolean enableStation(int machineId) {
+		if(isStationEnabled[machineId]) return false; // The machine is already enabled
 		boolean returnBool = !isStationEnabled[machineId];
 		isStationEnabled[machineId] = true;
 		for(SoftwareObserver obs : this.observers.get(machineId)) {
@@ -266,6 +267,7 @@ public class Software {
 	 * @return true if the station was successfully disabled, false if it could not be disabled.
 	 */
 	public boolean disableStation(int machineId) {
+		if(!isStationEnabled[machineId]) return false; // The machine is already disabled
 		if(currentSession[machineId] == null) {
 			isStationEnabled[machineId] = false;
 			disableStationQueued[machineId] = false;

@@ -51,6 +51,10 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 	private JButton assistButton; 
 	private int machineID; 
 	
+	private JCheckBox checkbox;
+	
+	private boolean notificationSent = false;
+	
 	private UserSessionState state = null; 
 	
 	// attendant's view of a self checkout machine
@@ -86,7 +90,7 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 		// add the close checkbox, when checked the machine is disabled
 		closeBox = new JPanel();
 		closeBox.setLayout(new GridLayout(1,1));
-		JCheckBox checkbox = new JCheckBox("Disable");
+		checkbox = new JCheckBox("Disable");
 		checkbox.setSize(75,50);
 		closeBox.setPreferredSize(checkbox.getSize());
 		closeBox.setBackground(Color.GRAY);
@@ -155,7 +159,8 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 	
 	@Override
 	public void onStateChanged(UserSessionState newState) {
-		if(newState.equals(UserSessionState.WAITING_FOR_ATTENDANT)) {
+		if(newState.equals(UserSessionState.WAITING_FOR_ATTENDANT) && !notificationSent) {
+			notificationSent = true;
 			// if waiting for the attendant alert that the station is waiting
 			JFrame alertFrame = new JFrame("Alert!");
 			alertFrame.setSize(300, 200);
@@ -168,6 +173,7 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
+					notificationSent = false;
 					// set the state of the machine to be ready for item state by default 
 					state = UserSessionState.READY_FOR_ITEM; 
 					Software.getInstance().getCurrentSession(machineID).setState(UserSessionState.READY_FOR_ITEM);
@@ -209,8 +215,12 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 	}
 	
 	@Override
-	public void onMachineDisabled() {}
+	public void onMachineDisabled() {
+		if(checkbox.isSelected()) checkbox.setSelected(false);
+	}
 
 	@Override
-	public void onMachineEnabled() {}
+	public void onMachineEnabled() {
+		if(!checkbox.isSelected()) checkbox.setSelected(true);
+	}
 }
