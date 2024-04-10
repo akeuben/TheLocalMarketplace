@@ -11,6 +11,7 @@ public class DisabledScreen extends AbstractUserScreen {
 	public DisabledScreen(int machineID) {
 		super(machineID);
 		setLayout(new GridBagLayout());
+		redraw();
 	}
 
 	@Override

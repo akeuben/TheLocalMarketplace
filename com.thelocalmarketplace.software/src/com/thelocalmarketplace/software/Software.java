@@ -34,6 +34,7 @@ import java.util.List;
 import com.thelocalmarketplace.hardware.AbstractSelfCheckoutStation;
 import com.thelocalmarketplace.hardware.AttendantStation;
 import com.thelocalmarketplace.software.membership.MembershipDatabase;
+import com.thelocalmarketplace.software.session.AttendantKeyboardHandler;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.state.PrintReceiptState;
 import com.thelocalmarketplace.software.state.UserSessionState;
@@ -45,6 +46,8 @@ public class Software {
 	private static Software instance;
 	
 	private UserSession[] currentSession;
+	
+	private AttendantKeyboardHandler keyboardHandler;
 	
 	private SelfCheckoutConfiguration configuration;
 	
@@ -314,7 +317,18 @@ public class Software {
 		return attendantStation; 
 	}
 	
+	public void startReadKeyboard(int machineID) {
+		this.keyboardHandler = new AttendantKeyboardHandler(getCurrentSession(machineID));
+		attendantStation.keyboard.register(keyboardHandler);
+	}
 	
+	public void stopReadKeyboard() {
+		attendantStation.keyboard.deregister(keyboardHandler);
+		this.keyboardHandler = null;
+	}
 	
+	public AttendantKeyboardHandler getKeyboardHandler() {
+		return this.keyboardHandler;
+	}
 	
 }

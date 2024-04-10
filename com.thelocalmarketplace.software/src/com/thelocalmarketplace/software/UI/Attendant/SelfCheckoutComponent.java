@@ -1,7 +1,6 @@
 package com.thelocalmarketplace.software.UI.Attendant;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -12,21 +11,15 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 
 import com.thelocalmarketplace.software.Software;
 import com.thelocalmarketplace.software.SoftwareObserver;
 import com.thelocalmarketplace.software.UI.components.TransactionView;
-import com.thelocalmarketplace.software.UI.components.WrappedJComponent;
 import com.thelocalmarketplace.software.session.SessionObserver;
 import com.thelocalmarketplace.software.session.UserSession;
 import com.thelocalmarketplace.software.state.UserSessionState;
@@ -51,7 +44,7 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 	private JButton assistButton; 
 	private int machineID; 
 	
-	private JCheckBox checkbox;
+	private JButton toggleDisabled;
 	
 	private boolean notificationSent = false;
 	
@@ -90,28 +83,24 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 		// add the close checkbox, when checked the machine is disabled
 		closeBox = new JPanel();
 		closeBox.setLayout(new GridLayout(1,1));
-		checkbox = new JCheckBox("Disable");
-		checkbox.setSize(75,50);
-		closeBox.setPreferredSize(checkbox.getSize());
+		toggleDisabled = new JButton("Disable");
+		toggleDisabled.setSize(75,50);
+		closeBox.setPreferredSize(toggleDisabled.getSize());
 		closeBox.setBackground(Color.GRAY);
-		checkbox.setBackground(Color.GRAY);
-		checkbox.addItemListener( new ItemListener() {
-
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if(e.getStateChange() == ItemEvent.SELECTED) {
-					// in the event the checkbox is selected then you want to disable the corresponding machine
-					Software.getInstance().disableStation(machineID);
-				}else {
-					//otherwise enable the station 
-					Software.getInstance().enableStation(machineID);
+		toggleDisabled.addActionListener((e) -> {
+			if(Software.getInstance().getStationEnabledState(newmachineID)) {
+				if(!Software.getInstance().disableStation(newmachineID)) {
+					toggleDisabled.setText("Disable Queued");
+					toggleDisabled.revalidate();
+					toggleDisabled.repaint();
 				}
-				
-			}	
+			} else {
+				Software.getInstance().enableStation(newmachineID);
+			}
 		});
 		
 		
-		closeBox.add(checkbox); 
+		closeBox.add(toggleDisabled); 
 		c = new GridBagConstraints();
 		c.gridx = 2; 
 		c.gridy = 0; 
@@ -216,11 +205,15 @@ public class SelfCheckoutComponent extends JPanel implements SoftwareObserver, S
 	
 	@Override
 	public void onMachineDisabled() {
-		if(checkbox.isSelected()) checkbox.setSelected(false);
+		toggleDisabled.setText("Enable");
+		toggleDisabled.revalidate();
+		toggleDisabled.repaint();
 	}
 
 	@Override
 	public void onMachineEnabled() {
-		if(!checkbox.isSelected()) checkbox.setSelected(true);
+		toggleDisabled.setText("Disable");
+		toggleDisabled.revalidate();
+		toggleDisabled.repaint();
 	}
 }

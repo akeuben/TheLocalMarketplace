@@ -14,6 +14,7 @@ import com.thelocalmarketplace.software.UI.components.TransactionView;
 public class AssistButtonListener implements ActionListener {
 	private int machineID; 
 	private AttendantUI ui; 
+	private AddItemPanel addItemPanel;
 	// get the attendant ui and the machineID to indicate which machine called the action method 
 	// this way we can bring up the proper transaction viewer
 	public AssistButtonListener(AttendantUI ui, int machineID) {
@@ -43,9 +44,18 @@ public class AssistButtonListener implements ActionListener {
 		c.gridy = 0; 
 		c.weightx = 1; 
 		c.weighty = 1;
-		c.gridheight = 2; 
+		c.gridheight = 1; 
 		c.fill = GridBagConstraints.BOTH; 
 		ui.getFrame().getContentPane().add(view, c);
+		
+		c.gridx = 1;
+		c.gridy = 0;
+		c.weightx = 1;
+		c.weighty = 1;
+		c.gridheight = 1;
+		c.fill = GridBagConstraints.BOTH;
+		addItemPanel = new AddItemPanel(machineID, ui.getFrame().getContentPane());
+		ui.getFrame().getContentPane().add(addItemPanel, c);
 		
 		// add a button that can be used to set the screen back to what it was before
 		JPanel buttonPanel = new JPanel(); 
@@ -55,8 +65,8 @@ public class AssistButtonListener implements ActionListener {
 		button.addActionListener(new AssistButtonListener(ui, machineID));
 		buttonPanel.add(button); 
 		c = new GridBagConstraints(); 
-		c.gridx = 1; 
-		c.gridy = 0; 
+		c.gridx = 0; 
+		c.gridy = 1; 
 		c.weighty = 0.8;
 		c.weightx = 0.8; 
 		c.anchor = GridBagConstraints.SOUTHEAST; 
